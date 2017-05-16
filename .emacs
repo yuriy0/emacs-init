@@ -94,8 +94,8 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-;; Batch mode
-(require 'batch-mode)
+;; require user packages 
+(mapc #'require package-selected-packages)
 
 ;; ido mode
 (require 'ido)
@@ -362,7 +362,6 @@
      (goto-char (region-end))
      (insert after-str))))
 
-(require 's)
 ;;;###autoload
 (defun enclose-region (&optional sep-str-arg)
   "Enclose the marked region in a box made of `sep-str', 
