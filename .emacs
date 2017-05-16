@@ -745,6 +745,7 @@
 (global-set-key (kbd "C-.") 'mc/mark-next-symbol-like-this)
 (global-set-key (kbd "C-,") 'mc/mark-previous-symbol-like-this)
 (global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 
 ;;;;;;;;;;;;;;;;;;;
 ;; smooth scroll ;;
