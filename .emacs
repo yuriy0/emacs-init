@@ -13,18 +13,31 @@
 ;; initialization ;;
 ;;;;;;;;;;;;;;;;;;;;
 
+;; whenever you install/update a package, the `package' package will (through
+;; 'customize') automatically clobber `package-selected-packages'. 
+;;;###autoload
+(defun package--dont-save-selected-packages (&optional val) 
+  (progn (message "Override package--dont-save-selected-packages called!") nil))
+(advice-add 'package--save-selected-packages :override 'package--dont-save-selected-packages)
+
+;; load custom before setting package-selected-packages
+(setq custom-file "~/.emacs.d/custom-set.el")
+(load custom-file 'noerror)
+
 ;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages '(
+  ac-helm 
   anaphora
   auto-complete
   auto-complete-clang
   batch-mode
-  command-log-mode
   cc-mode
   cl-lib            
+  command-log-mode
   csharp-mode
   cygwin-mount      
-  dash               
+  dash 
+  diminish
   elm-mode
   f
   font-utils        
@@ -52,11 +65,6 @@
   web-mode
   yaml-mode
 ))
-
-;; whenever you install/update a package, the `package' package will (through
-;; 'customize') automatically clobber `package-selected-packages'. this function
-;; is used by `package' to do so.
-(defun package--save-selected-packages (&rest opt) nil)
 
 ;; server start 
 (server-start)
@@ -107,6 +115,9 @@
 (require 'ido)
 (ido-mode t) 
 (require 'ido-yes-or-no)
+
+;; open only one frame on startup 
+(delete-other-frames)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; general customization ;;
@@ -490,7 +501,7 @@
 ;; uniquify
 (require 'uniquify) 
 (setq 
-  uniquify-buffer-name-style 'post-forward)
+  uniquify-buffer-name-style 'forward)
 
 ;; Maple 
 (setq load-path (cons "~/.emacs.d/maple" load-path))
