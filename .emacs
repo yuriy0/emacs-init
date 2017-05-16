@@ -364,6 +364,48 @@
         (select-frame frm1)
         (delete-frame frm2)))))
 
+;;;###autoload
+(defun enclose-region-in (before-str after-str)
+  "Insert the given text pair before/after the region."
+  (progn
+   (save-excursion
+     (goto-char (region-beginning))
+     (insert before-str))
+   (save-excursion
+     (goto-char (region-end))
+     (insert after-str))))
+
+(require 's)
+;;;###autoload
+(defun enclose-region (&optional sep-str-arg)
+  "Enclose the marked region in a box made of `sep-str', 
+   or the comment string if the arg is nil (otherwise does nothing).
+   If the region is not at the beginning/end of the line, the enclosing 
+   box seperates the previous/subsequent text with a newline. 
+   Does not work very well if the region spans multiple lines."
+  (interactive (list (if 
+    current-prefix-arg 
+    (read-from-minibuffer "Enclose region with: ") 
+    nil))) 
+  (let ((sep-str (or sep-str-arg 
+                     (if (string= comment-end "") comment-start nil))))
+    (if sep-str
+      (if (use-region-p)
+        (let*
+         ((sep-str-sz (length sep-str))
+          (beg (region-beginning)) (end (region-end))
+          (region-sz (- end beg))
+          (region-sep-sz (+ region-sz (* 2 sep-str-sz) 2) )
+          (count-sep-str (/ region-sep-sz sep-str-sz))
+          (enc-str (s-left region-sep-sz (s-repeat (1+ count-sep-str) sep-str)))
+          (enc-strs (list enc-str "\n" sep-str " "))
+          (before-str (apply 'concat (cons (if (eq beg (line-beginning-position)) "" "\n") enc-strs)))
+          (after-str (apply 'concat (reverse (cons (if (eq end (line-end-position)) "" "\n") enc-strs))))
+          )
+        (progn (message "test") (enclose-region-in before-str after-str)))
+        (message "No region selected."))
+      (message "No seperator string given and no single-line comment syntax defined."))))
+
 ;;;;;;;;;;;;;;;;;;;
 ;; Custom advice ;;
 ;;;;;;;;;;;;;;;;;;;
