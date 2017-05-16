@@ -155,6 +155,9 @@
 ;; save buffers
 (desktop-save-mode 1)
 
+;; remove toolbar 
+(tool-bar-mode -1)
+
 ;; cursor type unfortunately this makes multiple-cursors much uglier, as of some
 ;; recent version.  but why???  todo: fork mc and fix this
 ; (setq-default cursor-type 'bar) 
