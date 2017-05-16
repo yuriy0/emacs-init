@@ -388,7 +388,7 @@
     (read-from-minibuffer "Enclose region with: ") 
     nil))) 
   (let ((sep-str (or sep-str-arg 
-                     (if (string= comment-end "") comment-start nil))))
+                     (if (string= comment-end "") (s-trim-right comment-start) nil))))
     (if sep-str
       (if (use-region-p)
         (let*
