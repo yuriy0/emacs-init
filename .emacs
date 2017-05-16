@@ -557,7 +557,6 @@
 (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reload)
 (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
 (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
-(define-key haskell-mode-map (kbd "SPC") 'haskell-mode-contextual-space)
 (define-key haskell-mode-map (kbd "RET") 'electric-indent-just-newline)
 
 ;;;;;;;;;;;;;;;
