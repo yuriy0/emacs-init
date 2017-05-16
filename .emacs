@@ -14,7 +14,6 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 ;; Packages to be installed for this file to work. Emacs 24>
-;; maybe one day this can be obsoleted by `package-selected-packages'
 (setq package-selected-packages '(
   anaphora
   auto-complete
@@ -52,7 +51,6 @@
   web-mode
   yaml-mode
 ))
-(defvaralias 'my-packages 'package-selected-packages)
 
 ;; server start 
 (server-start)
@@ -92,7 +90,7 @@
 ;; fetch the list of packages available and install the missing packages
 (unless package-archive-contents
   (package-refresh-contents))
-(dolist (package my-packages)
+(dolist (package package-selected-packages)
   (unless (package-installed-p package)
     (package-install package)))
 
