@@ -290,7 +290,7 @@
   "Open the underlying file of a buffer in an external program."
   (interactive)
   (when buffer-file-name
-    (shell-command (concat "cmd /C start \"\" \"" buffer-file-name "\""))
+    (shell-command-silent (concat "cmd /C start \"\" \"" buffer-file-name "\""))
   ))
 (global-set-key (kbd "C-c o") 'prelude-open-with)
 
