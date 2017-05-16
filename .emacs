@@ -19,6 +19,7 @@
   auto-complete
   auto-complete-clang
   batch-mode
+  command-log-mode
   cc-mode
   cl-lib            
   csharp-mode
@@ -400,6 +401,12 @@
         (message "No region selected."))
       (message "No seperator string given and no single-line comment syntax defined."))))
 
+;;;###autoload
+(defun reload-emacs ()
+  "(Re)Loads the emacs init file"
+  (interactive)
+  (load-file "~/.emacs"))
+
 ;;;;;;;;;;;;;;;;;;;
 ;; Custom advice ;;
 ;;;;;;;;;;;;;;;;;;;
@@ -589,8 +596,6 @@
   ("Gam" "Γ") 
   ("gam" "γ")
 ))
-
-(require 'dash)
 
 ;;;###autoload
 (defun agda-quit-if-no-agda-buffs ()
