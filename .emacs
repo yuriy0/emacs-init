@@ -13,7 +13,7 @@
 ;; initialization ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-;; Packages to be installed for this file to work. Emacs 24>
+;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages '(
   anaphora
   auto-complete
@@ -51,6 +51,11 @@
   web-mode
   yaml-mode
 ))
+
+;; whenever you install/update a package, the `package' package will (through
+;; 'customize') automatically clobber `package-selected-packages'. this function
+;; is used by `package' to do so.
+(defun package--save-selected-packages (&rest opt) nil)
 
 ;; server start 
 (server-start)
