@@ -158,10 +158,10 @@
 ;; remove toolbar 
 (tool-bar-mode -1)
 
-;; cursor type unfortunately this makes multiple-cursors much uglier, as of some
-;; recent version.  but why???  todo: fork mc and fix this
-; (setq-default cursor-type 'bar) 
-; (setq cursor-type 'bar) ;; doesn't work when loading emacs, but eval after load works?? 
+;; set cursor to bar, and override multiple cursors function which distinguishes
+;; between bar and other cursors.
+(setq-default cursor-type 'bar) 
+(defun mc/cursor-is-bar () nil)
 
 ;; whitespace mode 
 (require 'whitespace)
