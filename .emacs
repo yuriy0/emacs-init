@@ -474,8 +474,6 @@
 (setq helm-ag-fuzzy-match t)
 
 ;; uniquify
-;; (require 'uniquify)
-;; (setq uniquify-buffer-name-style (quote forward) nil (uniquify))
 (require 'uniquify) 
 (setq 
   uniquify-buffer-name-style 'post-forward)
