@@ -363,6 +363,7 @@
 ;;;###autoload
 (defun enclose-region-in (before-str after-str)
   "Insert the given text pair before/after the region."
+  (interactive "sBefore text: \nsAfter text: ")
   (progn
    (save-excursion
      (goto-char (region-beginning))
@@ -398,8 +399,8 @@
           (after-str (apply 'concat (reverse (cons (if (eq end (line-end-position)) "" "\n") enc-strs))))
           )
         (progn (message "test") (enclose-region-in before-str after-str)))
-        (message "No region selected."))
-      (message "No seperator string given and no single-line comment syntax defined."))))
+        (error (message "No region selected.")))
+      (error (message "No seperator string given and no single-line comment syntax defined.")))))
 
 ;;;###autoload
 (defun reload-emacs ()
