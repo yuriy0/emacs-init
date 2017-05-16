@@ -4,16 +4,6 @@
 ;; this continues to exist only until I figure out how to manually set these
 ;; configurations
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (ido-yes-or-no intero yaml-mode web-mode auto-complete-clang auto-complete-config fuzzy visual-regexp unicode-fonts sml-mode smex setup-cygwin php-mode multiple-cursors malabar-mode helm-ag haskell-mode f elm-mode csharp-mode batch-mode auto-complete anaphora)))
- )
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -27,7 +17,7 @@
 
 ;; Packages to be installed for this file to work. Emacs 24>
 ;; maybe one day this can be obsoleted by `package-selected-packages'
-(setq my-packages '(
+(setq package-selected-packages '(
   anaphora
   auto-complete
   auto-complete-clang
@@ -64,6 +54,7 @@
   web-mode
   yaml-mode
 ))
+(defvaralias 'my-packages 'package-selected-packages)
 
 ;; server start 
 (server-start)
