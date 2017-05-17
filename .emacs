@@ -66,6 +66,9 @@
   yaml-mode
 ))
 
+;; set home directory as emacs default (aka home) directory 
+(setq default-directory (concat (getenv "HOME") "/"))
+
 ;; server start 
 (server-start)
 
@@ -77,6 +80,7 @@
 (defun really-kill-emacs ()
  (interactive)
  (setq really-kill-emacs t)
+ (desktop-save-in-desktop-dir)
  (save-buffers-kill-emacs))
 
 ;;;###autoload 
