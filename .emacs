@@ -118,6 +118,16 @@
 ;; general customization ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;###autoload
+(defun many (nargs fn &rest args) 
+  "Apply FN of arity NARGS to each consecutive group of NARGS
+values in the ARGS list. If the length of ARGS is not divisible
+by NARGS, the final trailing group of length < NARGS is ignored."
+  (--map (apply fn it) (-partition nargs args)))
+
+(defalias 'global-set-keys (apply-partially 'many 2 'global-set-key))
+(defalias 'customize-set-variables (apply-partially 'many 2 'customize-set-variable))
+
 ;; keep server alive
 ;; http://stackoverflow.com/questions/2001485/how-do-i-keep-emacs-server-running-when-the-current-window-is-closed-x-on-wind 
 (defvar really-kill-emacs nil)
@@ -140,10 +150,11 @@
 
 ;; Copy-paste settings 
 ;; (setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
-(global-set-key (kbd "C-z") 'undo) 
-(global-set-key (kbd "C-c c") 'copy-region-as-kill)
+(global-set-keys 
+ (kbd "C-z") 'undo
+ (kbd "C-c c") 'copy-region-as-kill
+ (kbd "C-v") 'yank)
 (setq delete-selection-mode t) 
-(global-set-key (kbd "C-v") 'yank)
 
 ;; fill paragraphs at width 80 
 (setq-default fill-column 80)
@@ -496,25 +507,28 @@
 (helm-mode 1)
 (helm-autoresize-mode t)
 
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+(many 2 (apply-partially 'define-key helm-map)
+ (kbd "<tab>") 'helm-execute-persistent-action ; rebind tab to run persistent action
+ (kbd "C-i") 'helm-execute-persistent-action   ; make TAB works in terminal
+ (kbd "C-z")  'helm-select-action)             ; list actions using C-z
 
-(global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-(global-set-key (kbd "C-M-y") 'helm-global-mark-ring)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "C-x b") 'helm-buffers-list)
-(global-set-key (kbd "C-x q") 'helm-resume)
+(global-set-keys
+ (kbd "M-x") 'helm-M-x
+ (kbd "M-y") 'helm-show-kill-ring
+ (kbd "C-M-y") 'helm-global-mark-ring
+ (kbd "C-x C-f") 'helm-find-files
+ (kbd "C-x b") 'helm-buffers-list
+ (kbd "C-x q") 'helm-resume)
 
 (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
 
 ;; helm-ag
 (require 'helm-ag)
-(global-set-key (kbd "C-x / 1") 'helm-do-ag)
-(global-set-key (kbd "C-x / 2") 'helm-do-ag-this-file)
-(global-set-key (kbd "C-x / 3") 'helm-do-ag-project-root)
-(global-set-key (kbd "C-x / 4") 'helm-do-ag-buffers)
+(global-set-keys
+ (kbd "C-x / 1") 'helm-do-ag
+ (kbd "C-x / 2") 'helm-do-ag-this-file
+ (kbd "C-x / 3") 'helm-do-ag-project-root
+ (kbd "C-x / 4") 'helm-do-ag-buffers)
 
 (setq helm-ag-fuzzy-match t)
 
@@ -585,10 +599,11 @@
       shell-pop-universal-key "C-'")
 
 ;; Haskell mode
-(customize-set-variable 'haskell-process-suggest-remove-import-lines t) 
-(customize-set-variable 'haskell-process-auto-import-loaded-modules t)
-(customize-set-variable 'haskell-process-log t)
-(customize-set-variable 'haskell-process-type 'auto)
+(customize-set-variables 
+  'haskell-process-suggest-remove-import-lines t
+  'haskell-process-auto-import-loaded-modules t
+  'haskell-process-log t
+  'haskell-process-type 'auto)
 
 (setq haskell-indent-offset 2
       haskell-indentation-left-offset 0
@@ -602,10 +617,11 @@
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
 ;; Haskell mode bindings
-(define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reload)
-(define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
-(define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
-(define-key haskell-mode-map (kbd "RET") 'electric-indent-just-newline)
+(many 2 (apply-partially 'define-key haskell-mode-map)
+ (kbd "C-c C-l") 'haskell-process-load-or-reload
+ (kbd "C-c C-t") 'haskell-process-do-type
+ (kbd "C-c C-i") 'haskell-process-do-info
+ (kbd "RET") 'electric-indent-just-newline)
 
 ;; Agda mode
 (load-file (let ((coding-system-for-read 'utf-8))
@@ -658,45 +674,45 @@
 (add-hook 'agda2-mode-hook '(lambda () (add-hook 'buffer-list-update-hook 'agda-quit-if-no-agda-buffs)))
 
 ;; Agda mode character mappings
-(setq agda-unicode-char-map '(
+(many 2 (lambda (a b) (set-fontset-font "fontset-default" a b nil 'prepend))
   ;; Greek Extended     U+1F00  U+1FFF  (233)
   ;; General Punctuation        U+2000  U+206F  (111)
   ;; Superscripts and Subscripts        U+2070  U+209F  (42)
-  ( (#x1f00 . #x209f) "FreeMono" )  
+   '(#x1f00 . #x209f) "FreeMono" 
  
   ;; Letterlike Symbols         U+2100  U+214F  (80)
   ;; Number Forms       U+2150  U+218F  (60)
   ;; Arrows     U+2190  U+21FF  (112)
-  ( (#x2100 . #x21ff) "FreeMono" )
+   '(#x2100 . #x21ff) "FreeMono" 
 
   ;; Mathematical Operators     U+2200  U+22FF  (256)
-  ( (#x2200 . #x22ff) "DejaVu Sans Mono" )
+   '(#x2200 . #x22ff) "DejaVu Sans Mono" 
 
   ;; Miscellaneous Technical    U+2300  U+23FF  (255)
-  ( (#x2300 . #x23ff) "FreeMono" )
+   '(#x2300 . #x23ff) "FreeMono" 
   
   ;; Enclosed Alphanumerics     U+2460  U+24FF  (160)
-  ( (#x2460 . #x24ff) "FreeMono" )
+   '(#x2460 . #x24ff) "FreeMono" 
   
   ;; Miscellaneous Symbols      U+2600  U+26FF  (256)
-  ( (#x2600 . #x26ff) "FreeMono" )
+   '(#x2600 . #x26ff) "FreeMono" 
   
   ;; Miscellaneous Mathematical Symbols-A       U+27C0  U+27EF  (48)
   ;; Supplemental Arrows-A      U+27F0  U+27FF  (16)
-  ( (#x27c0 . #x27ff) "FreeMono" )
+   '(#x27c0 . #x27ff) "FreeMono" 
   
   ;; Supplemental Arrows-B      U+2900  U+297F  (128)
   ;; Miscellaneous Mathematical Symbols-B       U+2980  U+29FF  (128)
-  ( (#x2900 . #x29ff) "FreeMono" )
+   '(#x2900 . #x29ff) "FreeMono" 
   
   ;; Supplemental Mathematical Operators        U+2A00  U+2AFF  (256)
-  ( (#x2a00 . #x2aff) "FreeMono" )
+   '(#x2a00 . #x2aff) "FreeMono" 
   
   ;; Miscellaneous Symbols and Arrows   U+2B00  U+2BFF  (206)
-  ( (#x2b00 . #x2bff) "FreeMono" )
+   '(#x2b00 . #x2bff) "FreeMono" 
   
   ;; Superscripts and Subscripts - U+2070 To U+209F
-  ( (#x2070 . #x209f) "FreeMono" )
+   '(#x2070 . #x209f) "FreeMono" 
   
   ;; LATIN SUBSCRIPT SMALL LETTER H (U+2095)
   ;; LATIN SUBSCRIPT SMALL LETTER K (U+2096)
@@ -706,21 +722,17 @@
   ;; LATIN SUBSCRIPT SMALL LETTER P (U+209A)
   ;; LATIN SUBSCRIPT SMALL LETTER S (U+209B)
   ;; LATIN SUBSCRIPT SMALL LETTER T (U+209C)
-  ( (#x2095 . #x209C) "DejaVu Sans Mono" )
+   '(#x2095 . #x209C) "DejaVu Sans Mono" 
   
   ;; angle brackets ⟨ ⟩
-  ( (#x27e8 . #x27f0) "DejaVu Sans Mono" )
-  ( (#x230a . #x230b) "DejaVu Sans Mono" )
+   '(#x27e8 . #x27f0) "DejaVu Sans Mono" 
+   '(#x230a . #x230b) "DejaVu Sans Mono" 
   
   ;; double curly brace ⦃ ⦄  
-  ( (#x2983 . #x2984) "DejaVu Sans" )
+   '(#x2983 . #x2984) "DejaVu Sans" 
   
   ;; relation compositon ⨾  
-  ( (#x2a3e . #x2a3e) "Cambria" )
-))
-
-(dolist (chm agda-unicode-char-map) 
-  (set-fontset-font "fontset-default" (nth 0 chm) (nth 1 chm) nil 'prepend))
+   '(#x2a3e . #x2a3e) "Cambria" )
 
 ;; doc-view mode
 (setq doc-view-continuous t
@@ -771,19 +783,20 @@
 
 ;; multi-cursor
 (require 'multiple-cursors)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this) 
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-.") 'mc/mark-next-symbol-like-this)
-(global-set-key (kbd "C-,") 'mc/mark-previous-symbol-like-this)
-(global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-keys
+ (kbd "C->") 'mc/mark-next-like-this
+ (kbd "C-<") 'mc/mark-previous-like-this
+ (kbd "C-.") 'mc/mark-next-symbol-like-this
+ (kbd "C-,") 'mc/mark-previous-symbol-like-this
+ (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click
+ (kbd "C-S-c C-S-c") 'mc/edit-lines)
 
 ;; smooth scroll
 ;; http://www.emacswiki.org/emacs/SmoothScrolling
-(setq scroll-step 1)
-(setq scroll-conservatively 10000)
-(setq auto-window-vscroll nil)
-(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+(setq scroll-step 1
+      scroll-conservatively 10000
+      auto-window-vscroll nil
+      mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 
 ;; line numbers 
 ;;;###autoload
@@ -806,18 +819,18 @@
 
 ;;;###autoload
 (defun custom-tex-hooks () 
-  (add-to-list 'tex-compile-commands 
-               '("SumatraPDF.exe \"%r.pdf\"" nil nil))
-  (add-to-list 'tex-compile-commands 
-               '("pdflatex.exe -interaction=nonstopmode \"%r.tex\"" nil nil))
-  (add-to-list 'tex-compile-commands 
-               '("bibtex.exe \"%r\"" nil nil))
-  (add-to-list 'tex-compile-commands 
+  (many 1 (lambda (x) (add-to-list 'tex-compile-commands x))
+               '("SumatraPDF.exe \"%r.pdf\"" nil nil)
+  ;; (add-to-list 'tex-compile-commands 
+               '("pdflatex.exe -interaction=nonstopmode \"%r.tex\"" nil nil)
+  ;; (add-to-list 'tex-compile-commands 
+               '("bibtex.exe \"%r\"" nil nil)
+  ;; (add-to-list 'tex-compile-commands 
                '((concat "pdflatex.exe -interaction=nonstopmode \"%r.tex\" && "
                          "bibtex.exe \"%r\" && "
                          "pdflatex.exe -interaction=nonstopmode \"%r.tex\" && "
                          "pdflatex.exe -interaction=nonstopmode \"%r.tex\"")
-                 nil nil)) )
+                 nil nil) ))
 (add-hook 'tex-mode-hook 'custom-tex-hooks)
 
 ;;; fin 
