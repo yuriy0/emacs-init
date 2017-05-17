@@ -116,9 +116,6 @@
 (ido-mode t) 
 (require 'ido-yes-or-no)
 
-;; open only one frame on startup 
-(delete-other-frames)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; general customization ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -164,8 +161,18 @@
 ;; i hate beeping
 (setq visible-bell 1)
 
-;; save buffers
+;; desktop 
 (desktop-save-mode 1)
+(setq desktop-load-locked-desktop t
+      desktop-dirname "~/.emacs.d/desktop/"
+      desktop-path (list desktop-dirname)
+      desktop-save t 
+      desktop-auto-save-timeout 120)
+;; disable modes on startup
+(add-to-list 'desktop-minor-mode-table (list 'whitespace-mode nil)) 
+(add-to-list 'desktop-minor-mode-table (list 'agda2-mode nil)) 
+
+(add-hook 'desktop-after-read-hook 'delete-other-frames) ; single frame on startup 
 
 ;; remove toolbar 
 (tool-bar-mode -1)
