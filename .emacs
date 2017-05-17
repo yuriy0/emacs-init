@@ -800,10 +800,9 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 
 ;; line numbers 
 ;;;###autoload
-(defun enable-linum-mode () (linum-mode 1))
-(add-hook 'prog-mode-hook 'enable-linum-mode)
-(add-hook 'haskell-mode-hook 'enable-linum-mode)
-(add-hook 'maplev-mode-hook 'enable-linum-mode)
+(defun enable-linum-mode-in-mode (the-mode) (add-hook the-mode (lambda () (linum-mode 1))))
+(-each '(prog-mode-hook haskell-mode-hook maplev-mode-hook) 
+       'enable-linum-mode-in-mode)
 
 ;; aspell
 (setq ispell-program-name "aspell")
