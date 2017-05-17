@@ -548,6 +548,22 @@
 ;; (e.g., "shell -c command")
 (setq shell-file-name explicit-shell-file-name)
 
+;; eshell
+(require 'helm-eshell)
+(fset 'shell 'eshell) ; replace shell with eshell 
+(add-hook 'eshell-mode-hook 
+  (lambda () 
+    (define-key eshell-mode-map (kbd "M-]") 'helm-eshell-history)
+    (setq eshell-cmpl-ignore-case t)
+    (eshell-cmpl-initialize)
+    (set-face-attribute 'eshell-prompt nil :foreground "chartreuse4")
+    (push-mark)
+    ))
+(setq eshell-prompt-function #'(lambda nil
+  (concat
+    (getenv "USER") "@" (system-name) ":" (abbreviate-file-name (eshell/pwd))
+    (if (= (user-uid) 0) " # " " $ "))))
+
 ;;;;;;;;;;;;;;;;;;
 ;; Haskell mode ;;
 ;;;;;;;;;;;;;;;;;;
@@ -781,11 +797,11 @@
 
 ;; todo: this should be its own function (`find-binary-and-add-to-exec-path')
 ;; which uses persistent storage to not make the system call every startup
-(add-to-list 'exec-path 
-  (canon-win-path 
-    (file-name-directory 
-      (replace-regexp-in-string "\n" "" 
-        (shell-command-to-string "where aspell"))))) 
+;; (add-to-list 'exec-path 
+;;   (canon-win-path 
+;;     (file-name-directory 
+;;       (replace-regexp-in-string "\n" "" 
+;;         (shell-command-to-string "where aspell"))))) 
 
 (setq ispell-program-name "aspell")
 (require 'ispell)
