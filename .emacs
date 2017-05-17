@@ -180,7 +180,9 @@
 ;; set cursor to bar, and override multiple cursors function which distinguishes
 ;; between bar and other cursors.
 (setq-default cursor-type 'bar) 
-(defun mc/cursor-is-bar () nil)
+
+(defun mc/cursor-is-bar-fake () nil)
+(advice-add 'mc/cursor-is-bar :override 'mc/cursor-is-bar-fake)
 
 ;; whitespace mode 
 (require 'whitespace)
