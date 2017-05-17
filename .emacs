@@ -57,6 +57,7 @@
   popup             
   s  
   setup-cygwin
+  shell-pop
   smex
   sml-mode
   ucs-utils         
@@ -567,6 +568,10 @@
   (concat
     (getenv "USER") "@" (system-name) ":" (abbreviate-file-name (eshell/pwd))
     (if (= (user-uid) 0) " # " " $ "))))
+
+;; shell pop + eshell 
+(customize-set-variable 'shell-pop-shell-type "eshell")
+(customize-set-variable 'shell-pop-universal-key "C-'")
 
 ;;;;;;;;;;;;;;;;;;
 ;; Haskell mode ;;
