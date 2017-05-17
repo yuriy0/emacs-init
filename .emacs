@@ -9,6 +9,10 @@
   :height 120
   :width 'normal)
 
+;; same behaviour as default, but allows customization of 
+;; the behaviour for specific modes by using add-to-list 
+(setq font-lock-maximum-decoration '((t . t)))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; initialization ;;
 ;;;;;;;;;;;;;;;;;;;;
@@ -84,22 +88,6 @@
 ;; server start 
 (server-start)
 
-;; keep server alive
-;; http://stackoverflow.com/questions/2001485/how-do-i-keep-emacs-server-running-when-the-current-window-is-closed-x-on-wind 
-(defvar really-kill-emacs nil)
-
-;;;###autoload 
-(defun really-kill-emacs ()
- (interactive)
- (setq really-kill-emacs t)
- (desktop-save-in-desktop-dir)
- (save-buffers-kill-emacs))
-
-;;;###autoload 
-(defadvice kill-emacs (around really-exit activate)
-   "Only kill emacs if the variable is true"
-   (if really-kill-emacs ad-do-it) (make-frame-invisible nil t))
-
 ;; suppress all warnings
 (setq warning-minimum-level :emergency
       byte-compile-warnings nil)
@@ -126,14 +114,25 @@
 ;; require user packages 
 (mapc #'require package-selected-packages)
 
-;; ido mode
-(require 'ido)
-(ido-mode t) 
-(require 'ido-yes-or-no)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; general customization ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; keep server alive
+;; http://stackoverflow.com/questions/2001485/how-do-i-keep-emacs-server-running-when-the-current-window-is-closed-x-on-wind 
+(defvar really-kill-emacs nil)
+
+;;;###autoload 
+(defun really-kill-emacs ()
+ (interactive)
+ (setq really-kill-emacs t)
+ (desktop-save-in-desktop-dir)
+ (save-buffers-kill-emacs))
+
+;;;###autoload 
+(defadvice kill-emacs (around really-exit activate)
+   "Only kill emacs if the variable is true"
+   (if really-kill-emacs ad-do-it) (make-frame-invisible nil t))
 
 ;; easy keyboard escape (2<Esc> instead of 3<Esc>)
 (require 'gnutls)
@@ -202,12 +201,6 @@
 (defun mc/cursor-is-bar-fake () nil)
 (advice-add 'mc/cursor-is-bar :override 'mc/cursor-is-bar-fake)
 
-;; whitespace mode 
-(require 'whitespace)
-(setq whitespace-style '(tabs tab-mark trailing))
-(setq-default whitespace-line-column 80)
-(global-whitespace-mode 1)
-
 ;; auto-revert
 (setq revert-without-query (list ".+") ;; auto revert any file without confirmation
       auto-revert-interval 1)
@@ -218,18 +211,13 @@
 ;; tabs are EVIL 
 (setq-default indent-tabs-mode nil)
 
-;; misc.
 (setq describe-char-unidata-list
   (quote
-   (name old-name general-category decomposition decimal-digit-value digit-value numeric-value uppercase))
-   mouse-buffer-menu-mode-mult 0
-   inhibit-startup-screen t)
+   (name old-name general-category decomposition decimal-digit-value digit-value numeric-value uppercase)) ; unicode input (??)
+   mouse-buffer-menu-mode-mult 0 ; right click menu
+   inhibit-startup-screen t) ; turn off startup screen
 
-(defun display-startup-echo-area-message () nil)
-
-;; same behaviour as default, but allows customization of 
-;; the behaviour for specific modes by using add-to-list 
-(setq font-lock-maximum-decoration '((t . t)))
+(defun display-startup-echo-area-message () nil) ; turn off startup echo msg
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom functions ;;
@@ -492,9 +480,18 @@
 ;; Custom modes ;;
 ;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;
-;; helm ;;
-;;;;;;;;;;
+;; whitespace mode 
+(require 'whitespace)
+(setq whitespace-style '(tabs tab-mark trailing))
+(setq-default whitespace-line-column 80)
+(global-whitespace-mode 1)
+
+;; ido mode 
+(require 'ido)
+(ido-mode t) 
+(require 'ido-yes-or-no)
+
+;; helm 
 (require 'helm-config)
 (helm-mode 1)
 (helm-autoresize-mode t)
@@ -512,9 +509,7 @@
 
 (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
 
-;;;;;;;;;;;;;
-;; helm-ag ;;
-;;;;;;;;;;;;;
+;; helm-ag
 (require 'helm-ag)
 (global-set-key (kbd "C-x / 1") 'helm-do-ag)
 (global-set-key (kbd "C-x / 2") 'helm-do-ag-this-file)
@@ -539,7 +534,7 @@
 (setq auto-mode-alist
       (cons '("\\.m$" . octave-mode) auto-mode-alist))
 
-;; C 
+;; C
 (require 'cc-mode) 
 
 ;; Web mode 
@@ -589,9 +584,7 @@
 (setq shell-pop-shell-type "eshell"
       shell-pop-universal-key "C-'")
 
-;;;;;;;;;;;;;;;;;;
-;; Haskell mode ;;
-;;;;;;;;;;;;;;;;;;
+;; Haskell mode
 (customize-set-variable 'haskell-process-suggest-remove-import-lines t) 
 (customize-set-variable 'haskell-process-auto-import-loaded-modules t)
 (customize-set-variable 'haskell-process-log t)
@@ -614,9 +607,7 @@
 (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
 (define-key haskell-mode-map (kbd "RET") 'electric-indent-just-newline)
 
-;;;;;;;;;;;;;;;
-;; Agda mode ;;
-;;;;;;;;;;;;;;;
+;; Agda mode
 (load-file (let ((coding-system-for-read 'utf-8))
                  (shell-command-to-string "agda-mode locate")))
 
@@ -666,9 +657,7 @@
     (progn (agda2-quit) (message "No agda buffers remaining; quitting agda"))))
 (add-hook 'agda2-mode-hook '(lambda () (add-hook 'buffer-list-update-hook 'agda-quit-if-no-agda-buffs)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Agda mode character mappings ;; 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Agda mode character mappings
 (setq agda-unicode-char-map '(
   ;; Greek Extended     U+1F00  U+1FFF  (233)
   ;; General Punctuation        U+2000  U+206F  (111)
@@ -733,15 +722,9 @@
 (dolist (chm agda-unicode-char-map) 
   (set-fontset-font "fontset-default" (nth 0 chm) (nth 1 chm) nil 'prepend))
 
-;;;;;;;;;;;;;;;;;;; 
-;; doc-view mode ;;
-;;;;;;;;;;;;;;;;;;;
+;; doc-view mode
 (setq doc-view-continuous t
       doc-view-ghostscript-program "gswin64c") 
-
-;;;;;;;;;;;;;;;;;;;;;
-;; Auto-completion ;;
-;;;;;;;;;;;;;;;;;;;;;
 
 ;; auto complete
 (require 'auto-complete)
@@ -773,7 +756,7 @@
     (my-ac-haskell-mode)))
 (add-hook 'find-file-hook 'my-haskell-ac-init)
 
-;; C/c++
+;; ;; ac - C/c++
 ;; (defun my-c-ac-init ()
 ;;   (when (member (file-name-extension buffer-file-name) '("c" "cpp" "h" "hpp"))
 ;;     (my-ac-mode))
@@ -781,16 +764,12 @@
 ;; (add-hook 'c-mode-common-hook 'my-ac-mode)
 ;; (add-hook 'find-file-hook 'my-c-ac-init)
 
-;;;;;;;;;;;;;;;;;;;
-;; visual regexp ;; 
-;;;;;;;;;;;;;;;;;;;
+;; visual regexp
 (require 'visual-regexp)
 (define-key global-map (kbd "C-c r") 'vr/replace)
 (define-key global-map (kbd "C-c q r") 'vr/query-replace)
 
-;;;;;;;;;;;;;;;;;;
-;; multi-cursor ;;
-;;;;;;;;;;;;;;;;;;
+;; multi-cursor
 (require 'multiple-cursors)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this) 
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
@@ -799,44 +778,27 @@
 (global-set-key (kbd "C-S-<mouse-1>") 'mc/add-cursor-on-click)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 
-;;;;;;;;;;;;;;;;;;;
-;; smooth scroll ;;
-;;;;;;;;;;;;;;;;;;;
+;; smooth scroll
 ;; http://www.emacswiki.org/emacs/SmoothScrolling
 (setq scroll-step 1)
 (setq scroll-conservatively 10000)
 (setq auto-window-vscroll nil)
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 
-;;;;;;;;;;;;;;;;;;
-;; line numbers ;;
-;;;;;;;;;;;;;;;;;;
+;; line numbers 
 ;;;###autoload
 (defun enable-linum-mode () (linum-mode 1))
 (add-hook 'prog-mode-hook 'enable-linum-mode)
 (add-hook 'haskell-mode-hook 'enable-linum-mode)
 (add-hook 'maplev-mode-hook 'enable-linum-mode)
 
-;;;;;;;;;;;;
-;; aspell ;;
-;;;;;;;;;;;;
-
-;; todo: this should be its own function (`find-binary-and-add-to-exec-path')
-;; which uses persistent storage to not make the system call every startup
-;; (add-to-list 'exec-path 
-;;   (canon-win-path 
-;;     (file-name-directory 
-;;       (replace-regexp-in-string "\n" "" 
-;;         (shell-command-to-string "where aspell"))))) 
-
+;; aspell
 (setq ispell-program-name "aspell")
 (require 'ispell)
 (global-set-key (kbd "<f8>") 'ispell-word)
 (setq ispell-local-dictionary "british")
 
-;;;;;;;;;;;
-;; Latex ;;
-;;;;;;;;;;;
+;; Latex
 (require 'tex-mode)
 
 (setq latex-run-command "pdflatex") 
