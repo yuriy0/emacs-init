@@ -208,6 +208,10 @@
    mouse-buffer-menu-mode-mult 0
    inhibit-startup-screen t)
 
+;; same behaviour as default, but allows customization of 
+;; the behaviour for specific modes by using add-to-list 
+(setq font-lock-maximum-decoration '((t . t)))
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -558,12 +562,12 @@
 (customize-set-variable 'haskell-process-type 'auto)
 
 ;; todo use customize-set OR setq 
-(setq font-lock-maximum-decoration '((haskell-mode . 2) (t . t))
-      haskell-indent-offset 2
+(setq haskell-indent-offset 2
       haskell-indentation-left-offset 0
       haskell-literate-default (quote tex)
       haskell-process-show-debug-tips nil)
-
+(add-to-list 'font-lock-maximum-decoration '(haskell-mode . 2))
+     
 ;; Interactive Haskell mode 
 (require 'haskell-interactive-mode)
 (require 'haskell-process)
