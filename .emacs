@@ -12,6 +12,17 @@
 ;;;;;;;;;;;;;;;;;;;;
 ;; initialization ;;
 ;;;;;;;;;;;;;;;;;;;;
+(defvar emacs-init-finished nil)
+;;;###autoload
+(defun check-emacs-init-finished ()
+  (interactive)
+  (if emacs-init-finished 
+      (message "emacs initialization finished.")
+      (message "%s" 
+               (propertize 
+                "emacs initialization failed!"
+                'face '(:foreground "red"))) ))
+(add-hook 'after-init-hook 'check-emacs-init-finished)
 
 ;; whenever you install/update a package, the `package' package will (through
 ;; 'customize') automatically clobber `package-selected-packages'. 
@@ -176,7 +187,10 @@
 (add-to-list 'desktop-minor-mode-table (list 'whitespace-mode nil)) 
 (add-to-list 'desktop-minor-mode-table (list 'agda2-mode nil)) 
 
-(add-hook 'desktop-after-read-hook 'delete-other-frames) ; single frame on startup 
+(add-hook 'desktop-after-read-hook 
+  #'(lambda () 
+      (delete-other-frames) ; single frame on startup 
+))
 
 ;; remove toolbar 
 (tool-bar-mode -1)
@@ -204,12 +218,14 @@
 ;; tabs are EVIL 
 (setq-default indent-tabs-mode nil)
 
-;; some GUI menu things??? I don't even remember
+;; misc.
 (setq describe-char-unidata-list
   (quote
    (name old-name general-category decomposition decimal-digit-value digit-value numeric-value uppercase))
    mouse-buffer-menu-mode-mult 0
    inhibit-startup-screen t)
+
+(defun display-startup-echo-area-message () nil)
 
 ;; same behaviour as default, but allows customization of 
 ;; the behaviour for specific modes by using add-to-list 
@@ -570,8 +586,8 @@
     (if (= (user-uid) 0) " # " " $ "))))
 
 ;; shell pop + eshell 
-(customize-set-variable 'shell-pop-shell-type "eshell")
-(customize-set-variable 'shell-pop-universal-key "C-'")
+(setq shell-pop-shell-type "eshell"
+      shell-pop-universal-key "C-'")
 
 ;;;;;;;;;;;;;;;;;;
 ;; Haskell mode ;;
@@ -581,7 +597,6 @@
 (customize-set-variable 'haskell-process-log t)
 (customize-set-variable 'haskell-process-type 'auto)
 
-;; todo use customize-set OR setq 
 (setq haskell-indent-offset 2
       haskell-indentation-left-offset 0
       haskell-literate-default (quote tex)
@@ -796,9 +811,11 @@
 ;;;;;;;;;;;;;;;;;;
 ;; line numbers ;;
 ;;;;;;;;;;;;;;;;;;
-(add-hook 'prog-mode-hook '(lambda () (linum-mode 1)))
-(add-hook 'haskell-mode-hook '(lambda () (linum-mode 1)))
-(add-hook 'maplev-mode-hook '(lambda () (linum-mode 1)))
+;;;###autoload
+(defun enable-linum-mode () (linum-mode 1))
+(add-hook 'prog-mode-hook 'enable-linum-mode)
+(add-hook 'haskell-mode-hook 'enable-linum-mode)
+(add-hook 'maplev-mode-hook 'enable-linum-mode)
 
 ;;;;;;;;;;;;
 ;; aspell ;;
@@ -840,3 +857,6 @@
                          "pdflatex.exe -interaction=nonstopmode \"%r.tex\"")
                  nil nil)) )
 (add-hook 'tex-mode-hook 'custom-tex-hooks)
+
+;;; fin 
+(setq emacs-init-finished t)
