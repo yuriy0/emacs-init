@@ -95,8 +95,7 @@
    ("marmalade" . "https://marmalade-repo.org/packages/")
    ("melpa" . "http://melpa.org/packages/")
    ;; ("melpa-stable" . "http://stable.melpa.org/packages/")
-   )
-)
+   ))
 (setq package-enable-at-startup nil)
 (package-initialize)
 (package-autoremove)
@@ -195,10 +194,7 @@
       auto-revert-interval 1)
 
 ;; f5 to refresh 
-(global-set-key 
- (kbd "<f5>") 
- (lambda () (interactive) (revert-buffer t t))
-)
+(global-set-key (kbd "<f5>") (lambda () (interactive) (revert-buffer t t)))
 
 ;; tabs are EVIL 
 (setq-default indent-tabs-mode nil)
@@ -284,26 +280,25 @@
 (defun canon-win-path (path)
   "Convert the given path to a canonical, Windows path"
   (interactive)
-  (replace-regexp-in-string "/" "\\\\" (convert-standard-filename (expand-file-name path)))
-)
+  (replace-regexp-in-string "/" "\\\\" (convert-standard-filename (expand-file-name path))))
 
 ;;;###autoload
 (defun unix-file ()
-      "Change the current buffer to Latin 1 with Unix line-ends."
-      (interactive)
-      (set-buffer-file-coding-system 'utf-8-unix t))
+  "Change the current buffer to Latin 1 with Unix line-ends."
+  (interactive)
+  (set-buffer-file-coding-system 'utf-8-unix t))
 
 ;;;###autoload
 (defun dos-file ()
-      "Change the current buffer to Latin 1 with DOS line-ends."
-      (interactive)
-      (set-buffer-file-coding-system 'utf-8-dos t))
+  "Change the current buffer to Latin 1 with DOS line-ends."
+  (interactive)
+  (set-buffer-file-coding-system 'utf-8-dos t))
 
 ;;;###autoload
 (defun mac-file ()
-      "Change the current buffer to Latin 1 with Mac line-ends."
-      (interactive)
-      (set-buffer-file-coding-system 'utf-8-mac t))
+  "Change the current buffer to Latin 1 with Mac line-ends."
+  (interactive)
+  (set-buffer-file-coding-system 'utf-8-mac t))
 
 ;; http://batsov.com/articles/2011/11/12/emacs-tip-number-2-open-file-in-external-program/
 ;;;###autoload
@@ -311,19 +306,18 @@
   "Open the underlying file of a buffer in an external program."
   (interactive)
   (when buffer-file-name
-    (shell-command-silent (concat "cmd /C start \"\" \"" buffer-file-name "\""))
-  ))
+    (shell-command-silent (concat "cmd /C start \"\" \"" buffer-file-name "\""))))
 (global-set-key (kbd "C-c o") 'prelude-open-with)
 
 ;;;###autoload
 (defun comment-or-uncomment-region-or-line ()
-    "Comments or uncomments the region or the current line if there's no active region."
-    (interactive)
-    (let (beg end)
-        (if (region-active-p)
-            (setq beg (region-beginning) end (region-end))
+  "Comments or uncomments the region or the current line if there's no active region."
+  (interactive)
+  (let (beg end)
+    (if (region-active-p)
+        (setq beg (region-beginning) end (region-end))
             (setq beg (line-beginning-position) end (line-end-position)))
-        (comment-or-uncomment-region beg end)))
+    (comment-or-uncomment-region beg end)))
 (global-set-key (kbd "M-;") 'comment-or-uncomment-region-or-line)
 
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
@@ -510,8 +504,7 @@
 
 ;; uniquify
 (require 'uniquify) 
-(setq 
-  uniquify-buffer-name-style 'forward)
+(setq uniquify-buffer-name-style 'forward)
 
 ;; Maple 
 (setq load-path (cons "~/.emacs.d/maple" load-path))
@@ -627,15 +620,10 @@
          (-none? (lambda (buf) 
            (with-current-buffer buf 
              (if (buffer-file-name) 
-                 (string= (file-name-extension (buffer-file-name)) "agda") 
-               nil
-          ))
-          ) (buffer-list))
-    )
-    (progn (agda2-quit) (message "No agda buffers remaining; quitting agda"))
-  )
-)
-
+                 (string= (file-name-extension (buffer-file-name)) "agda")
+               nil))) 
+                 (buffer-list)))
+    (progn (agda2-quit) (message "No agda buffers remaining; quitting agda"))))
 (add-hook 'agda2-mode-hook '(lambda () (add-hook 'buffer-list-update-hook 'agda-quit-if-no-agda-buffs)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -703,15 +691,13 @@
 ))
 
 (dolist (chm agda-unicode-char-map) 
-  (set-fontset-font "fontset-default" (nth 0 chm) (nth 1 chm) nil 'prepend)
-)
+  (set-fontset-font "fontset-default" (nth 0 chm) (nth 1 chm) nil 'prepend))
 
 ;;;;;;;;;;;;;;;;;;; 
 ;; doc-view mode ;;
 ;;;;;;;;;;;;;;;;;;;
 (setq doc-view-continuous t
-      doc-view-ghostscript-program "gswin64c" ;; must be in PATH
-) 
+      doc-view-ghostscript-program "gswin64c") 
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; Auto-completion ;;
@@ -721,12 +707,12 @@
 (require 'auto-complete)
 
 (defun my-ac-mode()
-(auto-complete-mode) 
-(setq-default ac-sources
-    '(ac-source-words-in-same-mode-buffers
-      ac-source-dictionary
-      ac-source-abbrev))
-)
+  (auto-complete-mode) 
+  (setq-default 
+     ac-sources
+     '(ac-source-words-in-same-mode-buffers
+       ac-source-dictionary
+       ac-source-abbrev)))
 
 ;; auto complete - haskell
 (define-key haskell-mode-map (kbd "M-/") 'ac-complete)
@@ -739,14 +725,12 @@
 
 (defun my-ac-haskell-mode ()
   (my-ac-mode)
-  (setq ac-sources (append '(ac-source-ghc-mod) ac-sources))
- )
+  (setq ac-sources (append '(ac-source-ghc-mod) ac-sources)))
 (add-hook 'haskell-mode-hook 'my-ac-haskell-mode)
 
 (defun my-haskell-ac-init ()
   (when (member (file-name-extension buffer-file-name) '("hs" "lhs"))
-    (my-ac-haskell-mode))
- )
+    (my-ac-haskell-mode)))
 (add-hook 'find-file-hook 'my-haskell-ac-init)
 
 ;; C/c++
@@ -829,6 +813,5 @@
                          "bibtex.exe \"%r\" && "
                          "pdflatex.exe -interaction=nonstopmode \"%r.tex\" && "
                          "pdflatex.exe -interaction=nonstopmode \"%r.tex\"")
-                 nil nil))  
-)
+                 nil nil)) )
 (add-hook 'tex-mode-hook 'custom-tex-hooks)
