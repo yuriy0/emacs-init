@@ -65,6 +65,7 @@
   intero
   list-utils        
   malabar-mode
+  markdown-mode 
   multiple-cursors
   pcache            
   persistent-soft   
@@ -828,6 +829,11 @@ by NARGS, the final trailing group of length < NARGS is ignored."
                          "pdflatex.exe -interaction=nonstopmode \"%r.tex\"")
                  nil nil) ))
 (add-hook 'tex-mode-hook 'custom-tex-hooks)
+
+;; markdown mode
+(require 'markdown-mode)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
 ;;; fin 
 (setq emacs-init-finished t)
