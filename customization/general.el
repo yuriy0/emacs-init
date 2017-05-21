@@ -75,7 +75,8 @@ by NARGS, the final trailing group of length < NARGS is ignored."
       desktop-dirname "~/.emacs.d/desktop/"
       desktop-path (list desktop-dirname)
       desktop-save t 
-      desktop-auto-save-timeout 120)
+      desktop-auto-save-timeout 120
+      desktop-restore-eager 10)
 ;; disable modes on startup
 (add-to-list 'desktop-minor-mode-table (list 'whitespace-mode nil)) 
 (add-to-list 'desktop-minor-mode-table (list 'agda2-mode nil)) 
@@ -85,6 +86,10 @@ by NARGS, the final trailing group of length < NARGS is ignored."
       (delete-other-frames) ; single frame on startup 
 ))
 
+(many 1 (apply-partially 'add-to-list 'desktop-globals-to-save) 
+      'extended-command-history 
+      'kill-ring)
+             
 ;; remove toolbar 
 (tool-bar-mode -1)
 
