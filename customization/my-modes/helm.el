@@ -17,7 +17,14 @@
  (kbd "C-x q") 'helm-resume)
 
 (setq helm-M-x-fuzzy-match t        ; optional fuzzy matching for helm-M-x
-      helm-ff-newfile-prompt-p nil) ; don't ask to create new file
+      helm-ff-newfile-prompt-p nil  ; don't ask to create new file
+      helm-display-header-line nil  ; no helm header 
+      helm-split-window-in-side-p t ; prevent helm from temporarily hiding other
+                                    ; buffers
+      helm-split-window-default-side 'below
+      helm-apropos-fuzzy-match t
+      helm-default-external-file-browser "explorer.exe"
+      helm-buffer-max-length nil)   ; don't truncate buffer names 
 
 ;; helm-ag
 (require 'helm-ag)
