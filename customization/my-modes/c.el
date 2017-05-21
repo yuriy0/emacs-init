@@ -1,0 +1,3 @@
+;; C
+(require 'cc-mode) 
+

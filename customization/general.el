@@ -1,3 +1,6 @@
+(setq mouse-buffer-menu-mode-mult 0 ; right click menu
+      inhibit-startup-screen t)     ; turn off startup screen
+
 ;;;###autoload
 (defun many (nargs fn &rest args) 
   "Apply FN of arity NARGS to each consecutive group of NARGS
@@ -101,3 +104,21 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 
 ;; tabs are EVIL 
 (setq-default indent-tabs-mode nil)
+
+;; cygwin
+(require 'cygwin-mount)
+(require 'setup-cygwin)
+
+(cygwin-mount-activate)
+
+(add-hook 'comint-output-filter-functions
+    'shell-strip-ctrl-m nil t)
+(add-hook 'comint-output-filter-functions
+    'comint-watch-for-password-prompt nil t)
+
+;; external shell
+(setq explicit-shell-file-name "bash.exe")
+
+;; For subprocesses invoked via the shell
+;; (e.g., "shell -c command")
+(setq shell-file-name explicit-shell-file-name)
