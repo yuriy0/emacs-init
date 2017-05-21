@@ -26,7 +26,13 @@
                (propertize 
                 "emacs initialization failed!"
                 'face '(:foreground "red"))) ))
-(add-hook 'after-init-hook 'check-emacs-init-finished)
+
+;; replace startup echo msg
+(fset 'display-startup-echo-area-message
+      'check-emacs-init-finished)
+
+(setq mouse-buffer-menu-mode-mult 0 ; right click menu
+      inhibit-startup-screen t)     ; turn off startup screen
 
 ;; whenever you install/update a package, the `package' package will (through
 ;; 'customize') automatically clobber `package-selected-packages'. 
@@ -63,8 +69,9 @@
   helm-ag
   ido-yes-or-no
   intero
-  list-utils        
-  malabar-mode
+  list-utils
+  ;; jdee ; this replaced malabar-mode a while back, but it's huge and who uses
+          ; java anyways
   markdown-mode 
   multiple-cursors
   pcache            
@@ -222,14 +229,6 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 
 ;; tabs are EVIL 
 (setq-default indent-tabs-mode nil)
-
-(setq describe-char-unidata-list
-  (quote
-   (name old-name general-category decomposition decimal-digit-value digit-value numeric-value uppercase)) ; unicode input (??)
-   mouse-buffer-menu-mode-mult 0 ; right click menu
-   inhibit-startup-screen t) ; turn off startup screen
-
-(defun display-startup-echo-area-message () nil) ; turn off startup echo msg
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom functions ;;
@@ -442,7 +441,7 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 (defun reload-emacs ()
   "(Re)Loads the emacs init file"
   (interactive)
-  (load-file "~/.emacs"))
+  (load-file "~/.emacs.d/init.el"))
 
 ;;;;;;;;;;;;;;;;;;;
 ;; Custom advice ;;
