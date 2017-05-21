@@ -10,7 +10,22 @@
     '("agda/newlib"
       "agda/categories" 
       "stdlib/agda-stdlib/src")))
-  
+
+;;;###autoload
+(defun agda-quit-if-no-agda-buffs ()
+  "Kill the agda process if there are no buffers visiting agda files."
+  (when
+    (and (agda2-running-p)
+         (-none? (lambda (buf) 
+           (with-current-buffer buf 
+             (if (buffer-file-name) 
+                 (string= (file-name-extension (buffer-file-name)) "agda")
+               nil))) 
+                 (buffer-list)))
+    (progn (agda2-quit) (message "No agda buffers remaining; quitting agda"))))
+(add-hook 'agda2-mode-hook #'(lambda () (add-hook 'buffer-list-update-hook #'agda-quit-if-no-agda-buffs)))
+
+(defun agda-init-unicode ()
 (setq agda-input-user-translations '(
   ;; random symbols 
   ("Nat" "ℕ") 
@@ -33,20 +48,6 @@
   ("Gam" "Γ") 
   ("gam" "γ")
 ))
-
-;;;###autoload
-(defun agda-quit-if-no-agda-buffs ()
-  "Kill the agda process if there are no buffers visiting agda files."
-  (when
-    (and (agda2-running-p)
-         (-none? (lambda (buf) 
-           (with-current-buffer buf 
-             (if (buffer-file-name) 
-                 (string= (file-name-extension (buffer-file-name)) "agda")
-               nil))) 
-                 (buffer-list)))
-    (progn (agda2-quit) (message "No agda buffers remaining; quitting agda"))))
-(add-hook 'agda2-mode-hook '(lambda () (add-hook 'buffer-list-update-hook 'agda-quit-if-no-agda-buffs)))
 
 ;; Agda mode character mappings
 (many 2 (lambda (a b) (set-fontset-font "fontset-default" a b nil 'prepend))
@@ -108,3 +109,6 @@
   
   ;; relation compositon ⨾  
    '(#x2a3e . #x2a3e) "Cambria" )
+)
+
+(add-hook 'agda2-mode-hook #'agda-init-unicode)
