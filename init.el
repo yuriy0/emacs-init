@@ -16,6 +16,12 @@
 ;;;;;;;;;;;;;;;;;;;;
 ;; initialization ;;
 ;;;;;;;;;;;;;;;;;;;;
+;; server start 
+(server-start)
+
+;; set home directory as emacs default (aka home) directory 
+(setq default-directory (concat (getenv "HOME") "/"))
+
 (defvar emacs-init-finished nil)
 (defvar emacs-init-stage "~/.emacs.d/init.el")
 
@@ -29,43 +35,9 @@
                 (format "emacs initialization failed while loading %s!" emacs-init-stage)
                 'face '(:foreground "red"))) ))
 
-;; return `nil' from `load' instead of returning a void value/throwing an error,
-;; etc. this might confuse other emacs functionality... 
-;;;###autoload
-(defun load-ret-nil (the-load &rest load-args) 
-  (unwind-protect
-      (let ((debug-on-error nil))
-        (with-demoted-errors
-            (setq load-ret-nil--ret-val (apply the-load load-args)) ))
-    (boundp 'load-ret-nil--ret-val )))
-(advice-add 'load :around 'load-ret-nil)
-    
-;; saves the loading file in `emacs-init-stage', then loads the file, then
-;; resets the previous value of `emacs-init-stage'. Also forces the printing of
-;; loading messages.
-;;;###autoload
-(defun log-and-load (the-load &rest load-args) 
-  (let ((old-stage emacs-init-stage)
-        (new-stage (nth 0 load-args))
-        (old-force-load force-load-messages))
-    (setq emacs-init-stage new-stage)
-    (setq force-load-messages t)
-    (let ((load-res (apply the-load load-args)))
-      (when load-res 
-        (setq emacs-init-stage old-stage))
-      (setq force-load-messages old-force-load)
-      load-res)))
-
 ;; replace startup echo msg
 (fset 'display-startup-echo-area-message
       'check-emacs-init-finished)
-
-;; whenever you install/update a package, the `package' package will (through
-;; 'customize') automatically clobber `package-selected-packages'. 
-;;;###autoload
-(defun package--dont-save-selected-packages (&optional val) 
-  (progn (message "Override package--dont-save-selected-packages called!") nil))
-(advice-add 'package--save-selected-packages :override 'package--dont-save-selected-packages)
 
 ;; load custom before setting package-selected-packages
 (setq custom-file "~/.emacs.d/custom-set.el")
@@ -117,12 +89,6 @@
   yaml-mode
 ))
 
-;; set home directory as emacs default (aka home) directory 
-(setq default-directory (concat (getenv "HOME") "/"))
-
-;; server start 
-(server-start)
-
 ;; suppress all warnings
 (setq warning-minimum-level :emergency
       byte-compile-warnings nil)
@@ -149,7 +115,44 @@
 ;; require user packages 
 (mapc #'require package-selected-packages)
 
-(advice-add 'load :around 'log-and-load) ; begin logging 
+;; whenever you install/update a package, the `package' package will (through
+;; 'customize') automatically clobber `package-selected-packages'. 
+;;;###autoload
+(defun package--dont-save-selected-packages (&optional val) 
+  (progn (message "Override package--dont-save-selected-packages called!") nil))
+(advice-add 'package--save-selected-packages :override 'package--dont-save-selected-packages)
+
+;;;;;;;;;;;;;;;;;;;
+;; begin logging ;;
+;;;;;;;;;;;;;;;;;;;
+
+;; return `nil' from `load' instead of returning a void value/throwing an error,
+;; etc. this might confuse other emacs functionality... 
+;;;###autoload
+(defun load-ret-nil (the-load &rest load-args) 
+  (unwind-protect
+      (let ((debug-on-error nil))
+        (with-demoted-errors
+            (setq load-ret-nil--ret-val (apply the-load load-args)) ))
+    (boundp 'load-ret-nil--ret-val )))
+(advice-add 'load :around 'load-ret-nil)
+    
+;; saves the loading file in `emacs-init-stage', then loads the file, then
+;; resets the previous value of `emacs-init-stage'. Also forces the printing of
+;; loading messages.
+;;;###autoload
+(defun log-and-load (the-load &rest load-args) 
+  (let ((old-stage emacs-init-stage)
+        (new-stage (nth 0 load-args))
+        (old-force-load force-load-messages))
+    (setq emacs-init-stage new-stage)
+    (setq force-load-messages t)
+    (let ((load-res (apply the-load load-args)))
+      (when load-res 
+        (setq emacs-init-stage old-stage))
+      (setq force-load-messages old-force-load)
+      load-res)))
+(advice-add 'load :around 'log-and-load) 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; general customization ;;

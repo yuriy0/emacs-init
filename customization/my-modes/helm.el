@@ -28,6 +28,7 @@
         "explorer.exe"
       helm-buffer-max-length nil            ) ; don't truncate buffer names 
 
+
 ;; helm-ag
 (require 'helm-ag)
 (global-set-keys
