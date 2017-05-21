@@ -2,6 +2,7 @@
 (require 'helm-config)
 (helm-mode 1)
 (helm-autoresize-mode t)
+(helm-adaptive-mode t)
 
 (many 2 (apply-partially 'define-key helm-map)
  (kbd "<tab>") 'helm-execute-persistent-action ; rebind tab to run persistent action
@@ -25,8 +26,7 @@
       helm-apropos-fuzzy-match t
       helm-default-external-file-browser 
         "explorer.exe"
-      helm-buffer-max-length nil              ; don't truncate buffer names 
-      helm-move-to-line-cycle-in-source t)
+      helm-buffer-max-length nil            ) ; don't truncate buffer names 
 
 ;; helm-ag
 (require 'helm-ag)
