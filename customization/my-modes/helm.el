@@ -12,7 +12,7 @@
 (global-set-keys
  (kbd "M-x") 'helm-M-x
  (kbd "M-y") 'helm-show-kill-ring
- (kbd "C-M-y") 'helm-global-mark-ring
+ (kbd "C-M-y") 'helm-all-mark-rings
  (kbd "C-x C-f") 'helm-find-files
  (kbd "C-x b") 'helm-buffers-list
  (kbd "C-x q") 'helm-resume)
