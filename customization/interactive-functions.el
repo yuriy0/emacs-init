@@ -135,30 +135,21 @@
          (select-window (funcall selector)))
        (setq arg (if (plusp arg) (1- arg) (1+ arg))))))
 
-;; https://www.emacswiki.org/emacs/RevertBuffer#toc1
+;; based on: https://www.emacswiki.org/emacs/RevertBuffer#toc1
 ;;;###autoload
 (defun revert-all-buffers ()
   "Iterate through the list of buffers and revert them, e.g. after a
     new branch has been checked out."
   (interactive)
   (when (yes-or-no-p "Are you sure - any changes in open buffers will be lost! ")
-    (let ((frm1 (selected-frame)))
-      (let ((frm2 (next-frame frm1)))
-        (select-frame frm2)
-        (make-frame-invisible)
-        (dolist (x (buffer-list))
-          (let ((test-buffer (buffer-name x)))
-            (when (not (string-match "\*" test-buffer))
-              (when (not (file-exists-p (buffer-file-name x)))
-                (select-frame frm1)
-                (when (yes-or-no-p (concat "File no longer exists (" (buffer-name x) "). Close buffer? "))
-                  (kill-buffer (buffer-name x)))
-                (select-frame frm2))
-              (when (file-exists-p (buffer-file-name x))
-                (switch-to-buffer (buffer-name x))
-                (revert-buffer t t t)))))
-        (select-frame frm1)
-        (delete-frame frm2)))))
+    (let* ((bufs-todo
+            (--filter (and (buffer-file-name it)
+                           (file-exists-p (buffer-file-name it)))
+                      (buffer-list)))
+           (bufs-names
+            (s-join ", " (-map 'buffer-name bufs-todo))))
+      (--each bufs-todo (with-current-buffer it (revert-buffer t t t)))
+      (message "Reverting %s" bufs-names) )))
 
 ;;;###autoload
 (defun enclose-region-in (before-str after-str)
