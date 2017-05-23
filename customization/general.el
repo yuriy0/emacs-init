@@ -127,3 +127,7 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 ;; For subprocesses invoked via the shell
 ;; (e.g., "shell -c command")
 (setq shell-file-name explicit-shell-file-name)
+
+;; window {un/re}do
+(require 'winner-mode)
+(winner-mode t)
