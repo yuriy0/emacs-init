@@ -2,9 +2,34 @@
 (defun kill-all-buffers ()
   "Kill every buffer except the current one."
   (interactive)
-  (dolist (buffer (buffer-list))
-    (unless (or (eql buffer (current-buffer)) (not (buffer-file-name buffer)))
-      (kill-buffer buffer))))
+  (funcall-interactively 'kill-old-buffers 1))
+
+;;;###autoload
+(defun kill-old-buffers (count-to-keep)
+  "Kill the oldest buffers visiting files, keeping
+`COUNT-TO-KEEP' buffers. The current buffer is considered the
+newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
+1, all but the current buffer is killed)."
+  (interactive "p")
+  (-let* 
+  ( (bufs (-filter 'buffer-file-name (buffer-list))) 
+    (bufs-sorted
+     (-sort (-on 'time-less-p 
+                 (lambda(b) (with-current-buffer b (visited-file-modtime))))
+            bufs))
+    (curr (current-buffer))
+    (curr-i (-elem-index curr bufs-sorted))
+    (bufs-sorted-curr
+     (if curr-i
+         (cons curr (-remove-at curr-i bufs-sorted))
+       bufs-sorted))
+    (bufs-to-kill (-drop count-to-keep bufs-sorted-curr))
+    (bufs-str (s-join ", " (-map 'buffer-name bufs-to-kill)) )
+    )
+  (progn
+    (message "Killing %s" bufs-str)
+    (-each bufs-to-kill 'kill-buffer)) ))
+(global-set-key (kbd "C-x C-k") 'kill-old-buffers)
 
 ;;;###autoload
 (defun shell-command-silent (cmd)
@@ -166,7 +191,7 @@
 
 ;;;###autoload
 (defun enclose-region (&optional sep-str-arg)
-  "Enclose the marked region in a box made of `sep-str', 
+  "Enclose the marked region in a box made of `SEP-STR-ARG', 
    or the comment string if the arg is nil (otherwise does nothing).
    If the region is not at the beginning/end of the line, the enclosing 
    box seperates the previous/subsequent text with a newline. 
@@ -174,7 +199,7 @@
   (interactive (list (if 
     current-prefix-arg 
     (read-from-minibuffer "Enclose region with: ") 
-    nil))) 
+    nil)))
   (let ((sep-str (or sep-str-arg 
                      (if (string= comment-end "") (s-trim-right comment-start) nil))))
     (if sep-str
