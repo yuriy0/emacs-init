@@ -56,6 +56,7 @@
   csharp-mode
   cygwin-mount      
   dash 
+  dash-functional
   diminish
   elm-mode
   f
