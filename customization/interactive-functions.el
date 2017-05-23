@@ -142,14 +142,15 @@
     new branch has been checked out."
   (interactive)
   (when (yes-or-no-p "Are you sure - any changes in open buffers will be lost! ")
-    (let* ((bufs-todo
-            (--filter (and (buffer-file-name it)
-                           (file-exists-p (buffer-file-name it)))
-                      (buffer-list)))
-           (bufs-names
-            (s-join ", " (-map 'buffer-name bufs-todo))))
-      (--each bufs-todo (with-current-buffer it (revert-buffer t t t)))
-      (message "Reverting %s" bufs-names) )))
+    (-let* 
+        ((bufs-todo
+          (-filter 'buffer-file-name (buffer-list)))
+         ((to-rev to-del)
+          (-map 'cdr (-group-by (-compose 'file-exists-p 'buffer-file-name) bufs-todo)))
+         )
+      (message "Reverting %s and deleting %s" to-rev to-del)
+      (--each to-rev (with-current-buffer it (revert-buffer t t t)))
+      (--each to-del (funcall-interactively 'kill-buffer it)) )))
 
 ;;;###autoload
 (defun enclose-region-in (before-str after-str)
