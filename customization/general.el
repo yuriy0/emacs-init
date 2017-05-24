@@ -129,5 +129,4 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 (setq shell-file-name explicit-shell-file-name)
 
 ;; window {un/re}do
-(require 'winner-mode)
 (winner-mode t)
