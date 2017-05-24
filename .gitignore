@@ -1,0 +1,18 @@
+# these files are managed by emacs
+tramp
+server/*
+!server/.keep
+emacs_backup/*
+desktop/*
+!desktop/.keep
+eshell/*
+.ido.last
+elpa/*
+.aspell.en.pws
+ac-dict/*
+ac-comphist.dat
+auto-save-list/*
+helm-adaptive-history
+
+# my own trash
+_*
