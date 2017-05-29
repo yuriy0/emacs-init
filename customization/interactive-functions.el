@@ -5,6 +5,27 @@
   (funcall-interactively 'kill-old-buffers 1))
 
 ;;;###autoload
+(defun recent-file-buffers-list (&optional keep-cur) 
+  (-let*
+      ((bufs (-filter 'buffer-file-name (buffer-list))) 
+       (bufs-sorted
+        (-sort (-on 'time-less-p 
+                    (lambda(b) (with-current-buffer b (visited-file-modtime))))
+               bufs))
+       )
+    (if keep-cur 
+        (-let*
+            ((curr (current-buffer))
+             (curr-i (-elem-index curr bufs-sorted))
+             (bufs-sorted-curr
+              (if curr-i
+                  (cons curr (-remove-at curr-i bufs-sorted))
+                bufs-sorted))
+             )
+          bufs-sorted-curr)
+      bufs-sorted)))
+
+;;;###autoload
 (defun kill-old-buffers (count-to-keep)
   "Kill the oldest buffers visiting files, keeping
 `COUNT-TO-KEEP' buffers. The current buffer is considered the
@@ -12,17 +33,7 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
 1, all but the current buffer is killed)."
   (interactive "p")
   (-let* 
-  ( (bufs (-filter 'buffer-file-name (buffer-list))) 
-    (bufs-sorted
-     (-sort (-on 'time-less-p 
-                 (lambda(b) (with-current-buffer b (visited-file-modtime))))
-            bufs))
-    (curr (current-buffer))
-    (curr-i (-elem-index curr bufs-sorted))
-    (bufs-sorted-curr
-     (if curr-i
-         (cons curr (-remove-at curr-i bufs-sorted))
-       bufs-sorted))
+  ( (bufs-sorted-curr (recent-file-buffers-list))
     (bufs-to-kill (-drop count-to-keep bufs-sorted-curr))
     (bufs-str (s-join ", " (-map 'buffer-name bufs-to-kill)) )
     )
