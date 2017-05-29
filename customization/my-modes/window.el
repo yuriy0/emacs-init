@@ -46,9 +46,21 @@
   (interactive "p") 
   (pull-window-dir delta 'top))
 
+;; advanced window resizing
 (global-set-keys 
   (kbd "C-c <C-down>" ) 'pull-window-down
   (kbd "C-c <C-up>"   ) 'pull-window-up
   (kbd "C-c <C-left>" ) 'pull-window-left
   (kbd "C-c <C-right>") 'pull-window-right
 )
+
+;; when splitting windows, open a different buffer in the new window
+(defun split-window--new-buffer (do-split &rest do-split-args)
+  (let* ((old-buf (current-buffer))
+         (__ (bury-buffer))
+         (win-res (apply do-split do-split-args)))
+    (when (and (boundp 'win-res) (windowp win-res))
+       (set-window-buffer nil old-buf)
+    )))
+(advice-add 'split-window-right :around 'split-window--new-buffer)
+(advice-add 'split-window-below :around 'split-window--new-buffer)
