@@ -129,4 +129,9 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 (setq shell-file-name explicit-shell-file-name)
 
 ;; window {un/re}do
+(let ((map (make-sparse-keymap)))
+  (progn
+      (define-key map (kbd "C-c ,") 'winner-undo)
+      (define-key map (kbd "C-c .") 'winner-redo)
+      (setq winner-mode-map map)))
 (winner-mode t)
