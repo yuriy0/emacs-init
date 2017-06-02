@@ -56,11 +56,14 @@
 
 ;; when splitting windows, open a different buffer in the new window
 (defun split-window--new-buffer (do-split &rest do-split-args)
-  (let* ((old-buf (current-buffer))
-         (__ (bury-buffer))
-         (win-res (apply do-split do-split-args)))
-    (when (and (boundp 'win-res) (windowp win-res))
-       (set-window-buffer nil old-buf)
-    )))
+  (interactive)
+  (let* ((buf (nth (length (window-list)) (-filter 'buffer-file-name (buffer-list))))
+         (res (apply do-split do-split-args))
+         )
+    (save-selected-window
+      (select-window res)
+      (switch-to-buffer buf)
+      )
+    res))
 (advice-add 'split-window-right :around 'split-window--new-buffer)
 (advice-add 'split-window-below :around 'split-window--new-buffer)
