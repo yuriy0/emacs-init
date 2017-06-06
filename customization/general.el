@@ -20,6 +20,7 @@ by NARGS, the final trailing group of length < NARGS is ignored."
  (interactive)
  (setq really-kill-emacs t)
  (desktop-save-in-desktop-dir)
+ (wg-save-session)
  (save-buffers-kill-emacs))
 
 ;;;###autoload 
