@@ -10,8 +10,15 @@
       (right  . 2)
       (bottom . 3)
      )))
+(defun opp-dir (dir) 
+  (alist-get dir 
+    '((left   . right )
+      (top    . bottom) 
+      (right  . left  )
+      (bottom . top   )
+     )))
 
-(setq pull-window-base-mult 2)
+(setq pull-window-base-mult 5)
 
 (defun pull-window-dir (delta dir)
   (-if-let* 
@@ -19,10 +26,14 @@
     )
       (-let* 
           ((c-crd (if (memq dir '(left right)) t nil))
-           (c-dir (nth dir-ix (window-anchored)))
+           (ws (window-anchored))
+           (c-dir (nth dir-ix ws))
+           (c-odir (nth (dir-to-ix (opp-dir dir)) ws))
            (c-val (* pull-window-base-mult (if c-dir -1 1) (abs delta)))
            )
-        (window-resize nil c-val c-crd)
+        (if (or c-odir c-dir)
+            (window-resize nil c-val c-crd)
+          (message "pull-window-dir: don't know what to do"))
         )
     (message "pull-window-dir(%S): error" dir) ))
 
@@ -67,3 +78,10 @@
     res))
 (advice-add 'split-window-right :around 'split-window--new-buffer)
 (advice-add 'split-window-below :around 'split-window--new-buffer)
+
+(defun other-window-rev (count &optional all-frames)
+  (interactive "p") 
+  (other-window (- count) all-frames))
+(global-set-keys (kbd "C-x i" ) 'other-window-rev)
+
+
