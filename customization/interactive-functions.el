@@ -173,7 +173,7 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
   (transpose-windows (- arg)))
 (global-set-keys 
  (kbd "C-x t") 'transpose-windows
- (kbd "C-x 4 t") 'tranpose-windows-rev)
+ (kbd "C-x 5 t") 'tranpose-windows-rev)
 
 ;; based on: https://www.emacswiki.org/emacs/RevertBuffer#toc1
 ;;;###autoload
