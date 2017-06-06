@@ -139,3 +139,6 @@ by NARGS, the final trailing group of length < NARGS is ignored."
       (define-key map (kbd "C-c .") 'winner-redo)
       (setq winner-mode-map map)))
 (winner-mode t)
+
+;; misc 
+(smex-initialize)
