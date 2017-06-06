@@ -8,10 +8,7 @@
 (defun recent-file-buffers-list (&optional keep-cur) 
   (-let*
       ((bufs (-filter 'buffer-file-name (buffer-list))) 
-       (bufs-sorted
-        (-sort (-on 'time-less-p 
-                    (lambda(b) (with-current-buffer b (visited-file-modtime))))
-               bufs))
+       (bufs-sorted bufs)
        )
     (if keep-cur 
         (-let*
@@ -191,7 +188,8 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
          ((to-rev to-del)
           (-map 'cdr (-group-by (-compose 'file-exists-p 'buffer-file-name) bufs-todo)))
          )
-      (message "Reverting %s and deleting %s" to-rev to-del)
+      (when to-del 
+        (message "Deleting %s" to-del))
       (--each to-rev (with-current-buffer it (revert-buffer t t t)))
       (--each to-del (funcall-interactively 'kill-buffer it)) )))
 
