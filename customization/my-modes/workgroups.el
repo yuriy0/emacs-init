@@ -30,4 +30,19 @@
       wg-remember-frame-for-each-wg t
       wg-restore-remote-buffers nil)
 
-(workgroups-mode 1)   ; put this one at the bottom of .emacs
+(defun wg-open-default (frame) 
+  (unless (wg-current-workgroup t frame) 
+      (let* (old-frame (selected-frame))
+        (message "wg-open-default: switching")
+        (select-frame-set-input-focus frame)
+        (wg-switch-to-workgroup-at-index 0) 
+        (wg-restore-frames)
+        (select-frame-set-input-focus old-frame)
+        )
+      )
+  )
+(add-hook 'after-make-frame-functions 'wg-open-default)
+;; (add-hook 'focus-in-hook '(lambda () (wg-open-default (selected-frame))))
+
+(workgroups-mode 1)
+
