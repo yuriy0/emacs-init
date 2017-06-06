@@ -9,6 +9,10 @@
        ac-source-dictionary
        ac-source-abbrev)))
 
+(with-eval-after-load "auto-complete"
+  (setq ac-auto-start nil)
+  (ac-set-trigger-key "TAB"))
+
 ;; auto complete - haskell
 (define-key haskell-mode-map (kbd "M-/") 'ac-complete)
 ;; http://pastebin.com/tJyyEBAS
