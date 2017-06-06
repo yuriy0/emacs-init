@@ -38,3 +38,6 @@
  (kbd "C-x / 4") 'helm-do-ag-buffers)
 
 (setq helm-ag-fuzzy-match t)
+
+;; misc. 
+(helm-descbinds-mode)

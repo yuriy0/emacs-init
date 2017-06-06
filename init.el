@@ -66,6 +66,7 @@
   haskell-mode     
   helm 
   helm-ag
+  helm-descbinds
   ido-yes-or-no
   intero
   ;; jdee ; this replaced malabar-mode a while back, but it's huge and who uses
