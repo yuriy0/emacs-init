@@ -88,7 +88,7 @@
   unicode-fonts
   visual-regexp
   web-mode
-  workgroups2
+  ;; workgroups2
   yaml-mode
 ))
 

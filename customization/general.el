@@ -20,7 +20,7 @@ by NARGS, the final trailing group of length < NARGS is ignored."
  (interactive)
  (setq really-kill-emacs t)
  (desktop-save-in-desktop-dir)
- (wg-save-session)
+ ;; (wg-save-session)
  (save-buffers-kill-emacs))
 
 ;;;###autoload 
@@ -142,3 +142,6 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 
 ;; misc 
 (smex-initialize)
+
+;; 
+(fset 'find-file-read-only 'find-file)
