@@ -83,10 +83,11 @@
   shell-pop
   smex
   sml-mode
-  ucs-utils         
+  ucs-utils
   unicode-fonts
   visual-regexp
   web-mode
+  workgroups2
   yaml-mode
 ))
 
