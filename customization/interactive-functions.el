@@ -50,7 +50,7 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
 (defun toggle-window-split ()
   "If frame is split into two horizontally/vertically, split it vertically/horizontally instead."
   (interactive)
-  (if (= (count-windows) 2)
+  ;; (if (= (count-windows) 2)
       (let* ((this-win-buffer (window-buffer))
            (next-win-buffer (window-buffer (next-window)))
            (this-win-edges (window-edges (selected-window)))
@@ -64,15 +64,18 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
                   (car (window-edges (next-window))))
                'split-window-horizontally
                'split-window-vertically)))
-        (delete-other-windows)
+        (if this-win-2nd 
+          (delete-window (selected-window))
+          (delete-window (other-window 1))
+          )
         (let ((first-win (selected-window)))
         (funcall splitter)
         (if this-win-2nd (other-window 1))
         (set-window-buffer (selected-window) this-win-buffer)
         (set-window-buffer (next-window) next-win-buffer)
         (select-window first-win)
-        (if this-win-2nd (other-window 1))))))
-(define-key ctl-x-4-map "t" 'toggle-window-split)
+        (if this-win-2nd (other-window 1)))))
+(global-set-key (kbd "C-x 4 t") 'toggle-window-split)
 
 ;;;###autoload
 (defun remove-dos-eol ()
