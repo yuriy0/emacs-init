@@ -170,6 +170,13 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
          (set-window-buffer (funcall selector) this-win)
          (select-window (funcall selector)))
        (setq arg (if (plusp arg) (1- arg) (1+ arg))))))
+;;;###autoload
+(defun tranpose-windows-rev (arg)
+  (interactive "p") 
+  (transpose-windows (- arg)))
+(global-set-keys 
+ (kbd "C-x t") 'transpose-windows
+ (kbd "C-x 4 t") 'tranpose-windows-rev)
 
 ;; based on: https://www.emacswiki.org/emacs/RevertBuffer#toc1
 ;;;###autoload
