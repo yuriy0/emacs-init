@@ -127,6 +127,9 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 ;; For subprocesses invoked via the shell
 ;; (e.g., "shell -c command")
 (setq shell-file-name explicit-shell-file-name)
+(setq-default coding-system-for-read 'utf-8)
+(setq-default coding-system-for-write 'utf-8)
+(set-coding-system-priority 'utf-8)
 
 ;; window {un/re}do
 (let ((map (make-sparse-keymap)))
