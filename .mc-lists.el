@@ -35,6 +35,7 @@
         kill-region
         kill-sentence
         maplev-electric-tab
+        markdown-exdent-or-delete
         mouse-buffer-menu
         mouse-minor-mode-menu
         org-self-insert-command
