@@ -35,9 +35,11 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
     (bufs-str (s-join ", " (-map 'buffer-name bufs-to-kill)) )
     )
   (progn
-    (message "Killing %s" bufs-str)
-    (-each bufs-to-kill 'kill-buffer)) ))
-(global-set-key (kbd "C-x C-\") 'kill-old-buffers)
+    (when 
+        (y-or-n-p (format "Kill buffers: %s?" bufs-str))
+      (message "Killing %s" bufs-str)
+      (-each bufs-to-kill 'kill-buffer)) )))
+(global-set-key (kbd "C-x C-\\") 'kill-old-buffers)
 
 ;;;###autoload
 (defun shell-command-silent (cmd)
