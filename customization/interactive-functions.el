@@ -37,7 +37,7 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
   (progn
     (message "Killing %s" bufs-str)
     (-each bufs-to-kill 'kill-buffer)) ))
-(global-set-key (kbd "C-x C-k") 'kill-old-buffers)
+(global-set-key (kbd "C-x C-\") 'kill-old-buffers)
 
 ;;;###autoload
 (defun shell-command-silent (cmd)
