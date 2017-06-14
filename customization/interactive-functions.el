@@ -245,7 +245,7 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
           (before-str (apply 'concat (cons (if (eq beg (line-beginning-position)) "" "\n") enc-strs)))
           (after-str (apply 'concat (reverse (cons (if (eq end (line-end-position)) "" "\n") enc-strs))))
           )
-        (progn (message "test") (enclose-region-in before-str after-str)))
+        (enclose-region-in before-str after-str))
         (error (message "No region selected.")))
       (error (message "No seperator string given and no single-line comment syntax defined.")))))
 
