@@ -11,7 +11,9 @@
     (push-mark)
     (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
     ))
-(setq eshell-prompt-function #'(lambda nil
-  (concat
-    (getenv "USER") "@" (system-name) ":" (abbreviate-file-name (eshell/pwd))
-    (if (= (user-uid) 0) " # " " $ "))))
+
+(setq eshell-prompt-function #'(lambda ()
+  (let ((sp (propertize " " 'face '(:background "#fff"))))
+    (concat
+     sp (abbreviate-file-name (eshell/pwd)) "\n"
+     sp (if (= (user-uid) 0) "#" "$") " ")) ))
