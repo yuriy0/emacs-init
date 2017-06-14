@@ -1,3 +1,13 @@
+;;;###autoload 
+(defmacro with-negated-prefix-arg (fn) 
+  "Defines a lambda which takes a prefix arg
+and passes the negated version to the given function, 
+along with any other arguments"
+  `(lambda (k &rest args) 
+     (interactive "p") 
+     (apply ,fn (cons (- k) args))
+     ))
+
 ;;;###autoload
 (defun kill-all-buffers ()
   "Kill every buffer except the current one."
