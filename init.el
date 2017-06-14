@@ -45,6 +45,9 @@
 
 ;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages '(
+  ;; jdee ; this replaced malabar-mode a while back, but it's huge and who uses
+          ; java anyways
+  ;; workgroups2
   ac-helm 
   anaphora
   auto-complete
@@ -69,10 +72,9 @@
   helm-descbinds
   ido-yes-or-no
   intero
-  ;; jdee ; this replaced malabar-mode a while back, but it's huge and who uses
-          ; java anyways
   list-utils
   load-dir
+  magit
   markdown-mode 
   multiple-cursors
   pcache            
@@ -88,7 +90,6 @@
   unicode-fonts
   visual-regexp
   web-mode
-  ;; workgroups2
   yaml-mode
 ))
 
