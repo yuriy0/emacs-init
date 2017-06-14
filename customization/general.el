@@ -145,3 +145,6 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 
 ;; 
 (fset 'find-file-read-only 'find-file)
+;; highlight parens
+(setq show-paren-delay 0)
+(add-hook 'prog-mode-hook '(lambda () (show-paren-mode 1)))
