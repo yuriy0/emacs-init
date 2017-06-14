@@ -173,3 +173,6 @@ the same window)."
     (if ix (format "%d:" ix) "")))
 (setq-default mode-line-buffer-identification 
   (cons '(:eval (buffer-index-str)) mode-line-buffer-identification ) )
+;; confusing
+(add-hook 'sh-mode-hook
+  '(lambda () (setq-local inhibit-eol-conversion t)))
