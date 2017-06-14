@@ -67,9 +67,4 @@
 (advice-add 'split-window-right :around 'split-window--new-buffer)
 (advice-add 'split-window-below :around 'split-window--new-buffer)
 
-(defun other-window-rev (count &optional all-frames)
-  (interactive "p") 
-  (other-window (- count) all-frames))
-(global-set-keys (kbd "C-x i" ) 'other-window-rev)
-
-
+(global-set-keys (kbd "C-x i" ) (with-negated-prefix-arg 'other-window))
