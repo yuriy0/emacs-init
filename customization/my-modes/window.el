@@ -37,33 +37,21 @@
         )
     (message "pull-window-dir(%S): error" dir) ))
 
-(defun pull-window-left (delta) 
-  (interactive "p") 
-  (pull-window-dir delta 'left))
+(setq pull-window-keymap
+  `(( ,(kbd "C-c <C-down>" ) . bottom )
+    ( ,(kbd "C-c <C-up>"   ) . top    )
+    ( ,(kbd "C-c <C-left>" ) . left   )
+    ( ,(kbd "C-c <C-right>") . right  )  ))
 
-(defun pull-window-up (delta) 
-  (interactive "p") 
-  (pull-window-dir delta 'top))
+(--each pull-window-keymap (global-set-key (car it) 'pull-window-dir-i))
 
-(defun pull-window-right (delta) 
-  (interactive "p") 
-  (pull-window-dir delta 'right))
+;; relies on pull-window-keymap to determine the direction 
+(defun pull-window-dir-i (delta)
+  (interactive "p")
+  (-when-let* ((key (this-command-keys))
+               (dir (cdr (assoc key pull-window-keymap))))
+    (pull-window-dir delta dir) ))
 
-(defun pull-window-down (delta) 
-  (interactive "p") 
-  (pull-window-dir delta 'bottom))
-
-(defun pull-window-up (delta) 
-  (interactive "p") 
-  (pull-window-dir delta 'top))
-
-;; advanced window resizing
-(global-set-keys 
-  (kbd "C-c <C-down>" ) 'pull-window-down
-  (kbd "C-c <C-up>"   ) 'pull-window-up
-  (kbd "C-c <C-left>" ) 'pull-window-left
-  (kbd "C-c <C-right>") 'pull-window-right
-)
 
 ;; when splitting windows, open a different buffer in the new window
 (defun split-window--new-buffer (do-split &rest do-split-args)
