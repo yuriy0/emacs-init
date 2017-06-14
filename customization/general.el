@@ -140,14 +140,16 @@ by NARGS, the final trailing group of length < NARGS is ignored."
       (setq winner-mode-map map)))
 (winner-mode t)
 
-;; misc 
+;; require doesn't cut it
 (smex-initialize)
 
-;; 
+;; who needs this...
 (fset 'find-file-read-only 'find-file)
+
 ;; highlight parens
 (setq show-paren-delay 0)
 (add-hook 'prog-mode-hook '(lambda () (show-paren-mode 1)))
+
 ;; display the next buffer in the same window if the current buffer is a help
 ;; buffer
 (defun mode-of-buffer (buf) (with-current-buffer buf major-mode))
@@ -161,6 +163,7 @@ the same window)."
                       '(helm-major-mode) )
                 (minibufferp buf) ))))
 (add-to-list 'display-buffer-alist '(same-window-buffers display-buffer-same-window))
+
 ;; display the buffer index in the mode line 
 (defun buffer-index (&optional buf-arg) 
   "The index of the given buffer in the list of visible buffers"
@@ -173,6 +176,7 @@ the same window)."
     (if ix (format "%d:" ix) "")))
 (setq-default mode-line-buffer-identification 
   (cons '(:eval (buffer-index-str)) mode-line-buffer-identification ) )
+
 ;; confusing
 (add-hook 'sh-mode-hook
   '(lambda () (setq-local inhibit-eol-conversion t)))
