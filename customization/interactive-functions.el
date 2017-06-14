@@ -112,7 +112,6 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
 ;;;###autoload 
 (defun canon-win-path (path)
   "Convert the given path to a canonical, Windows path"
-  (interactive)
   (replace-regexp-in-string "/" "\\\\" (convert-standard-filename (expand-file-name path))))
 
 ;;;###autoload
