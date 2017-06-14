@@ -148,3 +148,16 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 ;; highlight parens
 (setq show-paren-delay 0)
 (add-hook 'prog-mode-hook '(lambda () (show-paren-mode 1)))
+;; display the next buffer in the same window if the current buffer is a help
+;; buffer
+(defun mode-of-buffer (buf) (with-current-buffer buf major-mode))
+(defun same-window-buffers (buf ac)
+  "Returns t if the given buffer is not a minibuffer type buffer 
+(actual minibuffer or helm mode); and if the current buffer is a
+help mode buffer (i.e. if the given buffer should be displayed in
+the same window)."
+  (and (memq (mode-of-buffer (current-buffer)) '(help-mode apropos-mode))
+       (not (or (memq (mode-of-buffer buf) 
+                      '(helm-major-mode) )
+                (minibufferp buf) ))))
+(add-to-list 'display-buffer-alist '(same-window-buffers display-buffer-same-window))
