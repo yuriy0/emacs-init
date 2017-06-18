@@ -169,3 +169,6 @@ the same window)."
 ;; confusing
 (add-hook 'sh-mode-hook
   '(lambda () (setq-local inhibit-eol-conversion t)))
+
+;; save scratch file
+(persistent-scratch-setup-default)
