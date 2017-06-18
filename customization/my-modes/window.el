@@ -20,10 +20,9 @@
 
 (setq pull-window-base-mult 5)
 
-(defun pull-window-dir (delta dir)
-  (-if-let* 
-    ( (dir-ix (dir-to-ix dir))
-    )
+(defun pull-window-args (delta dir) 
+ (-if-let* 
+    ( (dir-ix (dir-to-ix dir)) )
       (-let* 
           ((c-crd (if (memq dir '(left right)) t nil))
            (ws (window-anchored))
@@ -31,11 +30,15 @@
            (c-odir (nth (dir-to-ix (opp-dir dir)) ws))
            (c-val (* pull-window-base-mult (if c-dir -1 1) (abs delta)))
            )
-        (if (or c-odir c-dir)
-            (window-resize nil c-val c-crd)
-          (message "pull-window-dir: don't know what to do"))
-        )
-    (message "pull-window-dir(%S): error" dir) ))
+        (cond ((or c-odir c-dir) (list c-val c-crd)) 
+              ))
+   (error "pull-window: invalid direction: %S" dir) ))
+
+(defun pull-window-dir (delta dir &optional win)
+  (-if-let*
+      (((c-val c-crd) (pull-window-args delta dir)))
+      (window-resize win c-val c-crd)
+    (message "pull-window-dir(%S): don't know what to do" dir) ))
 
 (setq pull-window-keymap
   `(( ,(kbd "C-c <C-down>" ) . bottom )
