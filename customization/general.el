@@ -163,9 +163,7 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 help mode buffer (i.e. if the given buffer should be displayed in
 the same window)."
   (and (memq (mode-of-buffer (current-buffer)) '(help-mode apropos-mode))
-       (not (or (memq (mode-of-buffer buf) 
-                      '(helm-major-mode) )
-                (minibufferp buf) ))))
+       (not (transitive-bufferp buf))))
 (add-to-list 'display-buffer-alist '(same-window-buffers display-buffer-same-window))
 
 ;; confusing
