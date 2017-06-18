@@ -1,6 +1,10 @@
 (setq mouse-buffer-menu-mode-mult 0 ; right click menu
       inhibit-startup-screen t)     ; turn off startup screen
 
+;; only angry people use capslock
+(setq w32-enable-caps-lock nil)
+(define-key function-key-map [(capslock)] 'event-apply-super-modifier)
+
 ;;;###autoload
 (defun many (nargs fn &rest args) 
   "Apply FN of arity NARGS to each consecutive group of NARGS
