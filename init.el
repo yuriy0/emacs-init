@@ -176,7 +176,7 @@
 ;;;;;;;;;;;;;;;;;;
 ;; Custom modes ;;
 ;;;;;;;;;;;;;;;;;;
-(load-file "~/.emacs.d/customization/my-modes.el")
+(load-dir-one "~/.emacs.d/customization/my-modes/")
 
 ;;; fin 
 (setq emacs-init-finished t)
