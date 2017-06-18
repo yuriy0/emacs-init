@@ -39,9 +39,8 @@
 (fset 'display-startup-echo-area-message
       'check-emacs-init-finished)
 
-;; load custom before setting package-selected-packages
-(setq custom-file "~/.emacs.d/custom-set.el")
-(load custom-file 'noerror)
+;; don't use custom
+(setq custom-file "NUL")
 
 ;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages '(
