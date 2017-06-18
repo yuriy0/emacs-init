@@ -22,3 +22,14 @@
  (kbd "C-c C-t") 'haskell-process-do-type
  (kbd "C-c C-i") 'haskell-process-do-info
  (kbd "RET") 'electric-indent-just-newline)
+
+(setq haskell-lexeme--char-literal-rx 
+ (rx-to-string 
+  `(: (group "'")
+      (| (: (group (regexp "[[:alpha:]_([]")) (group "'")) 
+         (: (group (| (regexp "\\\\[^\n][^'\n]*") 
+                      (regexp "[^[:alpha:]_(['\n]")
+                   ;; used to be
+                   ;; (regexp "[^[:alpha:]_(['\n][^'\n]*") 
+                      ))
+            (| (group "'") "\n" (regexp "\\'")))))) )
