@@ -153,6 +153,10 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 ;; display the next buffer in the same window if the current buffer is a help
 ;; buffer
 (defun mode-of-buffer (buf) (with-current-buffer buf major-mode))
+(defun transitive-bufferp (buf) 
+  (or (memq (mode-of-buffer buf) 
+            '(helm-major-mode) )
+      (minibufferp buf)))
 (defun same-window-buffers (buf ac)
   "Returns t if the given buffer is not a minibuffer type buffer 
 (actual minibuffer or helm mode); and if the current buffer is a
