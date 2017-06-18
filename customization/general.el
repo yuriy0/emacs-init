@@ -164,19 +164,6 @@ the same window)."
                 (minibufferp buf) ))))
 (add-to-list 'display-buffer-alist '(same-window-buffers display-buffer-same-window))
 
-;; display the buffer index in the mode line 
-(defun buffer-index (&optional buf-arg) 
-  "The index of the given buffer in the list of visible buffers"
-  (let* 
-     ((buf (if buf-arg buf-arg (current-buffer))) 
-      (bufs (-filter 'get-buffer-window (buffer-list))) )
-    (-find-index (apply-partially 'equal buf) bufs) ))
-(defun buffer-index-str (&optional buf) 
-  (let ((ix (buffer-index buf))) 
-    (if ix (format "%d:" ix) "")))
-(setq-default mode-line-buffer-identification 
-  (cons '(:eval (buffer-index-str)) mode-line-buffer-identification ) )
-
 ;; confusing
 (add-hook 'sh-mode-hook
   '(lambda () (setq-local inhibit-eol-conversion t)))
