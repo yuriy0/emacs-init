@@ -179,9 +179,9 @@ the same window)."
 
 ;; {frame+wind}move
 (global-set-keys 
- (kbd "C-x <left>") 'windmove-left
- (kbd "C-x <right>") 'windmove-right
- (kbd "C-x <up>") 'windmove-up
- (kbd "C-x <down>") 'windmove-down))
+ (kbd "C-x C-<left>") 'windmove-left
+ (kbd "C-x C-<right>") 'windmove-right
+ (kbd "C-x C-<up>") 'windmove-up
+ (kbd "C-x C-<down>") 'windmove-down))
 (setq framemove-hook-into-windmove t)
 (framemove-default-keybindings 'super)
