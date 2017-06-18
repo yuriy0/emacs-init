@@ -63,6 +63,7 @@
   elm-mode
   f
   font-utils        
+  framemove
   fringe-helper     
   fuzzy
   haskell-mode     

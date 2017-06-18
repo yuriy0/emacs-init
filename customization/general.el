@@ -176,3 +176,6 @@ the same window)."
 
 ;; save scratch file
 (persistent-scratch-setup-default)
+
+;; framemove
+(framemove-default-keybindings 'super)
