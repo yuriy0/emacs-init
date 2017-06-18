@@ -68,6 +68,9 @@
 (advice-add 'split-window-below :around 'split-window--new-buffer)
 
 (global-set-keys (kbd "C-x i" ) (with-negated-prefix-arg 'other-window))
+(global-set-keys (kbd "C-x p") #'(lambda (count &optional all-frames)
+  (interactive "sTarget window: ")
+  (funcall 'other-window (string-to-number count) all-frames)))
 
 ;;;###autoload
 (defun my-window-list (&optional buf)
