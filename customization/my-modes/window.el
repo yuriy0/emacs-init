@@ -68,3 +68,48 @@
 (advice-add 'split-window-below :around 'split-window--new-buffer)
 
 (global-set-keys (kbd "C-x i" ) (with-negated-prefix-arg 'other-window))
+
+;;;###autoload
+(defun my-window-list (&optional buf)
+  "A version of `window-list' which starts with `BUF' or 
+the first buffer in the buffer list if `NIL'."
+  (let* 
+      ((first-buf (or buf (car (-filter 'get-buffer-window (buffer-list)))))
+       (first-win (get-buffer-window first-buf))
+       (next-win (next-window first-win))
+       (wins (list first-win))
+       )
+    (while (not (equal first-win next-win))
+      (add-to-list 'wins next-win) 
+      (setq next-win (next-window (car wins))))
+    (reverse wins) ))
+
+(setq last-window-list nil)
+(make-variable-frame-local last-window-list)
+;;;###autoload
+(defun update-windows-and-redisplay-mode-line (wins extra-cond)
+  "Updates `last-windows-list' to the given window list and
+schedules an update of the mode line"
+  (when (and extra-cond (not (equal last-windows-list wins)))
+      (setq last-windows-list wins)
+      (run-with-idle-timer 0.05 nil 
+         '(lambda() (force-mode-line-update t)))
+      ))
+
+;;;###autoload
+(defun buffer-index-str (&optional buf-arg)
+  "The index of `BUF-ARG' (or current buffer if `nil') in the list of visible buffers,
+as a string."
+  (let* 
+      ((buf (or buf-arg (current-buffer)))
+       (win (get-buffer-window buf))
+       (wins (my-window-list))
+       (ix (-find-index (apply-partially 'equal win) wins))
+       )
+    (if ix 
+        (progn (update-windows-and-redisplay-mode-line wins (eq ix 0))
+               (format "%d:" ix))
+      "") ))
+
+(setq-default mode-line-buffer-identification 
+  (cons '(:eval (buffer-index-str)) mode-line-buffer-identification ) )
