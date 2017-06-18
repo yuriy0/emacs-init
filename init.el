@@ -77,8 +77,9 @@
   magit
   markdown-mode 
   multiple-cursors
-  pcache            
-  persistent-soft   
+  pcache
+  persistent-scratch
+  persistent-soft
   php-mode
   popup             
   s  
