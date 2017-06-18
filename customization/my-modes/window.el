@@ -60,8 +60,8 @@
          (res (apply do-split do-split-args))
          )
     (save-selected-window
-      (select-window res)
-      (switch-to-buffer buf)
+      (select-window res t)
+      (switch-to-buffer buf t)
       )
     res))
 (advice-add 'split-window-right :around 'split-window--new-buffer)
