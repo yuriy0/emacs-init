@@ -84,14 +84,15 @@ the first buffer in the buffer list if `NIL'."
       (setq next-win (next-window (car wins))))
     (reverse wins) ))
 
-(setq last-window-list nil)
-(make-variable-frame-local last-window-list)
 ;;;###autoload
 (defun update-windows-and-redisplay-mode-line (wins extra-cond)
-  "Updates `last-windows-list' to the given window list and
+  "Updates `last-window-list' to the given window list and
 schedules an update of the mode line"
-  (when (and extra-cond (not (equal last-windows-list wins)))
-      (setq last-windows-list wins)
+  (if (not (frame-parameter nil 'last-window-list))
+      (set-frame-parameter nil 'last-window-list nil))
+  (when (and extra-cond 
+             (not (equal (frame-parameter nil 'last-window-list) wins)))
+      (set-frame-parameter nil 'last-window-list wins)
       (run-with-idle-timer 0.05 nil 
          '(lambda() (force-mode-line-update t)))
       ))
