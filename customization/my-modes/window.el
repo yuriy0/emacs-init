@@ -74,7 +74,9 @@
   "A version of `window-list' which starts with `BUF' or 
 the first buffer in the buffer list if `NIL'."
   (let* 
-      ((first-buf (or buf (car (-filter 'get-buffer-window (buffer-list)))))
+      ((first-buf (or buf (car (-filter 
+          (lambda (b) (and (get-buffer-window b) (not (transitive-bufferp b)))) 
+          (buffer-list)))))
        (first-win (get-buffer-window first-buf))
        (next-win (next-window first-win))
        (wins (list first-win))
@@ -82,7 +84,8 @@ the first buffer in the buffer list if `NIL'."
     (while (not (equal first-win next-win))
       (add-to-list 'wins next-win) 
       (setq next-win (next-window (car wins))))
-    (reverse wins) ))
+    (-filter (-compose 'not 'transitive-bufferp 'window-buffer) (reverse wins))
+    ))
 
 ;;;###autoload
 (defun update-windows-and-redisplay-mode-line (wins extra-cond)
