@@ -134,5 +134,10 @@ as a string."
                (format "%d:" ix))
       "") ))
 
-(setq-default mode-line-buffer-identification 
-  (cons '(:eval (buffer-index-str)) mode-line-buffer-identification ) )
+(defun do-add-buffer-index-str-to-mode-line (k)
+  (funcall k 'mode-line-buffer-identification 
+     (cons '(:eval (buffer-index-str)) mode-line-buffer-identification ) ))
+
+(do-add-buffer-index-str-to-mode-line 'set-default)
+(add-hook 'dired-after-readin-hook 
+  (apply-partially 'do-add-buffer-index-str-to-mode-line 'set))
