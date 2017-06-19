@@ -115,9 +115,7 @@ schedules an update of the mode line"
   (when (and extra-cond 
              (not (equal (frame-parameter nil 'last-window-list) wins)))
       (set-frame-parameter nil 'last-window-list wins)
-      (run-with-idle-timer 0.05 nil 
-         '(lambda() (force-mode-line-update t)))
-      ))
+      (force-mode-line-update t)))
 
 ;;;###autoload
 (defun buffer-index-str (&optional buf-arg)
