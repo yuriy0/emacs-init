@@ -144,3 +144,6 @@ as a string."
 (do-add-buffer-index-str-to-mode-line 'set-default)
 (add-hook 'dired-after-readin-hook 
   (apply-partially 'do-add-buffer-index-str-to-mode-line 'set))
+
+(defun string-to-nat (str) 
+  (if (string-match "\\`[0-9]*[1-9][0-9]*\\'" str) (string-to-number str)))
