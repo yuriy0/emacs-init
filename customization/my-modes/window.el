@@ -138,6 +138,9 @@ as a string."
   (funcall k 'mode-line-buffer-identification 
      (cons '(:eval (buffer-index-str)) mode-line-buffer-identification ) ))
 
+;; In order to get the window index in windows which already override the
+;; default mode line, that need to be `set' (instead of `set-default') inside
+;; the appropriate hook for the mode
 (do-add-buffer-index-str-to-mode-line 'set-default)
 (add-hook 'dired-after-readin-hook 
   (apply-partially 'do-add-buffer-index-str-to-mode-line 'set))
