@@ -120,8 +120,14 @@ if the window list was actually updated."
     (when do-update (set-frame-parameter nil 'last-window-list wins))
     do-update))
 
-(add-hook 'post-command-hook '(lambda () (update-windows) (force-mode-line-update t)))
-(add-hook 'window-configuration-change-hook 'update-windows)
+(defun update-windows-and-mode-line () 
+  (update-windows) (force-mode-line-update t)))
+
+(many 1 (lambda (h) add-hook h 'update-windows-and-mode-line)
+      'post-command-hook
+      'window-configuration-change-hook
+      'kill-buffer-hook
+      )
 
 ;;;###autoload
 (defun buffer-index-str (&optional buf-arg)
