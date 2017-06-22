@@ -149,3 +149,35 @@ as a string."
 
 (defun string-to-nat (str) 
   (if (string-match "\\`[0-9]*[1-9][0-9]*\\'" str) (string-to-number str)))
+
+(defun read-from-minibuffer-i (with-contents prompt &rest read-args)
+  (let* ((wins0 (window-list))
+         (promptl (length prompt))
+         (mb nil))
+    (cc:thread 0
+      (while (not mb)
+        (setq mb (-difference (window-list) wins0)))
+      (setq mb (window-buffer (car mb)))
+      (fset 'mb-contents 
+            (lambda () 
+              (with-current-buffer mb 
+                (let* ((str (buffer-string)))
+                  (set-text-properties 0 promptl nil str)
+                  (s-chop-prefix prompt str))
+                )))
+      (fset 'on-change 
+            (lambda (beg end) 
+              (when (equal mb (current-buffer))
+                (funcall with-contents (funcall 'mb-contents))
+                )))
+      (fset 'on-exit 
+            (lambda ()
+              (when (equal mb (current-buffer))
+                (remove-hook 'before-change-functions 'on-change)
+                (remove-hook 'minibuffer-exit-hook 'on-exit)
+                )))
+      (add-hook 'before-change-functions 'on-change)
+      (add-hook 'minibuffer-exit-hook 'on-exit)
+      )
+    (apply 'read-from-minibuffer (cons prompt read-args))
+  ))
