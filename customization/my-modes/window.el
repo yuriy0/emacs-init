@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (defun window-anchored (&optional win)
   (-zip-with 'eq 
    (window-edges (frame-root-window win) nil nil t)
