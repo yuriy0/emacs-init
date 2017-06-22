@@ -55,10 +55,12 @@
   cc-mode
   cl-lib            
   command-log-mode
+  concurrent
   csharp-mode
   cygwin-mount      
   dash 
   dash-functional
+  deferred 
   diminish
   elm-mode
   f
