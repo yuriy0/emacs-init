@@ -28,6 +28,12 @@
         "explorer.exe"
       helm-buffer-max-length nil            ) ; don't truncate buffer names 
 
+(many 1 (apply-partially 'add-to-list 'helm-boring-buffer-regexp-list)
+      "\\*magit-process:" 
+      "\\*magit-diff:"
+      "\\*Quail Completions*"
+      "\\*Backtrace*"
+      )
 
 ;; helm-ag
 (require 'helm-ag)
