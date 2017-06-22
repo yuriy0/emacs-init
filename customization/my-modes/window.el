@@ -109,15 +109,19 @@ the first buffer in the buffer list if `NIL'."
     ))
 
 ;;;###autoload
-(defun update-windows-and-redisplay-mode-line (wins extra-cond)
-  "Updates `last-window-list' to the given window list and
-schedules an update of the mode line"
+(defun update-windows (&optional wins-def)
+  "Updates `last-window-list' to the given window list. Returns
+if the window list was actually updated."
   (if (not (frame-parameter nil 'last-window-list))
       (set-frame-parameter nil 'last-window-list nil))
-  (when (and extra-cond 
-             (not (equal (frame-parameter nil 'last-window-list) wins)))
-      (set-frame-parameter nil 'last-window-list wins)
-      (force-mode-line-update t)))
+  (let* ((wins (or wins-def (my-window-list)))
+         (do-update (not (equal (frame-parameter nil 'last-window-list) wins)))
+          )
+    (when do-update (set-frame-parameter nil 'last-window-list wins))
+    do-update))
+
+(add-hook 'post-command-hook '(lambda () (update-windows) (force-mode-line-update t)))
+(add-hook 'window-configuration-change-hook 'update-windows)
 
 ;;;###autoload
 (defun buffer-index-str (&optional buf-arg)
@@ -126,13 +130,11 @@ as a string."
   (let* 
       ((buf (or buf-arg (current-buffer)))
        (win (get-buffer-window buf))
-       (wins (my-window-list))
+       (wins (frame-parameter nil 'last-window-list))
        (ix (-find-index (apply-partially 'equal win) wins))
        )
-    (if ix 
-        (progn (update-windows-and-redisplay-mode-line wins (eq ix 0))
-               (format "%d:" ix))
-      "") ))
+    (when (not wins) (message "Window list not created"))
+    (if ix (format "%d:" ix) "") ))
 
 (defun do-add-buffer-index-str-to-mode-line (k)
   (funcall k 'mode-line-buffer-identification 
