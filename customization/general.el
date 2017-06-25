@@ -190,3 +190,9 @@ the same window)."
 (which-key-mode)
 (setq which-key-popup-type 'side-window)
 (setq which-key-side-window-max-width 0.45)
+
+;; default emacs keys which I don't use which annoy me
+(many 1 'global-unset-key
+  (kbd "C-x <left>") 
+  (kbd "C-x <right>"))
+
