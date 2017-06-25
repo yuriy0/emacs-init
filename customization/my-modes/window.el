@@ -157,34 +157,29 @@ as a string."
 (defun string-to-nat (str) 
   (if (string-match "\\`[0-9]*[1-9][0-9]*\\'" str) (string-to-number str)))
 
-(defun read-from-minibuffer-i (with-contents prompt &rest read-args)
+(defun read-from-minibuffer-i (with-contents prompt &optional initial-contents keymap read hist default-value inherit-input-method)
   (let* ((wins0 (window-list))
          (promptl (length prompt))
-         (mb nil))
+         (mb nil)
+         (map (copy-keymap (or keymap minibuffer-local-map)))
+         (did-quit nil)
+         )
+    (define-key map (kbd "C-g") (lambda() (interactive) (setq did-quit t) (exit-minibuffer)))
     (cc:thread 0
       (while (not mb)
         (setq mb (-difference (window-list) wins0)))
       (setq mb (window-buffer (car mb)))
-      (fset 'mb-contents 
-            (lambda () 
-              (with-current-buffer mb 
-                (let* ((str (buffer-string)))
-                  (set-text-properties 0 promptl nil str)
-                  (s-chop-prefix prompt str))
-                )))
       (fset 'on-change 
             (lambda (beg end) 
-              (when (equal mb (current-buffer))
-                (funcall with-contents (funcall 'mb-contents))
-                )))
-      (fset 'on-exit 
-            (lambda ()
-              (when (equal mb (current-buffer))
-                (remove-hook 'before-change-functions 'on-change)
-                (remove-hook 'minibuffer-exit-hook 'on-exit)
-                )))
-      (add-hook 'before-change-functions 'on-change)
-      (add-hook 'minibuffer-exit-hook 'on-exit)
+                (funcall with-contents 
+                         (with-current-buffer mb 
+                           (let* ((str (buffer-string)))
+                             (set-text-properties 0 promptl nil str)
+                             (s-chop-prefix prompt str))))))
+      (with-current-buffer mb (add-hook 'before-change-functions 'on-change nil t))
       )
-    (apply 'read-from-minibuffer (cons prompt read-args))
-  ))
+    (let ((res (read-from-minibuffer prompt initial-contents map read hist default-value inherit-input-method)))
+      (if did-quit nil res)))
+  )
+
+
