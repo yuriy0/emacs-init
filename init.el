@@ -47,6 +47,8 @@
   ;; jdee ; this replaced malabar-mode a while back, but it's huge and who uses
           ; java anyways
   ;; workgroups2
+  ;; switch-window
+  ;; ace-window
   ac-helm 
   anaphora
   auto-complete
