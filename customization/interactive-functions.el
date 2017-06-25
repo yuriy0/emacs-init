@@ -62,7 +62,7 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
 (defun toggle-window-split ()
   "If frame is split into two horizontally/vertically, split it vertically/horizontally instead."
   (interactive)
-  ;; (if (= (count-windows) 2)
+  (if (> (count-windows) 1)
       (let* ((this-win-buffer (window-buffer))
            (next-win-buffer (window-buffer (next-window)))
            (this-win-edges (window-edges (selected-window)))
