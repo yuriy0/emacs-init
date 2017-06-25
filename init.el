@@ -93,6 +93,7 @@
   unicode-fonts
   visual-regexp
   web-mode
+  which-key
   yaml-mode
 ))
 

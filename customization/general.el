@@ -185,3 +185,8 @@ the same window)."
  (kbd "C-x C-<down>") 'windmove-down))
 (setq framemove-hook-into-windmove t)
 (framemove-default-keybindings 'super)
+
+;; which-key
+(which-key-mode)
+(setq which-key-popup-type 'side-window)
+(setq which-key-side-window-max-width 0.45)
