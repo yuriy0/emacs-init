@@ -141,7 +141,6 @@ as a string."
        (wins (frame-parameter nil 'last-window-list))
        (ix (-find-index (apply-partially 'equal win) wins))
        )
-    (when (not wins) (message "Window list not created"))
     (if ix (format "%d:" ix) "") ))
 
 (defun do-add-buffer-index-str-to-mode-line (k)
