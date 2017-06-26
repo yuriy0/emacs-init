@@ -123,9 +123,9 @@ if the window list was actually updated."
     do-update))
 
 (defun update-windows-and-mode-line () 
-  (update-windows) (force-mode-line-update t)))
+  (update-windows) (force-mode-line-update t))
 
-(many 1 (lambda (h) add-hook h 'update-windows-and-mode-line)
+(many 1 (lambda (h) (add-hook h 'update-windows-and-mode-line))
       'post-command-hook
       'window-configuration-change-hook
       'kill-buffer-hook
