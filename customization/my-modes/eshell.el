@@ -8,6 +8,8 @@
       esh-ext esh-groups esh-io esh-mode esh-module esh-opt
       esh-proc esh-util esh-var eshell))
 
+(add-to-list 'eshell-modules-list 'eshell-rebind)
+
 (add-hook 'eshell-mode-hook 
   (lambda () 
     (setq eshell-cmpl-ignore-case t)
