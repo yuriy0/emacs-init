@@ -192,6 +192,7 @@ the same window)."
 ;; which-key
 (which-key-mode)
 (setq which-key-popup-type 'side-window)
+(setq which-key-side-window-location 'right)
 (setq which-key-side-window-max-width 0.45)
 
 ;; default emacs keys which I don't use which annoy me
