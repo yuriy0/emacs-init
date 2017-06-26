@@ -17,6 +17,7 @@
     (define-keys eshell-mode-map 
       (kbd "M-]") 'helm-eshell-history
       [remap eshell-pcomplete] 'helm-esh-pcomplete
+      (kbd "<home>") 'eshell-bol
       )
     (setq eshell-prompt-function #'(lambda ()
       (let ((sp (propertize " " 'face '(:background "#fff"))))
