@@ -1,6 +1,5 @@
 ;; eshell
 (require 'helm-eshell)
-(fset 'shell 'eshell) ; replace shell with eshell 
 
 (add-hook 'eshell-mode-hook 
   (lambda () 
