@@ -10,6 +10,10 @@
 
 (add-to-list 'eshell-modules-list 'eshell-rebind)
 
+(setq eshell-hist-rebind-keys-alist
+  (--remove (member (car it) '([up] [down])) 
+            eshell-hist-rebind-keys-alist))
+
 (add-hook 'eshell-mode-hook 
   (lambda () 
     (setq eshell-cmpl-ignore-case t)
