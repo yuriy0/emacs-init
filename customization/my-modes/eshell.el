@@ -21,6 +21,10 @@
       [remap eshell-pcomplete] 'helm-esh-pcomplete
       (kbd "<home>") 'eshell-bol
       )
+    (many 1 (lambda (c) (add-to-list 'eshell-cannot-leave-input-list c))
+      'left-char 
+      'right-char
+      )
     ))
 
 (setq eshell-prompt-function #'(lambda ()
