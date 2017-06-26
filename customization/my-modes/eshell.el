@@ -1,5 +1,6 @@
 ;; eshell
 (require 'helm-eshell)
+(require 'em-prompt)
 
 (add-hook 'eshell-mode-hook 
   (lambda () 
