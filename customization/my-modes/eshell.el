@@ -6,7 +6,7 @@
       em-glob em-hist em-ls em-pred em-prompt em-rebind em-script
       em-smart em-term em-tramp em-unix em-xtra esh-arg esh-cmd
       esh-ext esh-groups esh-io esh-mode esh-module esh-opt
-      esh-proc esh-util esh-var))
+      esh-proc esh-util esh-var eshell))
 
 (add-hook 'eshell-mode-hook 
   (lambda () 
