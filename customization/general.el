@@ -14,6 +14,9 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 
 (defalias 'global-set-keys (apply-partially 'many 2 'global-set-key))
 (defalias 'customize-set-variables (apply-partially 'many 2 'customize-set-variable))
+(defalias 'define-keys 
+  (lambda(m &rest as) 
+    (apply 'many (cons 2 (cons (apply-partially 'define-key m) as)))))
 
 ;; keep server alive
 ;; http://stackoverflow.com/questions/2001485/how-do-i-keep-emacs-server-running-when-the-current-window-is-closed-x-on-wind 
