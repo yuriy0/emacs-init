@@ -195,6 +195,9 @@ the same window)."
 (setq which-key-side-window-location 'right)
 (setq which-key-side-window-max-width 0.45)
 
+;; fill-column indicator
+(add-hook 'prog-mode-hook '(lambda () (fci-mode t)))
+
 ;; default emacs keys which I don't use which annoy me
 (many 1 'global-unset-key
   (kbd "C-x <left>") 
