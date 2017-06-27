@@ -194,6 +194,7 @@ the same window)."
 (setq which-key-popup-type 'side-window)
 (setq which-key-side-window-location 'right)
 (setq which-key-side-window-max-width 0.45)
+(setq which-key-idle-delay 3.0)
 
 ;; fill-column indicator
 (add-hook 'prog-mode-hook '(lambda () (fci-mode t)))
