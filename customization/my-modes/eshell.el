@@ -36,3 +36,31 @@
      (concat
       sp (abbreviate-file-name (eshell/pwd)) "\n"
       sp (if (= (user-uid) 0) "#" "$") " ")) ))
+
+;; copied almost verbatim from eshell.el (***). The behaviour which is
+;; overridden is: "A nonnumeric prefix arg means to create a new session."
+;;;###autoload
+(defun my--eshell (&optional arg)
+  "Create an interactive Eshell buffer.
+The buffer used for Eshell sessions is determined by the value of
+`eshell-buffer-name'.  If there is already an Eshell session
+active in that buffer, Emacs will simply switch to it.
+Otherwise, a new session will begin.  A numeric prefix arg (as in
+`C-u 42 M-x eshell RET') switches to the session with that
+number, creating it if necessary. Returns the buffer selected (or
+created)."
+  (interactive "P")
+  (cl-assert eshell-buffer-name)
+  (let (;; *** except this part ;;;;;;;;;;;;;;;;;;;
+        (buf (get-buffer-create
+              (format "%s<%d>"
+                      eshell-buffer-name
+                      (if (numberp arg) arg 0))))
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        )
+    (cl-assert (and buf (buffer-live-p buf)))
+    (pop-to-buffer-same-window buf)
+    (unless (derived-mode-p 'eshell-mode)
+      (eshell-mode))
+    buf))
+(fset 'eshell 'my--eshell)
