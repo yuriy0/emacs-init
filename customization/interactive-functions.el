@@ -250,3 +250,13 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
   "(Re)Loads the emacs init file"
   (interactive)
   (load-file "~/.emacs.d/init.el"))
+
+;;;###autoload
+;; https://superuser.com/questions/132225/how-to-get-back-to-an-active-minibuffer-prompt-in-emacs-without-the-mouse
+(defun switch-to-minibuffer-window ()
+  "switch to minibuffer window (if active)"
+  (interactive)
+  (when (active-minibuffer-window)
+    (select-frame-set-input-focus (window-frame (active-minibuffer-window)))
+    (select-window (active-minibuffer-window))))
+(global-set-key (kbd "C-c m") 'switch-to-minibuffer-window)
