@@ -2,8 +2,9 @@
 (require 'whitespace)
 (setq-default
  whitespace-line-column nil
- whitespace-style       '(face lines-tail tabs tab-mark trailing))
-(setq global-whitespace-mode '(prog-mode (not agda2-mode)))
+ whitespace-style       '(face lines-tail tabs tab-mark trailing)
+ global-whitespace-mode nil)
+(add-hook 'prog-mode-hook 'whitespace-mode)
 
 ;; https://www.emacswiki.org/emacs/WhiteSpace
 (setq whitespace-display-mappings
