@@ -66,7 +66,6 @@
   diminish
   elm-mode
   f
-  fill-column-indicator
   font-utils        
   framemove
   fringe-helper     
