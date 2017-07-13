@@ -256,6 +256,16 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
         (error (message "No region selected.")))
       (error (message "No seperator string given and no single-line comment syntax defined.")))))
 
+(defun text-hrule ()
+  "Inserts a horizontal rule consisting of comment characters (if
+there is a comment syntax) starting from current point to length
+of `fill-column'."
+  (interactive)
+  (let ((str (unary-comment-syntax)))
+    (if str
+        (insert (s-replicate (- fill-column (current-column)) str))
+      (user-error "No comment syntax defined"))))
+
 ;;;###autoload
 (defun reload-emacs ()
   "(Re)Loads the emacs init file"
