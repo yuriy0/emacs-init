@@ -216,6 +216,19 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
      (insert after-str))))
 
 ;;;###autoload
+(defun unary-comment-syntax ()
+  (if (string= comment-end "") (s-trim-right comment-start) nil))
+
+(defun s-replicate (len str)
+  "Repeats `STR' until it has length exactly `LEN'. If `STR' is
+ shorter than `LEN', the prefix of length `LEN' is returned"
+  (let* ((str-len (length str))
+         (count (/ len str-len))
+         (str-out (s-left len (s-repeat (1+ count) str)))
+         )
+    str-out))
+
+;;;###autoload
 (defun enclose-region (&optional sep-str-arg)
   "Enclose the marked region in a box made of `SEP-STR-ARG', 
    or the comment string if the arg is nil (otherwise does nothing).
@@ -226,8 +239,7 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
     current-prefix-arg 
     (read-from-minibuffer "Enclose region with: ") 
     nil)))
-  (let ((sep-str (or sep-str-arg 
-                     (if (string= comment-end "") (s-trim-right comment-start) nil))))
+  (let ((sep-str (or sep-str-arg (unary-comment-syntax))))
     (if sep-str
       (if (use-region-p)
         (let*
@@ -235,8 +247,7 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
           (beg (region-beginning)) (end (region-end))
           (region-sz (- end beg))
           (region-sep-sz (+ region-sz (* 2 sep-str-sz) 2) )
-          (count-sep-str (/ region-sep-sz sep-str-sz))
-          (enc-str (s-left region-sep-sz (s-repeat (1+ count-sep-str) sep-str)))
+          (enc-str (s-replicate region-sep-sz sep-str))
           (enc-strs (list enc-str "\n" sep-str " "))
           (before-str (apply 'concat (cons (if (eq beg (line-beginning-position)) "" "\n") enc-strs)))
           (after-str (apply 'concat (reverse (cons (if (eq end (line-end-position)) "" "\n") enc-strs))))
