@@ -13,5 +13,10 @@
     (newline-mark ?\n   [?\xB6 ?\n] [?$ ?\n]) ; end-of-line
     ))
 
-(set-face-attribute 'whitespace-trailing nil
-   :background "bisque")
+(add-hook 'focus-in-hook '(lambda()
+  (set-face-attribute 'whitespace-trailing nil
+     :background "bisque")
+  (set-face-attribute 'whitespace-line nil
+     :foreground nil
+     :background "RosyBrown1")))
+
