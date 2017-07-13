@@ -13,27 +13,34 @@
 (setq eshell-modules-list
    (delete 'eshell-pred eshell-modules-list))
 
+;; don't rebind <up> and <down> as history scroll keys
 (setq eshell-hist-rebind-keys-alist
   (--remove (member (car it) '([up] [down])) 
             eshell-hist-rebind-keys-alist))
 
+;; customization of eshell
 (add-hook 'eshell-mode-hook 
   (lambda () 
+    ;; ignore case in completions
     (setq eshell-cmpl-ignore-case t)
     (eshell-cmpl-initialize)
+    ;; prompt colour
     (set-face-attribute 'eshell-prompt nil :foreground "chartreuse4")
-    (push-mark)
+    (push-mark) ;; ??
+    ;; custom keybindings
     (define-keys eshell-mode-map 
       (kbd "M-]") 'helm-eshell-history
       [remap eshell-pcomplete] 'helm-esh-pcomplete
       (kbd "<home>") 'eshell-bol
       )
+    ;; left and right cannot move into the prompt string
     (many 1 (lambda (c) (add-to-list 'eshell-cannot-leave-input-list c))
       'left-char 
       'right-char
       )
     ))
 
+;; customize prompt
 (setq eshell-prompt-function #'(lambda ()
    (let ((sp (propertize " " 'face '(:background "#fff"))))
      (concat
