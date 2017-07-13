@@ -3,12 +3,15 @@
 
 ;; just for *Help*
 (mapc #'require '(em-alias em-banner em-basic em-cmpl em-dirs
-      em-glob em-hist em-ls em-pred em-prompt em-rebind em-script
+      em-glob em-hist em-ls em-prompt em-rebind em-script
       em-smart em-term em-tramp em-unix em-xtra esh-arg esh-cmd
       esh-ext esh-groups esh-io esh-mode esh-module esh-opt
       esh-proc esh-util esh-var eshell))
 
+;; modules
 (add-to-list 'eshell-modules-list 'eshell-rebind)
+(setq eshell-modules-list
+   (delete 'eshell-pred eshell-modules-list))
 
 (setq eshell-hist-rebind-keys-alist
   (--remove (member (car it) '([up] [down])) 
