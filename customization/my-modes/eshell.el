@@ -67,3 +67,9 @@ created)."
       (eshell-mode))
     buf))
 (fset 'eshell 'my--eshell)
+
+;;; eshell functions
+(defun eshell/buffer-contents (buf)
+  "Echo the contents of a given buffer"
+  (interactive)
+  (eshell/echo (with-current-buffer buf (buffer-string))))
