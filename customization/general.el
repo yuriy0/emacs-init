@@ -196,8 +196,10 @@ the same window)."
 (setq which-key-side-window-max-width 0.45)
 (setq which-key-idle-delay 3.0)
 
+;; column numbers
+(column-number-mode t)
+
 ;; default emacs keys which I don't use which annoy me
 (many 1 'global-unset-key
   (kbd "C-x <left>") 
   (kbd "C-x <right>"))
-
