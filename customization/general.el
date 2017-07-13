@@ -66,9 +66,10 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 ;; no autosave
 (setq auto-save-default nil)
 
-;; enable {up/down}case-region (copied from somewhere...)
+;; enable some disabled-by-default comands
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
+(put 'erase-buffer 'disabled nil)
 
 ;; split vertically 
 (setq split-height-threshold 0
