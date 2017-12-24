@@ -92,6 +92,21 @@ is multiplied by the given delta to determine the true delta."
   (funcall 'other-window (string-to-number count) all-frames))
 (global-set-keys (kbd "C-x p") 'other-window-target)
 
+
+;;;###autoload
+(defun transpose-windows (arg)
+   "Transpose the buffers shown in two windows."
+   (interactive "nWindow buffer to transpose with: ")
+   (let* ((wins (my-window-list))
+          (this-win (nth 0 wins))
+          (othr-win (nth arg wins))
+          (this-buf (window-buffer this-win))
+          (othr-buf (window-buffer othr-win)) )
+     (set-window-buffer this-win othr-buf)
+     (set-window-buffer othr-win this-buf)
+     (select-window othr-win)))
+(global-set-keys (kbd "C-x t") 'transpose-windows)
+
 ;;;###autoload
 (defun my-window-list (&optional buf)
   "A version of `window-list' which starts with `BUF' or 

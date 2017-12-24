@@ -169,22 +169,6 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
           (set-visited-file-name new-name)
           (set-buffer-modified-p nil))))))
 
-;;;###autoload
-(defun transpose-windows (arg)
-   "Transpose the buffers shown in two windows."
-   (interactive "p")
-   (let ((selector (if (>= arg 0) 'next-window 'previous-window)))
-     (while (/= arg 0)
-       (let ((this-win (window-buffer))
-             (next-win (window-buffer (funcall selector))))
-         (set-window-buffer (selected-window) next-win)
-         (set-window-buffer (funcall selector) this-win)
-         (select-window (funcall selector)))
-       (setq arg (if (plusp arg) (1- arg) (1+ arg))))))
-(global-set-keys 
- (kbd "C-x t")   'transpose-windows
- (kbd "C-x 5 t") (with-negated-prefix-arg 'transpose-windows))
-
 ;; based on: https://www.emacswiki.org/emacs/RevertBuffer#toc1
 ;;;###autoload
 (defun revert-all-buffers ()
