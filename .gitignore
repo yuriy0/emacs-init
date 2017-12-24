@@ -13,6 +13,8 @@ ac-dict/*
 ac-comphist.dat
 auto-save-list/*
 helm-adaptive-history
+.persistent-scratch
+smex-items
 
 # my own trash
 _*
