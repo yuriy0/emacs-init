@@ -26,28 +26,31 @@
 (add-hook 'agda2-mode-hook #'(lambda () (add-hook 'buffer-list-update-hook #'agda-quit-if-no-agda-buffs)))
 
 (defun agda-init-unicode ()
-(setq agda-input-user-translations '(
-  ;; random symbols 
-  ("Nat" "ℕ") 
-  ("BBN" "ℕ") 
-  ("BBZ" "ℤ") 
-  ("BBQ" "ℚ")
-  ("SCup" "⊔")
-  ("<#" "⇐")
-  ("La" "⇐")
-  ("ddown" "⇩")
-  ("|-" "⊢")
-  ("[=" "⊑")
-  ("eps" "ε")
-  ("cv" "⋎")
-  ("{" "｛")
-  ("}" "｝")
-  ;; greek letters 
-  ("Del" "Δ")
-  ("del" "δ")
-  ("Gam" "Γ") 
-  ("gam" "γ")
-))
+  (setq agda-input-user-translations '(
+    ;; random symbols 
+    ("Nat" "ℕ") 
+    ("BBN" "ℕ") 
+    ("BBZ" "ℤ") 
+    ("BBQ" "ℚ")
+    ("SCup" "⊔")
+    ("<#" "⇐")
+    ("La" "⇐")
+    ("ddown" "⇩")
+    ("|-" "⊢")
+    ("[=" "⊑")
+    ("eps" "ε")
+    ("cv" "⋎")
+    ("{" "｛")
+    ("}" "｝")
+    ;; greek letters 
+    ("Del" "Δ")
+    ("del" "δ")
+    ("Gam" "Γ") 
+    ("gam" "γ")
+  ))
+  (agda-input-setup)
+)
+(agda-init-unicode)
 
 ;; Agda mode character mappings
 (many 2 (lambda (a b) (set-fontset-font "fontset-default" a b nil 'prepend))
@@ -108,7 +111,7 @@
    '(#x2983 . #x2984) "DejaVu Sans" 
   
   ;; relation compositon ⨾  
-   '(#x2a3e . #x2a3e) "Cambria" )
+   '(#x2a3e . #x2a3e) "Cambria"
 )
 
 (add-hook 'agda2-mode-hook #'agda-init-unicode)
