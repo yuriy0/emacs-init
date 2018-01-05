@@ -15,6 +15,7 @@ auto-save-list/*
 helm-adaptive-history
 .persistent-scratch
 smex-items
+network-security.data
 
 # my own trash
 _*
