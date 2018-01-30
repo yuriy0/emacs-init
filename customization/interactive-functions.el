@@ -265,3 +265,20 @@ of `fill-column'."
     (select-frame-set-input-focus (window-frame (active-minibuffer-window)))
     (select-window (active-minibuffer-window))))
 (global-set-key (kbd "C-c m") 'switch-to-minibuffer-window)
+
+;;;###autoload
+(defun delete-file-and-kill-buffer ()
+  "Delete the file visited by the current buffer, then kill the
+current buffer."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (when filename
+      (condition-case nil
+          (progn
+            (if (vc-backend filename)
+                (vc-delete-file filename)
+              (delete-file filename t))
+            (message "Deleted file %s" filename) )
+        (error (message "Failed to delete file %s" filename)) ) )
+    (kill-buffer)))
+(global-set-key (kbd "C-c D") 'delete-file-and-kill-buffer)
