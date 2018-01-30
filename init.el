@@ -78,6 +78,7 @@
   intero
   list-utils
   load-dir
+  lua-mode
   magit
   markdown-mode 
   multiple-cursors
