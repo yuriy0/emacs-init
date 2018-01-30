@@ -204,3 +204,6 @@ the same window)."
 (many 1 'global-unset-key
   (kbd "C-x <left>") 
   (kbd "C-x <right>"))
+
+;; use recycle bin
+(setq delete-by-moving-to-trash t)
