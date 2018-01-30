@@ -50,6 +50,8 @@
   ;; switch-window
   ;; ace-window
   ac-helm 
+  ace-jump-mode
+  ace-jump-zap
   anaphora
   auto-complete
   auto-complete-clang
