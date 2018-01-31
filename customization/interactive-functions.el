@@ -156,7 +156,10 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
 ;;;###autoload
 (defun rename-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive "sNew name: ")
+  (interactive
+   (let* ((pr (file-name-nondirectory (buffer-file-name)))
+          (str (read-string "New name: " pr)))
+     (list str) ))
   (let ((name (buffer-name))
         (filename (buffer-file-name)))
     (if (not filename)
