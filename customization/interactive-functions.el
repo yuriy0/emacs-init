@@ -154,23 +154,27 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
 
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
 ;;;###autoload
-(defun rename-file-and-buffer (new-name)
+(defun rename-file-and-buffer ()
   "Renames both current buffer and file it's visiting to NEW-NAME."
+  (interactive)
+  (if (not (buffer-file-name))
+      (message "Buffer '%s' is not visiting a file!" (buffer-name))
+    (call-interactively 'do-rename-file-and-buffer) ) )
+
+;;;###autoload
+(defun do-rename-file-and-buffer (new-name)
   (interactive
    (let* ((pr (file-name-nondirectory (buffer-file-name)))
           (str (read-string "New name: " pr)))
      (list str) ))
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (if (not filename)
-        (message "Buffer '%s' is not visiting a file!" name)
+  (let ((name (buffer-name)))
       (if (get-buffer new-name)
           (message "A buffer named '%s' already exists!" new-name)
         (progn
           (rename-file (file-name-nondirectory name) new-name 1)
           (rename-buffer new-name)
           (set-visited-file-name new-name)
-          (set-buffer-modified-p nil))))))
+          (set-buffer-modified-p nil)))))
 
 ;; based on: https://www.emacswiki.org/emacs/RevertBuffer#toc1
 ;;;###autoload
