@@ -103,7 +103,7 @@
 ))
 
 ;; suppress all warnings
-(setq warning-minimum-level :emergency
+(setq warning-minimum-level :error
       byte-compile-warnings nil)
 
 ;; packages
