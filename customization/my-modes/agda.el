@@ -115,3 +115,6 @@
 )
 
 (add-hook 'agda2-mode-hook #'agda-init-unicode)
+
+;; kill agda after loading (probably a better way...)
+(agda2-quit)
