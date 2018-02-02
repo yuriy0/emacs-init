@@ -202,8 +202,9 @@ the same window)."
 
 ;; default emacs keys which I don't use which annoy me
 (many 1 'global-unset-key
-  (kbd "C-x <left>") 
-  (kbd "C-x <right>"))
+  (kbd "C-x <left>")
+  (kbd "C-x <right>")
+  (kbd "C-x C-b") )
 
 ;; use recycle bin
 (setq delete-by-moving-to-trash t)
