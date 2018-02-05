@@ -65,6 +65,10 @@
   dash 
   dash-functional
   deferred 
+  dired-details
+  dired-hacks-utils
+  dired-rainbow
+  dired-subtree
   diminish
   elm-mode
   f
