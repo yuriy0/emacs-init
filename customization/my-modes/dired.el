@@ -1,3 +1,8 @@
+;; general
+(setq dired-recursive-copies (quote always))
+(setq dired-recursive-deletes (quote top))
+(save-place-mode 1)
+
 ;; find file with `a' in same buffer
 (put 'dired-find-alternate-file 'disabled nil)
 
@@ -14,4 +19,6 @@
    (kbd "i") #'dired-subtree-insert
    (kbd "<tab>") #'dired-subtree-toggle
    (kbd "<backtab>") #'dired-subtree-cycle
+   (kbd "<RET>") #'dired-find-alternate-file
+   (kbd "a") #'dired-find-file
    )
