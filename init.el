@@ -81,7 +81,6 @@
   helm-ag
   helm-descbinds
   ido-yes-or-no
-  intero
   list-utils
   load-dir
   lua-mode
