@@ -45,5 +45,11 @@
 
 (setq helm-ag-fuzzy-match t)
 
+(set-face-attribute 'helm-grep-finish nil
+     :foreground "MediumSeaGreen"
+     :weight 'bold
+     :width 'expanded
+     )
+
 ;; misc. 
 (helm-descbinds-mode)
