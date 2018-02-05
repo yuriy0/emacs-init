@@ -16,6 +16,7 @@ helm-adaptive-history
 .persistent-scratch
 smex-items
 network-security.data
+places
 
 # my own trash
 _*
