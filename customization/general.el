@@ -209,3 +209,6 @@ the same window)."
 
 ;; use recycle bin
 (setq delete-by-moving-to-trash t)
+
+;; make frame
+(define-key global-map (kbd "C-x 5 -") 'make-frame)
