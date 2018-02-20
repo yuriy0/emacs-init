@@ -111,7 +111,13 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 
 ;; auto-revert
 (setq revert-without-query (list ".+") ;; auto revert any file without confirmation
-      auto-revert-interval 1)
+      auto-revert-interval 1
+      auto-revert-use-notify nil)
+
+;; ignore changes to file on disk (but warn about them)
+(defun ask-user-about-supersession-threat (fn)
+  (message "File %s changed on disk, overriding modifications!"
+           (buffer-file-name)))
 
 ;; f5 to refresh 
 (global-set-key (kbd "<f5>") (lambda () (interactive) (revert-buffer t t)))
