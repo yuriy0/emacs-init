@@ -54,6 +54,18 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 (global-set-key (kbd "RET") 'electric-indent-just-newline)
 
 ;; backup files
+(defun my-backup-file-name (fpath)
+  "Return a new file path of a given file path.
+If the new path's directories does not exist, create them."
+  (let* (
+        (backupRootDir "~/.emacs.d/emacs_backup/")
+        (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path, for example, “C:”
+        (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") ))
+        )
+    (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
+    backupFilePath ) )
+(setq make-backup-file-name-function 'my-backup-file-name)
+
 (setq backup-directory-alist '(("" . "~/.emacs.d/emacs_backup"))
       backup-by-copying t 
       version-control t 
