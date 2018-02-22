@@ -3,7 +3,6 @@
 
 ;; only angry people use capslock
 (setq w32-enable-caps-lock nil)
-(define-key function-key-map [(capslock)] 'event-apply-super-modifier)
 
 ;;;###autoload
 (defun many (nargs fn &rest args) 
