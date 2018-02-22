@@ -90,6 +90,7 @@
   pcache
   persistent-scratch
   persistent-soft
+  perspeen
   php-mode
   popup             
   s  
@@ -128,8 +129,13 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-;; require user packages 
-(mapc #'require package-selected-packages)
+;; require user packages
+(setq load-later '(perspeen))
+(mapc #'(lambda (p)
+          (if (member p load-later)
+              nil
+            (require p)))
+      package-selected-packages)
 
 ;; whenever you install/update a package, the `package' package will (through
 ;; 'customize') automatically clobber `package-selected-packages'. 
