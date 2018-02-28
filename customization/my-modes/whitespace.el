@@ -5,6 +5,10 @@
  whitespace-style       '(face lines-tail tabs tab-mark trailing)
  global-whitespace-mode nil)
 (add-hook 'prog-mode-hook 'whitespace-mode)
+(add-hook 'lua-mode-hook
+   (lambda ()
+     (setq-local whitespace-style '(face tabs tab-mark trailing))
+   ) )
 
 ;; https://www.emacswiki.org/emacs/WhiteSpace
 (setq whitespace-display-mappings
