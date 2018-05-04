@@ -51,5 +51,11 @@
      :width 'expanded
      )
 
-;; misc. 
+;; find-file - when the file doesn't exist, create it
+(defun find-file-create-if-nonexistant (_)
+  (when (not (file-exists-p (buffer-file-name)))
+    (save-buffer) ) )
+(advice-add 'helm-find-files :after 'find-file-create-if-nonexistant)
+
+;; misc.
 (helm-descbinds-mode)
