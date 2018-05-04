@@ -24,3 +24,6 @@
      :foreground nil
      :background "RosyBrown1")))
 
+;; cleanup whitespace before saving
+(add-hook 'before-save-hook 'whitespace-cleanup)
+
