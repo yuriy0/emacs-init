@@ -7,7 +7,7 @@
 (add-hook 'prog-mode-hook 'whitespace-mode)
 (add-hook 'lua-mode-hook
    (lambda ()
-     (setq-local whitespace-style '(face tabs tab-mark trailing))
+     (whitespace-toggle-options '(lines-tail))
    ) )
 
 ;; https://www.emacswiki.org/emacs/WhiteSpace
