@@ -229,3 +229,9 @@ the same window)."
 
 ;; make frame
 (define-key global-map (kbd "C-x 5 -") 'make-frame)
+
+;; for WAF build system
+(add-to-list 'auto-mode-alist
+   '("[\\/]wscript\\'" . python-mode)
+   '("\\.waf_files\\'" . text-mode)
+)
