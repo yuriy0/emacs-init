@@ -256,6 +256,8 @@ of `fill-column'."
     (if str
         (insert (s-replicate (- fill-column (current-column)) str))
       (user-error "No comment syntax defined"))))
+(global-set-key (kbd "C-h C-r") 'text-hrule)
+
 
 ;;;###autoload
 (defun reload-emacs ()
