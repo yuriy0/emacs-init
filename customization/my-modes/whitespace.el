@@ -25,5 +25,6 @@
      :background "RosyBrown1")))
 
 ;; cleanup whitespace before saving
-(add-hook 'before-save-hook 'whitespace-cleanup)
+;; TODO: figure out how to stop this from screwing files in source control
+;; (add-hook 'before-save-hook 'whitespace-cleanup)
 
