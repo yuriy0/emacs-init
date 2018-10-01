@@ -40,6 +40,7 @@
         mouse-buffer-menu
         mouse-minor-mode-menu
         org-self-insert-command
+        overwrite-mode
         python-backspace
         save-some-buffers
         shm/space
