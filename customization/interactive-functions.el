@@ -109,10 +109,6 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
           (replace-match "" nil nil))
         (message (format "%d ^M removed from buffer." remove-count))))))
 
-(add-hook 'buffer-list-update-hook '(lambda() 
-   (if (not (active-minibuffer-window)) (remove-dos-eol))
-))
-
 ;;;###autoload 
 (defun canon-win-path (path)
   "Convert the given path to a canonical, Windows path"
