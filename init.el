@@ -92,6 +92,7 @@
   persistent-soft
   php-mode
   popup             
+  python-mode
   s  
   setup-cygwin
   shell-pop
