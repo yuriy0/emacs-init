@@ -1,3 +1,7 @@
 [submodule "maplev"]
 	path = maplev
 	url = https://github.com/JoeRiel/maplev
+
+[submodule "fakecygpty"]
+	path = fakecygpty
+	url = https://github.com/d5884/fakecygpty

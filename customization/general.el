@@ -235,3 +235,32 @@ the same window)."
    '("[\\/]wscript\\'" . python-mode)
    '("\\.waf_files\\'" . text-mode)
 )
+
+;; HACK for Tramp to work with cygwin
+;; For rationale, see:
+;;   https://www.gnu.org/software/emacs/manual/html_node/tramp/Windows-setup-hints.html#Windows-setup-hints 
+;;   https://www.emacswiki.org/emacs/SshWithNTEmacs
+(cond
+  ( (not (executable-find "fakecygpty"))
+    (message "Skipping 'fakecygpty' since 'fakecygpty.exe' not found on path")
+  )
+  (t (progn
+       (add-to-list 'load-path "~/.emacs.d/fakecygpty")
+       (require 'fakecygpty)
+       (fakecygpty-activate)
+     )
+  )
+)
+
+(eval-after-load "tramp"
+  '(progn
+     (add-to-list 'tramp-methods
+                  (mapcar
+                   (lambda (x)
+                     (cond
+                      ((equal x "sshx") "cygssh")
+                      ((eq (car x) 'tramp-login-program) (list 'tramp-login-program "fakecygpty ssh"))
+                      (t x)))
+                   (assoc "sshx" tramp-methods)))
+     (setq tramp-default-method "cygssh"))
+)

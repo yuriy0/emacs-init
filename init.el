@@ -80,6 +80,7 @@
   helm 
   helm-ag
   helm-descbinds
+  helm-tramp
   ido-yes-or-no
   list-utils
   load-dir
