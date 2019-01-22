@@ -191,9 +191,8 @@ the same window)."
        (not (transitive-bufferp buf))))
 (add-to-list 'display-buffer-alist '(same-window-buffers display-buffer-same-window))
 
-;; confusing
-(add-hook 'sh-mode-hook
-  '(lambda () (setq-local inhibit-eol-conversion t)))
+;; converting eol automatically is confusing
+(setq inhibit-eol-conversion t)
 
 ;; save scratch file
 (persistent-scratch-setup-default)
