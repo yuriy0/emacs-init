@@ -41,6 +41,7 @@
         mouse-minor-mode-menu
         org-self-insert-command
         overwrite-mode
+        py-electric-delete
         python-backspace
         save-some-buffers
         shm/space
