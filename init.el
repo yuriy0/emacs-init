@@ -117,7 +117,13 @@
    ("gnu" . "http://elpa.gnu.org/packages/")
    ("marmalade" . "https://marmalade-repo.org/packages/")
    ("melpa" . "http://melpa.org/packages/")
-   ;; ("melpa-stable" . "http://stable.melpa.org/packages/")
+
+;; Ever since this (https://github.com/melpa/melpa/pull/5008) change, which
+;; removes EmacsWiki packages from melpa, some packages here are not available
+;; from melpa. This breaks the automated package installation workflow in a bad
+;; way. Thankfully someone has created an ELPA for EmacsWiki (see
+;; https://github.com/emacs-china/emacswiki-elpa).
+   ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
    ))
 (setq package-enable-at-startup nil)
 (package-initialize)
