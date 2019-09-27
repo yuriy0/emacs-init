@@ -39,9 +39,12 @@
         markdown-exdent-or-delete
         mouse-buffer-menu
         mouse-minor-mode-menu
+        nxml-electric-slash
         org-self-insert-command
         overwrite-mode
+        py-electric-comment
         py-electric-delete
+        py-indent-or-complete
         python-backspace
         save-some-buffers
         shm/space
@@ -74,6 +77,7 @@
         shm/del
         tab-to-tab-stop
         tex-compile
+        toggle-frame-fullscreen
         yaml-electric-backspace
         yank-rectangle
         ))
