@@ -107,7 +107,57 @@ newest buffer for this purpose (that is, when `COUNT-TO-KEEP' is
         (while (re-search-forward (concat (char-to-string 13) "$") (point-max) t)
           (setq remove-count (+ remove-count 1))
           (replace-match "" nil nil))
-        (message (format "%d ^M removed from buffer." remove-count))))))
+        (message (format "%d CR removed from buffer." remove-count))))))
+
+;; Counts how many times `regex' matches in `string'
+(defun count-occurences (regex string)
+  (let ((current-index 0)
+        (next-index nil)
+        (count 0)
+        )
+    (while
+        (and
+         (setq next-index (string-match regex string current-index))
+         (not (equal next-index current-index))
+         )
+      (setq current-index (+ 1 next-index))
+      (setq count (+ 1 count))
+    )
+    count
+   )
+)
+
+;; Entire contents of a buffer with no properties
+(defun buffer-string-no-prop ()
+  (save-restriction
+    (widen)
+    (buffer-substring-no-properties (point-min) (point-max))
+  )
+)
+
+;;;###autoload
+(defun normalize-eol ()
+  "Tries to guess what type of line endings the current buffer should have,
+and replaces any which are inconsistent."
+  (interactive)
+  (save-match-data
+    (save-excursion
+      (let* ((buf-str (buffer-string-no-prop))
+             (eol-c (count-occurences "\n" buf-str))
+             (dos-eol-c (count-occurences "\r\n" buf-str))
+             (nix-eol-c (count-occurences "\n$" buf-str))
+            )
+        (cond
+         ((or (equal dos-eol-c 0) (equal nix-eol-c 0))
+          (message "Line endings already consistent")
+          )
+
+         ((>= nix-eol-c dos-eol-c) (delete-dos-eol))
+
+         ((< nix-eol-c dos-eol-c)
+          (message "TODO: REPLACE LF WITH CRLF")
+          )
+         )))))
 
 ;;;###autoload 
 (defun canon-win-path (path)
