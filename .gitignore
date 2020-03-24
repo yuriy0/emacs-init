@@ -17,6 +17,7 @@ helm-adaptive-history
 smex-items
 network-security.data
 places
+url
 
 # my own trash
 _*
