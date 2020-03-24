@@ -70,6 +70,7 @@
         helm-buffers-list
         helm-show-kill-ring
         latex-insert-item
+        mark-paragraph
         mouse-appearance-menu
         mouse-set-region
         scroll-bar-toolkit-scroll
