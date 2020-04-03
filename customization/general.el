@@ -153,9 +153,9 @@ If the new path's directories does not exist, create them."
 ;; For subprocesses invoked via the shell
 ;; (e.g., "shell -c command")
 (setq shell-file-name explicit-shell-file-name)
-(setq-default coding-system-for-read 'utf-8-unix)
+;;(setq-default coding-system-for-read 'utf-8-unix)
 ;;(setq-default coding-system-for-write 'utf-8)
-(set-coding-system-priority 'utf-8-unix 'utf-8-dos)
+;;(set-coding-system-priority 'utf-8-unix 'utf-8-dos)
 
 ;; window {un/re}do
 (let ((map (make-sparse-keymap)))
