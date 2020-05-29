@@ -93,6 +93,7 @@
   persistent-soft
   php-mode
   popup             
+  powershell
   python-mode
   s  
   setup-cygwin
