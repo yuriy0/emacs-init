@@ -15,4 +15,4 @@
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 
 ;; optional key bindings, easier than hs defaults
-(define-key nxml-mode-map (kbd "C-c '") 'hs-toggle-hiding)
+(define-key hs-minor-mode-map [C-tab] 'hs-toggle-hiding)
