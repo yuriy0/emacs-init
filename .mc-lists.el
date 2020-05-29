@@ -53,6 +53,7 @@
         smex
         tex-insert-quote
         tex-terminate-paragraph
+        yaml-electric-backspace
         yaml-electric-dash-and-dot
         ))
 
@@ -79,6 +80,5 @@
         tab-to-tab-stop
         tex-compile
         toggle-frame-fullscreen
-        yaml-electric-backspace
         yank-rectangle
         ))
