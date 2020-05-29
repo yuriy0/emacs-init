@@ -43,6 +43,7 @@
  (kbd "C-x / 3") 'helm-do-ag-project-root
  (kbd "C-x / 4") 'helm-do-ag-buffers)
 
+(setq helm-ag-base-command "ag --vimgrep --no-color")
 (setq helm-ag-fuzzy-match t)
 
 (set-face-attribute 'helm-grep-finish nil
