@@ -25,6 +25,7 @@
         cua-paste-pop
         cua-set-rectangle-mark
         dabbrev-expand
+        electric-indent-just-newline
         electric-newline-and-maybe-indent
         haskell-indentation-delete-backward-char
         haskell-mode-contextual-space
@@ -37,6 +38,7 @@
         maplev-electric-tab
         maplev-indent-newline
         markdown-exdent-or-delete
+        markdown-outdent-or-delete
         mouse-buffer-menu
         mouse-minor-mode-menu
         nxml-electric-slash

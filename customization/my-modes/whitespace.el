@@ -2,13 +2,15 @@
 (require 'whitespace)
 (setq-default
  whitespace-line-column nil
- whitespace-style       '(face lines-tail tabs tab-mark trailing)
+ whitespace-style       '(face tabs tab-mark trailing)
  global-whitespace-mode nil)
+
 (add-hook 'prog-mode-hook 'whitespace-mode)
-(add-hook 'lua-mode-hook
-   (lambda ()
-     (whitespace-toggle-options '(lines-tail))
-   ) )
+
+;; (add-hook 'lua-mode-hook
+;;    (lambda ()
+;;      (whitespace-toggle-options '(lines-tail))
+;;    ) )
 
 ;; https://www.emacswiki.org/emacs/WhiteSpace
 (setq whitespace-display-mappings

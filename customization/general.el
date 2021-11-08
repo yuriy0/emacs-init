@@ -236,31 +236,42 @@ the same window)."
    '("\\.waf_files\\'" . text-mode)
 )
 
+;; HACK for Tramp
+;; The default does not like the ~ before > so do a kludge
+(setq shell-prompt-pattern '"^[^#$%>\n]*~?[#$%>] *")
+
 ;; HACK for Tramp to work with cygwin
 ;; For rationale, see:
 ;;   https://www.gnu.org/software/emacs/manual/html_node/tramp/Windows-setup-hints.html#Windows-setup-hints 
 ;;   https://www.emacswiki.org/emacs/SshWithNTEmacs
-(cond
-  ( (not (executable-find "fakecygpty"))
-    (message "Skipping 'fakecygpty' since 'fakecygpty.exe' not found on path")
-  )
-  (t (progn
-       (add-to-list 'load-path "~/.emacs.d/fakecygpty")
-       (require 'fakecygpty)
-       (fakecygpty-activate)
-     )
-  )
-)
+;; (cond
+;;   ( (not (executable-find "fakecygpty"))
+;;     (message "Skipping 'fakecygpty' since 'fakecygpty.exe' not found on path")
+;;   )
+;;   (t (progn
+;;        (add-to-list 'load-path "~/.emacs.d/fakecygpty")
+;;        (require 'fakecygpty)
+;;        (fakecygpty-activate)
+;;      )
+;;   )
+;; )
 
-(eval-after-load "tramp"
-  '(progn
-     (add-to-list 'tramp-methods
-                  (mapcar
-                   (lambda (x)
-                     (cond
-                      ((equal x "sshx") "cygssh")
-                      ((eq (car x) 'tramp-login-program) (list 'tramp-login-program "fakecygpty ssh"))
-                      (t x)))
-                   (assoc "sshx" tramp-methods)))
-     (setq tramp-default-method "cygssh"))
-)
+;; (eval-after-load "tramp"
+;;   '(progn
+;;      (add-to-list 'tramp-methods
+;;                   (mapcar
+;;                    (lambda (x)
+;;                      (cond
+;;                       ((equal x "sshx") "cygssh")
+;;                       ((eq (car x) 'tramp-login-program) (list 'tramp-login-program "fakecygpty ssh"))
+;;                       (t x)))
+;;                    (assoc "sshx" tramp-methods)))
+;;      (setq tramp-default-method "cygssh"))
+;; )
+
+;; Use utf-8 encoding by default
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(set-selection-coding-system 'utf-8)
+

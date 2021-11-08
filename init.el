@@ -60,6 +60,7 @@
   cl-lib            
   command-log-mode
   concurrent
+  cmake-mode
   csharp-mode
   cygwin-mount      
   dash 
@@ -82,6 +83,7 @@
   helm-descbinds
   helm-tramp
   ido-yes-or-no
+  json-mode
   list-utils
   load-dir
   lua-mode
@@ -104,6 +106,7 @@
   unicode-fonts
   visual-regexp
   web-mode
+  web-server
   which-key
   yaml-mode
 ))
