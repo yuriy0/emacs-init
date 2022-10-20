@@ -136,27 +136,6 @@ If the new path's directories does not exist, create them."
 ;; tabs are EVIL 
 (setq-default indent-tabs-mode nil)
 
-;; cygwin
-(require 'cygwin-mount)
-(require 'setup-cygwin)
-
-(cygwin-mount-activate)
-
-(add-hook 'comint-output-filter-functions
-    'shell-strip-ctrl-m nil t)
-(add-hook 'comint-output-filter-functions
-    'comint-watch-for-password-prompt nil t)
-
-;; external shell
-(setq explicit-shell-file-name "bash.exe")
-
-;; For subprocesses invoked via the shell
-;; (e.g., "shell -c command")
-(setq shell-file-name explicit-shell-file-name)
-;;(setq-default coding-system-for-read 'utf-8-unix)
-;;(setq-default coding-system-for-write 'utf-8)
-;;(set-coding-system-priority 'utf-8-unix 'utf-8-dos)
-
 ;; window {un/re}do
 (let ((map (make-sparse-keymap)))
   (progn

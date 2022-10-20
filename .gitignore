@@ -19,6 +19,7 @@ network-security.data
 places
 url
 transient/*
+.lsp-session*
 
 # needs seperate installation
 fonts/

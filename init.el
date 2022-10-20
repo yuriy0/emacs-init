@@ -58,6 +58,7 @@
   cc-mode
   cl-lib            
   command-log-mode
+  company
   concurrent
   cmake-mode
   csharp-mode
@@ -71,7 +72,6 @@
   elm-mode
   f
   font-utils        
-  ;;framemove
   fringe-helper     
   fuzzy
   gnu-elpa-keyring-update
@@ -96,6 +96,14 @@
   powershell
   python-mode
   s
+  rustic
+
+  ;; used by rustic
+  lv
+  lsp-mode
+  ht
+  ;;
+
   shell-pop
   smex
   sml-mode
@@ -126,6 +134,29 @@
 
 ;; local packages
 (add-to-list 'load-path (concat user-emacs-directory "/emacswiki-pkg"))
+
+;;;; cygwin bash hacks (required otherwise shell commands will always fail)
+;; do this early because some package requires are going to try shell commands
+(require 'cygwin-mount)
+(require 'setup-cygwin)
+
+(cygwin-mount-activate)
+
+(add-hook 'comint-output-filter-functions
+    'shell-strip-ctrl-m nil t)
+(add-hook 'comint-output-filter-functions
+    'comint-watch-for-password-prompt nil t)
+
+;; external shell
+(setq explicit-shell-file-name "bash.exe")
+
+;; For subprocesses invoked via the shell
+;; (e.g., "shell -c command")
+(setq shell-file-name explicit-shell-file-name)
+;;(setq-default coding-system-for-read 'utf-8-unix)
+;;(setq-default coding-system-for-write 'utf-8)
+;;(set-coding-system-priority 'utf-8-unix 'utf-8-dos)
+;;;; end cygwin bash hacks
 
 ;; refresh package contents
 (unless package-archive-contents
