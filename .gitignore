@@ -19,5 +19,8 @@ network-security.data
 places
 url
 
+# needs seperate installation
+fonts/
+
 # my own trash
 _*
