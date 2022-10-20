@@ -1,23 +1,71 @@
 ;; see https://github.com/rksm/emacs-rust-config/blob/master/init.el
 
 
-(setq rustic-lsp-setup-p nil) ;; disables auto setup which seems to break any further configuration?
-(require 'rustic)
+(use-package rustic
+  :ensure
 
-;; find rust analyzer
-(setq lsp-rust-server 'rust-analyzer)
-(let ((rust-analyzer-path
-       (shell-command-to-string  "rustup which --toolchain stable rust-analyzer")))
+  :init
+  (setq rustic-lsp-setup-p nil) ;; disables auto setup which seems to break any further configuration?
+
+  :config
+  (progn
+    ;; find rust analyzer
+    (setq lsp-rust-server 'rust-analyzer)
+    (let ((rust-analyzer-path
+           (shell-command-to-string  "rustup which --toolchain stable rust-analyzer")))
       (setq rustic-analyzer-command (list rust-analyzer-path))
+      )
+   )
+  (add-hook 'rustic-mode-hook
+    (lambda ()
+
+      ;; indent settings
+      (setq indent-tabs-mode nil)
+      (setq tab-width 2)
+      (setq default-tab-width 2)
+      (setq rust-indent-offset 2)
+    ))
 )
 
-(add-hook 'rustic-mode-hook
-  (lambda ()
+(use-package lsp-mode
+  :ensure
+  :commands lsp
 
-    ;; indent settings
-    (setq indent-tabs-mode nil)
-    (setq tab-width 2)
-    (setq default-tab-width 2)
-    (setq rust-indent-offset 2)
-  )
+  :custom
+  (lsp-idle-delay 0.3)
+
+  ;;"lens" = count references to symbols
+  (lsp-lens-enable t)
+
+  ;; This controls the overlays that display type and other hints inline. Enable
+  ;; / disable as you prefer. Well require a `lsp-workspace-restart' to have an
+  ;; effect on open projects. 
+  ;; currently have enabled most rust-isms...
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names t)
+  (lsp-rust-analyzer-display-closure-return-type-hints t)
+  (lsp-rust-analyzer-display-parameter-hints t)
+  (lsp-rust-analyzer-display-reborrow-hints t)
+
+  :config
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+)
+
+(use-package lsp-ui
+  :ensure
+  :commands lsp-ui-mode
+
+  :bind
+  ;; standard xref jump using lsp-ui instead
+  (([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
+   ([remap xref-find-references] . #'lsp-ui-peek-find-references)
+   )
+
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-sideline-show-diagnostics t)
 )

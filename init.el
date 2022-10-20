@@ -119,6 +119,7 @@
   web-server
   which-key
   yaml-mode
+  ,(make-initmod :name 'use-package :autoload t)
 ))
 
 ;; suppress all warnings
