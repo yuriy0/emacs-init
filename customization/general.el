@@ -199,6 +199,7 @@ the same window)."
 (persistent-scratch-setup-default)
 
 ;; {frame+wind}move
+(require 'framemove)
 (global-set-keys 
  (kbd "C-x C-<left>") 'windmove-left
  (kbd "C-x C-<right>") 'windmove-right

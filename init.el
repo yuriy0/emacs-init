@@ -55,18 +55,15 @@
   anaphora
   auto-complete
   auto-complete-clang
-  batch-mode
   cc-mode
   cl-lib            
   command-log-mode
   concurrent
   cmake-mode
   csharp-mode
-  cygwin-mount      
   dash 
   dash-functional
-  deferred 
-  dired-details
+  deferred				
   dired-hacks-utils
   dired-rainbow
   dired-subtree
@@ -74,7 +71,7 @@
   elm-mode
   f
   font-utils        
-  framemove
+  ;;framemove
   fringe-helper     
   fuzzy
   gnu-elpa-keyring-update
@@ -99,7 +96,6 @@
   powershell
   python-mode
   s
-  setup-cygwin
   shell-pop
   smex
   sml-mode
@@ -126,11 +122,16 @@
 
 (setq package-enable-at-startup nil)
 (package-initialize)
-(package-autoremove)
+(package-autoremove) ;; remove packages which shouldn't be here
 
-;; fetch the list of packages available and install the missing packages
+;; local packages
+(add-to-list 'load-path (concat user-emacs-directory "/emacswiki-pkg"))
+
+;; refresh package contents
 (unless package-archive-contents
   (package-refresh-contents))
+
+;; install any missing packages
 (dolist (package package-selected-packages)
   (unless (package-installed-p package)
     (package-install package)))
