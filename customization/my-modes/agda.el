@@ -1,15 +1,13 @@
 ;; Agda mode
 (load-file (let ((coding-system-for-read 'utf-8))
-                 (shell-command-to-string "agda-mode locate")))
+                 (shell-command-to-string "agda-mode.exe locate")))
+
+
+;; fixes an issue with emacs hanging when viewing some unicode files
+;; see https://github.com/purcell/emacs.d/issues/273
+(setq inhibit-compacting-font-caches t)
 
 (require 'agda2-mode)
-(add-hook 'agda2-mode-hook '(lambda () (buffer-face-mode 0)))
-
-(setq agda2-program-args
-  (mapcar (lambda (q) (concat "--include-path=" (canon-win-path (concat "~/" q))))
-    '("agda/newlib"
-      "agda/categories" 
-      "stdlib/agda-stdlib/src")))
 
 ;;;###autoload
 (defun agda-quit-if-no-agda-buffs ()
@@ -52,7 +50,14 @@
 )
 (agda-init-unicode)
 
-;; Agda mode character mappings
+;; find a good font which has all the characters?
+(add-hook 'agda2-mode-hook
+          (lambda ()
+            (setq buffer-face-mode-face '(:family "Mononoki"))
+            (buffer-face-mode)))
+
+;; Agda mode character mappings for characters which don't have definitions 
+;; in the base font
 (many 2 (lambda (a b) (set-fontset-font "fontset-default" a b nil 'prepend))
   ;; Greek Extended     U+1F00  U+1FFF  (233)
   ;; General Punctuation        U+2000  U+206F  (111)
@@ -114,7 +119,6 @@
    '(#x2a3e . #x2a3e) "Cambria"
 )
 
-(add-hook 'agda2-mode-hook #'agda-init-unicode)
+(set-fontset-font "fontset-default" '(#x25A0 . #x265F)  '("Symbola" . "iso10646-1") nil 'prepend)
 
-;; kill agda after loading (probably a better way...)
-(agda2-quit)
+(add-hook 'agda2-mode-hook #'agda-init-unicode)
