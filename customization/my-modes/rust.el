@@ -40,26 +40,59 @@
 
 (use-package flycheck :ensure)
 
+;;;###autoload
+(defun company-abort-then-complete ()
+  (interactive)
+  (call-interactively 'company-complete)
+)
+
 (use-package company
   :ensure
 
   :custom
 
-  ;; no idle completion
-  ;; (company-idle-delay nil)
+  ;; idle completion
+  (company-idle-delay 0)
+  (company-tooltip-idle-delay 9999)
 
   ;; completion starts with any # of characters
   (company-minimum-prefix-length 1)
 
+  (company-frontends
+   '(
+     company-pseudo-tooltip-unless-just-one-frontend
+     company-preview-if-just-one-frontend))
+
   :bind
 
   ;; explicit completion
-  ("M-/" . 'company-complete)
+  ;; ("M-/" . 'yuriy/company-complete)
 
   (:map company-active-map
         ;; esc while completion popup is active closes it
-        ("ESC" . 'company-abort))
+        ("ESC" . 'company-abort)
+
+        ;; ("TAB" . company-complete-selection)
+        ("<tab>" . company-complete-selection)
+        )
+
+  :init
+  (add-hook 'company-completion-started-hook
+            (lambda (is-manual)
+              (if is-manual
+                  (setq company-tooltip-idle-delay 0)
+                )
+              )
+            )
+  (add-hook 'company-after-completion-hook
+            (lambda (s)
+              (setq company-tooltip-idle-delay 99999)
+              )
+            )
 )
+
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "M-/") #'company-complete))
 
 (use-package lsp-mode
   :ensure
