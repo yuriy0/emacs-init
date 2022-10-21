@@ -24,10 +24,38 @@
       (setq tab-width 2)
       (setq default-tab-width 2)
       (setq rust-indent-offset 2)
+
+      ;; don't need in rust mode, the rust analyzer gives very good results
+      ;; (setq-local company-backends
+      ;;    (remove 'company-files (
+      ;;     remove 'company-etags (
+      ;;     remove 'company-dabbrev company-backends)))
+      ;;  )
     ))
 )
 
 (use-package flycheck :ensure)
+
+(use-package company
+  :ensure
+
+  :custom
+
+  ;; no idle completion
+  ;; (company-idle-delay nil)
+
+  ;; completion starts with any # of characters
+  (company-minimum-prefix-length 1)
+
+  :bind
+
+  ;; explicit completion
+  ("M-/" . 'company-complete)
+
+  (:map company-active-map
+        ;; esc while completion popup is active closes it
+        ("ESC" . 'company-abort))
+)
 
 (use-package lsp-mode
   :ensure
