@@ -49,12 +49,6 @@
 
 ;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages `(
-  ;; jdee ; this replaced malabar-mode a while back, but it's huge and who uses
-          ; java anyways
-  ;; workgroups2
-  ;; switch-window
-  ;; ace-window
-  ac-helm 
   ace-jump-mode
   ace-jump-zap
   anaphora
@@ -81,10 +75,6 @@
   fuzzy
   gnu-elpa-keyring-update
   haskell-mode     
-  helm 
-  helm-ag
-  helm-descbinds
-  helm-tramp
   ido-yes-or-no
   json-mode
   list-utils
