@@ -27,6 +27,8 @@
     ))
 )
 
+(use-package flycheck :ensure)
+
 (use-package lsp-mode
   :ensure
   :commands lsp
@@ -36,6 +38,9 @@
 
   ;;"lens" = count references to symbols
   (lsp-lens-enable t)
+
+  ;;interferes with diagnostics from flycheck
+  (lsp-eldoc-enable-hover nil)
 
   ;; This controls the overlays that display type and other hints inline. Enable
   ;; / disable as you prefer. Well require a `lsp-workspace-restart' to have an
@@ -51,6 +56,7 @@
 
   :config
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  (add-hook 'lsp-mode-hook 'flycheck-mode)
 )
 
 (use-package lsp-ui
@@ -65,7 +71,7 @@
 
   :custom
   (lsp-ui-peek-always-show t)
-  (lsp-ui-sideline-show-hover t)
   (lsp-ui-doc-enable nil)
+  (lsp-ui-sideline-show-hover t)
   (lsp-ui-sideline-show-diagnostics t)
 )
