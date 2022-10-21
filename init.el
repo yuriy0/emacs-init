@@ -49,20 +49,16 @@
 
 ;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages `(
-  ace-jump-mode
-  ace-jump-zap
-  anaphora
-  auto-complete
-  auto-complete-clang
-  cc-mode
+
   cl-lib            
   command-log-mode
-  company
   concurrent
   cmake-mode
   csharp-mode
+
   dash 
   dash-functional
+
   deferred				
   dired-hacks-utils
   dired-rainbow
