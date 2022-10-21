@@ -32,6 +32,10 @@
       ;;     remove 'company-dabbrev company-backends)))
       ;;  )
     ))
+
+  :bind (:map
+         rustic-mode-map
+         ("C-c C-c a" . lsp-execute-code-action))
 )
 
 (use-package flycheck :ensure)
@@ -102,6 +106,6 @@
   :custom
   (lsp-ui-peek-always-show t)
   (lsp-ui-doc-enable nil)
-  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-sideline-show-hover nil)
   (lsp-ui-sideline-show-diagnostics t)
 )
