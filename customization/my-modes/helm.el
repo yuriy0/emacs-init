@@ -4,6 +4,11 @@
 (helm-autoresize-mode t)
 (helm-adaptive-mode t)
 
+;; handles a very strange issue in which M-x looks at the text at point
+;; and if it looks like a URL it tries to ping that URL...
+;; see https://github.com/emacs-helm/helm/issues/648
+(setq ffap-machine-p-known 'reject)
+
 (many 2 (apply-partially 'define-key helm-map)
  (kbd "<tab>") 'helm-execute-persistent-action ; rebind tab to run persistent action
  (kbd "C-i") 'helm-execute-persistent-action   ; make TAB works in terminal
