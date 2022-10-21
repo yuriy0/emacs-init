@@ -52,7 +52,7 @@
   :custom
 
   ;; idle completion
-  (company-idle-delay 0.1)
+  (company-idle-delay 0.0)
 
   ;; (company-idle-delay 0)
   ;; (company-tooltip-idle-delay 9999)
