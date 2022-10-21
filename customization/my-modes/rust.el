@@ -34,7 +34,7 @@
   :commands lsp
 
   :custom
-  (lsp-idle-delay 0.3)
+  (lsp-idle-delay 1.25)
 
   ;;"lens" = count references to symbols
   (lsp-lens-enable t)
@@ -48,10 +48,10 @@
   ;; currently have enabled most rust-isms...
   (lsp-rust-analyzer-server-display-inlay-hints t)
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
-  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-chaining-hints nil)
   (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names t)
   (lsp-rust-analyzer-display-closure-return-type-hints t)
-  (lsp-rust-analyzer-display-parameter-hints t)
+  (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints t)
 
   :config
