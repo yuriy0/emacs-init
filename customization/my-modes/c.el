@@ -1,3 +1,11 @@
+(use-package json-mode
+  :ensure
+  :config
+
+  (add-to-list 'auto-mode-alist '("\\.shader\\'" . json-mode))
+  (add-to-list 'auto-mode-alist '("\\.materialtype\\'" . json-mode))
+)
+
 (use-package cc-mode
   :ensure
   :config
@@ -8,9 +16,6 @@
 
   (add-to-list 'auto-mode-alist '("\\.azsli\\'" . c++-mode))
   (add-to-list 'auto-mode-alist '("\\.azsl\\'" . c-mode))
-
-  (add-to-list 'auto-mode-alist '("\\.shader\\'" . json-mode))
-  (add-to-list 'auto-mode-alist '("\\.materialtype\\'" . json-mode))
 
   (add-hook 'c-mode-common-hook
             #'(lambda()

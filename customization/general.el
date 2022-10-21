@@ -144,9 +144,6 @@ If the new path's directories does not exist, create them."
       (setq winner-mode-map map)))
 (winner-mode t)
 
-;; require doesn't cut it
-(smex-initialize)
-
 ;; who needs this...
 (fset 'find-file-read-only 'find-file)
 
@@ -174,27 +171,6 @@ the same window)."
 (add-hook 'sh-mode-hook
   '(lambda () (setq-local inhibit-eol-conversion t)))
 
-;; save scratch file
-(persistent-scratch-setup-default)
-
-;; {frame+wind}move
-(require 'framemove)
-(global-set-keys 
- (kbd "C-x C-<left>") 'windmove-left
- (kbd "C-x C-<right>") 'windmove-right
- (kbd "C-x C-<up>") 'windmove-up
- (kbd "C-x C-<down>") 'windmove-down)
-(setq framemove-hook-into-windmove t)
-(framemove-default-keybindings 'super)
-
-;; which-key
-(which-key-mode)
-(setq which-key-popup-type 'side-window)
-(setq which-key-side-window-location 'right)
-(setq which-key-side-window-max-width 0.45)
-(setq which-key-idle-delay 3.0)
-(define-key global-map (kbd "C-h /") 'which-key-show-major-mode)
-
 ;; column numbers
 (column-number-mode t)
 
@@ -212,7 +188,6 @@ the same window)."
 
 ;; for WAF build system
 (add-to-list 'auto-mode-alist
-   '("[\\/]wscript\\'" . python-mode)
    '("\\.waf_files\\'" . text-mode)
 )
 
@@ -254,4 +229,3 @@ the same window)."
 (set-default-coding-systems 'utf-8)
 (set-language-environment 'utf-8)
 (set-selection-coding-system 'utf-8)
-

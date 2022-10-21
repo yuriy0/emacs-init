@@ -20,6 +20,7 @@ places
 url
 transient/*
 .lsp-session*
+var/pcache/*
 
 # needs seperate installation
 fonts/

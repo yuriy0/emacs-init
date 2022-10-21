@@ -1,8 +1,12 @@
-;; shell pop + eshell
-(customize-set-variable
-  'shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))) )
-(global-set-keys (kbd "C-'") 'shell-pop)
-(setq shell-pop-restore-window-configuration nil)
+(use-package shell-pop
+  :ensure
+  :config
+
+  (customize-set-variable
+   'shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))) )
+  (global-set-keys (kbd "C-'") 'shell-pop)
+  (setq shell-pop-restore-window-configuration nil)
+)
 
 (defun extremal-windows (dirs)
   "Computes the windows in the current frame farthest in the

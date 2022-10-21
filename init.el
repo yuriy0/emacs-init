@@ -45,53 +45,12 @@
 ;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages `(
   use-package
-
-  ;; TODO: move these to use-package
-  command-log-mode
-  concurrent
-  cmake-mode
-  csharp-mode
-
-  dash 
+  anaphora
+  dash
   dash-functional
-
-  deferred				
-  dired-hacks-utils
-  dired-rainbow
-  dired-subtree
-  diminish
-  elm-mode
-  f
-  font-utils        
-  fringe-helper     
-  fuzzy
-  gnu-elpa-keyring-update
-  haskell-mode     
-  ido-yes-or-no
-  json-mode
   list-utils
+  gnu-elpa-keyring-update
   load-dir
-  lua-mode
-  magit
-  markdown-mode 
-  multiple-cursors
-  pcache
-  persistent-scratch
-  persistent-soft
-  php-mode
-  popup             
-  powershell
-  python-mode
-  s
-  shell-pop
-  smex
-  sml-mode
-  ucs-utils
-  unicode-fonts
-  visual-regexp
-  web-mode
-  web-server
-  which-key
 ))
 
 ;; suppress all warnings

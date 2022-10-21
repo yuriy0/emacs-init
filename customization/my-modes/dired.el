@@ -13,12 +13,18 @@
   (define-key dired-mode-map (kbd "^")
     (lambda () (interactive) (find-alternate-file "..")))))
 
-;; dired-subtree
-(setq dired-subtree-use-backgrounds nil)
-(many 2 (apply-partially 'define-key dired-mode-map)
-   (kbd "i") #'dired-subtree-insert
-   (kbd "<tab>") #'dired-subtree-toggle
-   (kbd "<backtab>") #'dired-subtree-cycle
-   (kbd "<RET>") #'dired-find-alternate-file
-   (kbd "a") #'dired-find-file
-   )
+(use-package dired-hacks-utils :ensure :requires (dired))
+
+(use-package dired-rainbow :ensure :requires (dired))
+
+(use-package dired-subtree :ensure :requires (dired)
+  :config
+  (setq dired-subtree-use-backgrounds nil)
+  (many 2 (apply-partially 'define-key dired-mode-map)
+        (kbd "i") #'dired-subtree-insert
+        (kbd "<tab>") #'dired-subtree-toggle
+        (kbd "<backtab>") #'dired-subtree-cycle
+        (kbd "<RET>") #'dired-find-alternate-file
+        (kbd "a") #'dired-find-file
+        )
+)
