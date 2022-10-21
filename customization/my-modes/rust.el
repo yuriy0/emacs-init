@@ -34,7 +34,7 @@
   :commands lsp
 
   :custom
-  (lsp-idle-delay 1.25)
+  (lsp-idle-delay 0.65)
 
   ;;"lens" = count references to symbols
   (lsp-lens-enable t)
@@ -44,8 +44,7 @@
 
   ;; This controls the overlays that display type and other hints inline. Enable
   ;; / disable as you prefer. Well require a `lsp-workspace-restart' to have an
-  ;; effect on open projects. 
-  ;; currently have enabled most rust-isms...
+  ;; effect on open projects.
   (lsp-rust-analyzer-server-display-inlay-hints t)
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
   (lsp-rust-analyzer-display-chaining-hints nil)
@@ -53,6 +52,9 @@
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints t)
+
+  ;; after changes clear diagnostics since they will usually refer to invalid line/column numbers
+  (lsp-diagnostic-clean-after-change t)
 
   :config
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
