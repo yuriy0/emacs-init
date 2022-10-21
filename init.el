@@ -42,15 +42,11 @@
 ;; don't use custom
 (setq custom-file "NUL")
 
-
-(require 'cl-lib)
-(cl-defstruct initmod
-  name autoload)
-
 ;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages `(
+  use-package
 
-  cl-lib            
+  ;; TODO: move these to use-package
   command-log-mode
   concurrent
   cmake-mode
@@ -143,27 +139,13 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(require 'use-package)
-
-
-;; put packages in the correct form
-(setq package-selected-packages
-      (mapcar (lambda(p) (if (symbolp p) (make-initmod :name p :autoload t) p)) package-selected-packages)
-)
-
 ;; install any missing packages
 (dolist (package package-selected-packages)
-  (unless (or (not (initmod-autoload package)) (package-installed-p (initmod-name package)))
-    (package-install (initmod-name package))))
+  (unless (package-installed-p package)
+    (package-install package)))
 
 ;; require user packages
-(mapc (lambda (p)
-	(if (package-installed-p (initmod-name p))
-	    (require (initmod-name p)))
-	)
-      package-selected-packages)
+(mapc (lambda (p) (require p)) package-selected-packages)
 
 ;; whenever you install/update a package, the `package' package will (through
 ;; 'customize') automatically clobber `package-selected-packages'. 
