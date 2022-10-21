@@ -101,14 +101,6 @@
   powershell
   python-mode
   s
-
-  ,(make-initmod :name 'rustic :autoload nil)
-  ;; used by rustic
-  ,(make-initmod :name 'lv :autoload nil)
-  ,(make-initmod :name 'lsp-mode :autoload nil)
-  ,(make-initmod :name 'ht :autoload nil)
-  ;;
-
   shell-pop
   smex
   sml-mode
@@ -118,8 +110,6 @@
   web-mode
   web-server
   which-key
-  yaml-mode
-  ,(make-initmod :name 'use-package :autoload t)
 ))
 
 ;; suppress all warnings
@@ -167,6 +157,10 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(require 'use-package)
+
 
 ;; put packages in the correct form
 (setq package-selected-packages
@@ -179,7 +173,11 @@
     (package-install (initmod-name package))))
 
 ;; require user packages
-(mapc (lambda (p) (require (initmod-name p))) package-selected-packages)
+(mapc (lambda (p)
+	(if (package-installed-p (initmod-name p))
+	    (require (initmod-name p)))
+	)
+      package-selected-packages)
 
 ;; whenever you install/update a package, the `package' package will (through
 ;; 'customize') automatically clobber `package-selected-packages'. 
