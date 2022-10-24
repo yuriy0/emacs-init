@@ -21,6 +21,7 @@ url
 transient/*
 .lsp-session*
 var/pcache/*
+projects
 
 # needs seperate installation
 fonts/

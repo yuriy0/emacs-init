@@ -30,6 +30,14 @@
       (setq default-tab-width 2)
       (setq rust-indent-offset 2)
     ))
+
+  ;; faces for compilation output (inherit from defaults)
+  (custom-set-faces
+   '(rustic-compilation-column ((t (:inherit compilation-column-number))))
+   '(rustic-compilation-line ((t (:inherit compilation-line-number))))
+   '(rustic-compilation-error-face ((t (:inherit compilation-error))))
+   '(rustic-compilation-warning-face ((t (:inherit compilation-warning))))
+   )
 )
 
 (use-package lsp-mode
