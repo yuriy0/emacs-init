@@ -85,12 +85,12 @@ is multiplied by the given delta to determine the true delta."
 (advice-add 'split-window-right :around 'split-window--new-buffer)
 (advice-add 'split-window-below :around 'split-window--new-buffer)
 
-(global-set-keys (kbd "C-x i" ) (with-negated-prefix-arg 'other-window))
+(global-set-keys (kbd "C-c i" ) (with-negated-prefix-arg 'other-window))
 
 (defun other-window-target (count &optional all-frames)
   (interactive "sTarget window: ")
   (funcall 'other-window (string-to-number count) all-frames))
-(global-set-keys (kbd "C-x p") 'other-window-target)
+(global-set-keys (kbd "C-c p") 'other-window-target)
 
 
 ;;;###autoload
@@ -105,7 +105,7 @@ is multiplied by the given delta to determine the true delta."
      (set-window-buffer this-win othr-buf)
      (set-window-buffer othr-win this-buf)
      (select-window othr-win)))
-(global-set-keys (kbd "C-x t") 'transpose-windows)
+(global-set-keys (kbd "C-c t") 'transpose-windows)
 
 ;;;###autoload
 (defun my-window-list (&optional buf)
