@@ -80,12 +80,16 @@
   :commands lsp-ui-mode
 
   :bind
-  ("C-c C-c s" . #'toggle-lsp-ui-sideline-show-hover)
+  (:map lsp-ui-mode-map
+        ("C-c C-c s" . #'toggle-lsp-ui-sideline-show-hover)
+        ("C-c C-c t" . #'lsp-ui-doc-mode)
+        ("C-c C-c >" . #'lsp-describe-thing-at-point)
 
-  ;; standard xref jump using lsp-ui instead
-  (([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
-   ([remap xref-find-references] . #'lsp-ui-peek-find-references)
-   )
+        ;; standard xref jump using lsp-ui instead
+        (([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
+         ([remap xref-find-references] . #'lsp-ui-peek-find-references)
+         )
+        )
 
   :custom
   (lsp-ui-peek-always-show t)
