@@ -48,9 +48,13 @@
   ;;"lens" = count references to symbols
   (lsp-lens-enable t)
 
+  ;; full doc strings are very long and get broken when put into the minibuffer
+  ;; the "short" version shows types for some subexpressions (but occasionally shows
+  ;; nothing useful?)
+  (lsp-eldoc-render-all nil)
+
   ;; what to use when checking on-save. "check" is default, I prefer clippy
   (lsp-rust-analyzer-cargo-watch-command "clippy")
-  (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
 
   ;; This controls the overlays that display type and other hints inline. Enable
