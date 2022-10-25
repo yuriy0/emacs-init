@@ -80,6 +80,7 @@
   (setq read-process-output-max (expt 2 16))
   (setq gc-cons-threshold (* 3 (expt 10 8)))
 
+  ;; auto start lsp-ui
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
 
@@ -106,7 +107,40 @@
   (lsp-ui-doc-enable nil)
   (lsp-ui-sideline-show-hover nil)
   (lsp-ui-sideline-show-diagnostics t)
+
+  :config
+
+  ;; fixes a bug with lsp-ui-doc / lsp help buffers
+  ;; see https://github.com/emacs-lsp/lsp-ui/issues/452
+  (advice-add 'markdown-follow-thing-at-point :around #'lsp-ui-follow-thing-at-point/advice-around)
+
+  ;; for completeness
+  (define-key help-mode-map (kbd "<return>") #'markdown-follow-thing-at-point)
 )
+
+;; this is identical to `lsp-ui-doc--open-markdown-link' except:
+;;  - we return `t' in case we actually followed a link
+(defun lsp-ui-follow-thing-at-point ()
+  (interactive)
+  (let ((buffer-list-update-hook nil))
+    (-let [(buffer point) (if-let* ((valid (and (listp last-input-event)
+                                                (eq (car last-input-event) 'mouse-2)))
+                                    (event (cadr last-input-event))
+                                    (win (posn-window event))
+                                    (buffer (window-buffer win)))
+                              `(,buffer ,(posn-point event))
+                            `(,(current-buffer) ,(point)))]
+      (with-current-buffer buffer
+        ;; Markdown-mode puts the url in 'help-echo
+        (-some--> (get-text-property point 'help-echo)
+          (and (string-match-p goto-address-url-regexp it)
+               (progn (browse-url it) t)))))))
+
+(defun lsp-ui-follow-thing-at-point/advice-around (fn &rest fn-args)
+  (or (lsp-ui-follow-thing-at-point)
+      (apply fn fn-args)))
+
+
 
 (defun toggle-lsp-ui-sideline-show-hover ()
   (interactive)
