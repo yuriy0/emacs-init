@@ -16,14 +16,18 @@
         haskell-process-show-debug-tips nil)
   (add-to-list 'font-lock-maximum-decoration '(haskell-mode . 2))
   
-  ;; Interactive Haskell mode 
   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
   ;; Haskell mode bindings
   (many 2 (apply-partially 'define-key haskell-mode-map)
+
+        ;; Interactive Haskell mode 
         (kbd "C-c C-l") 'haskell-process-load-or-reload
-        (kbd "C-c C-t") 'haskell-process-do-type
-        (kbd "C-c C-i") 'haskell-process-do-info
+
+        ;; interactive process commands mostly made obsolete by lsp-mode
+        ;; (kbd "C-c C-t") 'haskell-process-do-type
+        ;; (kbd "C-c C-i") 'haskell-process-do-info
+
         (kbd "RET") 'electric-indent-just-newline)
 
   (setq haskell-lexeme--char-literal-rx 
@@ -64,5 +68,11 @@
       :hook (haskell-mode . lsp-deferred)
       :commands (lsp lsp-deferred)
       )
+
+    (use-package yasnippet
+      :hook (haskell-mode . yas-minor-mode)
+      :commands (yas-minor-mode)
+      )
+
 
     ))
