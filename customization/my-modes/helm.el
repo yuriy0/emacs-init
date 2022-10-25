@@ -27,13 +27,13 @@
   (setq helm-M-x-fuzzy-match t                  ; optional fuzzy matching for helm-M-x
         helm-ff-newfile-prompt-p nil            ; don't ask to create new file
         helm-display-header-line nil            ; no helm header 
-        helm-split-window-in-side-p t           ; prevent helm from temporarily hiding other
-                                        ; buffers
+        helm-split-window-in-side-p t           ; prevent helm from temporarily hiding other buffers
         helm-split-window-default-side 'below
         helm-apropos-fuzzy-match t
-        helm-default-external-file-browser 
-        "explorer.exe"
-        helm-buffer-max-length nil            ) ; don't truncate buffer names 
+        helm-default-external-file-browser  "explorer.exe"
+        helm-buffer-max-length nil             ; don't truncate buffer names 
+        helm-M-x-always-save-history t         ; save command to history even if it produces an error
+   )
 
   (many 1 (apply-partially 'add-to-list 'helm-boring-buffer-regexp-list)
         "\\*magit-process:" 
@@ -78,3 +78,4 @@
   (helm-descbinds-mode)
 )
 (use-package helm-tramp :ensure :requires (helm))
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
