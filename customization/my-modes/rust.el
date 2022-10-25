@@ -66,6 +66,9 @@
 
   ;; after changes clear diagnostics since they will usually refer to invalid line/column numbers
   (lsp-diagnostic-clean-after-change t)
+  
+  ;; don't execute an action automatically when its the only one
+  (lsp-auto-execute-action nil)
 
   ;; disables some types of diagnostics from rust-analyzer
   ;; see https://rust-analyzer.github.io/manual.html#diagnostics
@@ -103,7 +106,6 @@
   (lsp-ui-doc-enable nil)
   (lsp-ui-sideline-show-hover nil)
   (lsp-ui-sideline-show-diagnostics t)
-  (lsp-auto-execute-action nil)
 )
 
 (defun toggle-lsp-ui-sideline-show-hover ()
