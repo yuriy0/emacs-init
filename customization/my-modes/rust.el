@@ -53,23 +53,28 @@
   ;; nothing useful?)
   (lsp-eldoc-render-all nil)
 
-  ;; what to use when checking on-save. "check" is default, I prefer clippy
-  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  ;; what to use when checking on-save. "check" or "clippy"
+  (lsp-rust-analyzer-cargo-watch-command "check")
+
   (lsp-idle-delay 0.6)
 
   ;; This controls the overlays that display type and other hints inline. Enable
   ;; / disable as you prefer. Well require a `lsp-workspace-restart' to have an
   ;; effect on open projects.
   (lsp-rust-analyzer-server-display-inlay-hints t)
-  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "never")
   (lsp-rust-analyzer-display-chaining-hints t)
   (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
-  (lsp-rust-analyzer-display-reborrow-hints nil)
+  (lsp-rust-analyzer-display-reborrow-hints "never")
 
   ;; after changes clear diagnostics since they will usually refer to invalid line/column numbers
   (lsp-diagnostic-clean-after-change t)
+
+  ;; disables some types of diagnostics from rust-analyzer
+  ;; see https://rust-analyzer.github.io/manual.html#diagnostics
+  ;; (lsp-rust-analyzer-diagnostics-disabled [])
 
   :config
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
