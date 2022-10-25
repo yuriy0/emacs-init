@@ -57,11 +57,31 @@
 
 (when-let ((hls-path (get-haskell-language-server-path)))
   (progn
+
     (use-package lsp-haskell
       :ensure
       :config
 
       (setq lsp-haskell-server-path hls-path)
+
+      (setq
+       ;; disables all hlint diagnostics which are very aggressive...
+       lsp-haskell-plugin-hlint-diagnostics-on nil
+       lsp-haskell-plugin-hlint-code-actions-on nil
+
+       ;; some combination of the following makes CodeActions extremely slow?
+       lsp-haskell-plugin-tactics-global-on nil ; "wingman"
+       ;; lsp-haskell-plugin-import-lens-code-actions-on nil
+       ;; lsp-haskell-plugin-pragmas-code-actions-on nil
+       )
+
+      ;; configure additional lsp properties which aren't provided by lsp-haskell
+      ;; (defcustom-lsp lsp-haskell/plugin/ghcide-code-actions-fill-holes/globalOn
+      ;;   nil
+      ;;   ""
+      ;;   :group 'lsp-haskell-plugins
+      ;;   :type 'boolean
+      ;;   :lsp-path "haskell.plugin.ghcide-code-actions-fill-holes.globalOn")
       )
 
     (use-package lsp-mode
@@ -73,6 +93,4 @@
       :hook (haskell-mode . yas-minor-mode)
       :commands (yas-minor-mode)
       )
-
-
     ))
