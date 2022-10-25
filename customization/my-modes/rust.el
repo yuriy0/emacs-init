@@ -103,6 +103,7 @@
   (lsp-ui-doc-enable nil)
   (lsp-ui-sideline-show-hover nil)
   (lsp-ui-sideline-show-diagnostics t)
+  (lsp-auto-execute-action nil)
 )
 
 (defun toggle-lsp-ui-sideline-show-hover ()
