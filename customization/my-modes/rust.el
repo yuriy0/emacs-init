@@ -130,6 +130,9 @@
   ;; completion starts with any # of characters
   (company-minimum-prefix-length 1)
 
+  ;; put completions from recent buffers at the top
+  (company-transformers '(company-sort-by-occurrence))
+
   (company-frontends
    '(
      company-pseudo-tooltip-unless-just-one-frontend
