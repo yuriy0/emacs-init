@@ -1,11 +1,6 @@
 ;; see https://github.com/rksm/emacs-rust-config/blob/master/init.el
 (use-package rustic
   :ensure
-  :bind
-  (:map rustic-mode-map
-        ("M-j" . lsp-ui-imenu)
-        ("C-c C-c a" . lsp-execute-code-action)
-        )
 
   :config
   ;; uncomment for less flashiness
@@ -89,6 +84,8 @@
         ("C-c C-c s" . #'toggle-lsp-ui-sideline-show-hover)
         ("C-c C-c t" . #'lsp-ui-doc-mode)
         ("C-c C-c >" . #'lsp-describe-thing-at-point)
+        ("M-j" . #'lsp-ui-imenu)
+        ("C-c C-c a" . #'lsp-execute-code-action)
 
         ;; standard xref jump using lsp-ui instead
         (([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
