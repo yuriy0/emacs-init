@@ -72,6 +72,11 @@
   ;; (lsp-rust-analyzer-diagnostics-disabled [])
 
   :config
+
+  ;; improves lsp-mode performance
+  (setq read-process-output-max (expt 2 16))
+  (setq gc-cons-threshold (* 3 (expt 10 8)))
+
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
 
