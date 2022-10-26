@@ -42,7 +42,7 @@
 )
 
 (use-package lsp-mode
-  :commands lsp
+  :commands (lsp lsp-deferred)
   :custom
 
   ;; what to use when checking on-save. "check" or "clippy"

@@ -1,6 +1,6 @@
 (use-package lsp-mode
   :ensure
-  :commands lsp
+  :commands (lsp lsp-deferred)
   :custom
 
   ;;"lens" = count references to symbols
