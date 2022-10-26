@@ -1,5 +1,6 @@
 (use-package smex
   :ensure
+  :commands (execute-extended-command helm-M-x)
   :config
 
   (smex-initialize)

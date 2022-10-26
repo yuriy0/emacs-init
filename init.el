@@ -1,5 +1,6 @@
 (defvar profiler-emacs-init nil)
 (when profiler-emacs-init
+  (setq debug-on-error t)
   (profiler-start 'cpu))
 
 ;;;;;;;;;;;

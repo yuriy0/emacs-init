@@ -1,11 +1,16 @@
 ;; Maple 
-(setq load-path (cons "~/.emacs.d/maplev/lisp" load-path))
-(autoload 'maplev-mode "maplev" "Maple editing mode" t)
-(add-to-list 'auto-mode-alist '("\\.mpl\\'" . maplev-mode))
-(setq maplev-indent-level 2)
-(add-hook 'maplev-mode-hook 
-          (lambda ()
-            (progn
-              (run-hooks 'prog-mode-hook)
-              (linum-mode 1)
-              )))
+
+(use-package maplev
+  :commands (maplev-mode)
+  :load-path "~/.emacs.d/maplev/lisp"
+  :mode ("\\.mpl\\'" . maplev-mode)
+  :init (autoload 'maplev-mode "maplev" "Maple editing mode" t)
+
+  :config
+  (setq maplev-indent-level 2)
+  (add-hook 'maplev-mode-hook
+            (lambda ()
+              (progn
+                (run-hooks 'prog-mode-hook)
+                )))
+)

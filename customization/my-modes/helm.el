@@ -1,30 +1,30 @@
 (use-package helm
   :ensure
 
+  :bind
+  (
+   ("M-x" . helm-M-x)
+   ("M-y" . helm-show-kill-ring)
+   ("C-M-y" . helm-all-mark-rings)
+   ("C-x C-f" . helm-find-files)
+   ("C-x b" . helm-buffers-list)
+   ("C-x q" . helm-resume)
+
+   :map helm-map
+   ("<tab>" . helm-execute-persistent-action) ; rebind tab to run persistent action
+   ("C-i" . helm-execute-persistent-action)   ; make TAB works in terminal
+   ("C-z" . helm-select-action)             ; list actions using C-z
+   )
+
   :config
   (helm-mode 1)
   (helm-autoresize-mode t)
   (helm-adaptive-mode t)
 
-
-
   ;; handles a very strange issue in which M-x looks at the text at point
   ;; and if it looks like a URL it tries to ping that URL...
   ;; see https://github.com/emacs-helm/helm/issues/648
   (setq ffap-machine-p-known 'reject)
-
-  (many 2 (apply-partially 'define-key helm-map)
-        (kbd "<tab>") 'helm-execute-persistent-action ; rebind tab to run persistent action
-        (kbd "C-i") 'helm-execute-persistent-action   ; make TAB works in terminal
-        (kbd "C-z")  'helm-select-action)             ; list actions using C-z
-
-  (global-set-keys
-   (kbd "M-x") 'helm-M-x
-   (kbd "M-y") 'helm-show-kill-ring
-   (kbd "C-M-y") 'helm-all-mark-rings
-   (kbd "C-x C-f") 'helm-find-files
-   (kbd "C-x b") 'helm-buffers-list
-   (kbd "C-x q") 'helm-resume)
 
   (setq helm-M-x-fuzzy-match t                  ; optional fuzzy matching for helm-M-x
         helm-ff-newfile-prompt-p nil            ; don't ask to create new file
@@ -56,14 +56,15 @@
   :ensure
   :requires (helm)
 
-  :config
-  ;; helm-ag
-  (global-set-keys
-   (kbd "C-x / 1") 'helm-do-ag
-   (kbd "C-x / 2") 'helm-do-ag-this-file
-   (kbd "C-x / 3") 'helm-do-ag-project-root
-   (kbd "C-x / 4") 'helm-do-ag-buffers)
+  :bind
+  (
+   ("C-x / 1" . helm-do-ag)
+   ("C-x / 2" . helm-do-ag-this-file)
+   ("C-x / 3" . helm-do-ag-project-root)
+   ("C-x / 4" . helm-do-ag-buffers)
+   )
 
+  :config
   (setq helm-ag-base-command "ag --vimgrep --no-color")
   (setq helm-ag-fuzzy-match t)
 
@@ -75,10 +76,14 @@
 )
 
   ;; misc.
-(use-package ac-helm :ensure :requires (helm))
-(use-package helm-descbinds :ensure :requires (helm)
+(use-package ac-helm :ensure
+  :after (helm))
+(use-package helm-descbinds :ensure
+  :after (helm)
   :config
   (helm-descbinds-mode)
 )
-(use-package helm-tramp :ensure :requires (helm))
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+(use-package helm-tramp :ensure
+  :after (helm))
+(use-package helm-lsp
+  :commands helm-lsp-workspace-symbol)
