@@ -20,7 +20,8 @@
   :bind
 
   ;; explicit completion
-  ("M-/" . #'company-complete)
+  (:map company-mode-map
+        ("M-/" . #'company-complete))
 
   (:map company-active-map
         ;; esc while completion popup is active closes it
