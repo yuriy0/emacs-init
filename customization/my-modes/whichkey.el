@@ -1,5 +1,6 @@
 (use-package which-key
   :ensure
+  :defer 10 ;; which-key mainly functions by an idle timer so we have good way to determine when this is needed
 
   :config
   (which-key-mode)
