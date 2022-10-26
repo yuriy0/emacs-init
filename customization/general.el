@@ -89,27 +89,6 @@ If the new path's directories does not exist, create them."
 ;; i hate beeping
 (setq visible-bell 1)
 
-;; desktop 
-(desktop-save-mode 1)
-(setq desktop-load-locked-desktop t
-      desktop-dirname "~/.emacs.d/desktop/"
-      desktop-path (list desktop-dirname)
-      desktop-save t 
-      desktop-auto-save-timeout 120
-      desktop-restore-eager 10)
-;; disable modes on startup
-(add-to-list 'desktop-minor-mode-table (list 'whitespace-mode nil)) 
-(add-to-list 'desktop-minor-mode-table (list 'agda2-mode nil)) 
-
-(add-hook 'desktop-after-read-hook 
-  #'(lambda () 
-      (delete-other-frames) ; single frame on startup 
-))
-
-(many 1 (apply-partially 'add-to-list 'desktop-globals-to-save) 
-      'extended-command-history 
-      'kill-ring)
-             
 ;; remove toolbar 
 (tool-bar-mode -1)
 
