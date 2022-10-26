@@ -60,6 +60,8 @@
 
     (use-package lsp-haskell
       :ensure
+      :after (lsp-mode)
+
       :config
 
       (setq lsp-haskell-server-path hls-path)

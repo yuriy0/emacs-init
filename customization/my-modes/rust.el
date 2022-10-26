@@ -3,11 +3,6 @@
   :ensure
 
   :config
-  ;; uncomment for less flashiness
-  ;; (setq lsp-eldoc-hook nil)
-  ;; (setq lsp-enable-symbol-highlighting nil)
-  ;; (setq lsp-signature-auto-activate nil)
-
   ;; find rust analyzer
   (progn
     (setq lsp-rust-server 'rust-analyzer)
@@ -36,22 +31,11 @@
 )
 
 (use-package lsp-mode
-  :ensure
   :commands lsp
   :custom
 
-  ;;"lens" = count references to symbols
-  (lsp-lens-enable t)
-
-  ;; full doc strings are very long and get broken when put into the minibuffer
-  ;; the "short" version shows types for some subexpressions (but occasionally shows
-  ;; nothing useful?)
-  (lsp-eldoc-render-all nil)
-
   ;; what to use when checking on-save. "check" or "clippy"
   (lsp-rust-analyzer-cargo-watch-command "check")
-
-  (lsp-idle-delay 0.6)
 
   ;; This controls the overlays that display type and other hints inline. Enable
   ;; / disable as you prefer. Well require a `lsp-workspace-restart' to have an
@@ -64,88 +48,11 @@
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints "never")
 
-  ;; after changes clear diagnostics since they will usually refer to invalid line/column numbers
-  (lsp-diagnostic-clean-after-change t)
-  
-  ;; don't execute an action automatically when its the only one
-  (lsp-auto-execute-action nil)
-
   ;; disables some types of diagnostics from rust-analyzer
   ;; see https://rust-analyzer.github.io/manual.html#diagnostics
   ;; (lsp-rust-analyzer-diagnostics-disabled [])
-
-  :config
-
-  ;; improves lsp-mode performance
-  (setq read-process-output-max (expt 2 16))
-  (setq gc-cons-threshold (* 3 (expt 10 8)))
-
-  ;; auto start lsp-ui
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
-
-
-(use-package lsp-ui
-  :ensure
-  :commands lsp-ui-mode
-
-  :bind
-  (:map lsp-ui-mode-map
-        ("C-c C-c s" . #'toggle-lsp-ui-sideline-show-hover)
-        ("C-c C-c t" . #'lsp-ui-doc-mode)
-        ("C-c C-c >" . #'lsp-describe-thing-at-point)
-        ("M-j" . #'lsp-ui-imenu)
-        ("C-c C-c a" . #'lsp-execute-code-action)
-
-        ;; standard xref jump using lsp-ui instead
-        (([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
-         ([remap xref-find-references] . #'lsp-ui-peek-find-references)
-         )
-        )
-
-  :custom
-  (lsp-ui-peek-always-show t)
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-sideline-show-hover nil)
-  (lsp-ui-sideline-show-diagnostics t)
-
-  :config
-
-  ;; fixes a bug with lsp-ui-doc / lsp help buffers
-  ;; see https://github.com/emacs-lsp/lsp-ui/issues/452
-  (advice-add 'markdown-follow-thing-at-point :around #'lsp-ui-follow-thing-at-point/advice-around)
-
-  ;; for completeness
-  (define-key help-mode-map (kbd "<return>") #'markdown-follow-thing-at-point)
 )
 
-;; this is identical to `lsp-ui-doc--open-markdown-link' except:
-;;  - we return `t' in case we actually followed a link
-(defun lsp-ui-follow-thing-at-point ()
-  (interactive)
-  (let ((buffer-list-update-hook nil))
-    (-let [(buffer point) (if-let* ((valid (and (listp last-input-event)
-                                                (eq (car last-input-event) 'mouse-2)))
-                                    (event (cadr last-input-event))
-                                    (win (posn-window event))
-                                    (buffer (window-buffer win)))
-                              `(,buffer ,(posn-point event))
-                            `(,(current-buffer) ,(point)))]
-      (with-current-buffer buffer
-        ;; Markdown-mode puts the url in 'help-echo
-        (-some--> (get-text-property point 'help-echo)
-          (and (string-match-p goto-address-url-regexp it)
-               (progn (browse-url it) t)))))))
-
-(defun lsp-ui-follow-thing-at-point/advice-around (fn &rest fn-args)
-  (or (lsp-ui-follow-thing-at-point)
-      (apply fn fn-args)))
-
-
-
-(defun toggle-lsp-ui-sideline-show-hover ()
-  (interactive)
-  (setq lsp-ui-sideline-show-hover (not lsp-ui-sideline-show-hover))
-)
 
 (use-package flycheck :ensure)
 
@@ -155,36 +62,3 @@
   (yas-reload-all)
   (add-hook 'rustic-mode-hook 'yas-minor-mode)
   )
-
-(use-package company
-  :ensure
-
-  :custom
-
-  ;; idle completion
-  (company-idle-delay (lambda() (if (company-in-string-or-comment) nil 0.0)))
-
-  ;; completion starts with any # of characters
-  (company-minimum-prefix-length 1)
-
-  ;; put completions from recent buffers at the top
-  (company-transformers '(company-sort-by-occurrence))
-
-  (company-frontends
-   '(
-     company-pseudo-tooltip-unless-just-one-frontend
-     company-preview-if-just-one-frontend))
-
-  :bind
-
-  ;; explicit completion
-  ("M-/" . #'company-complete)
-
-  (:map company-active-map
-        ;; esc while completion popup is active closes it
-        ("ESC" . 'company-abort)
-
-        ;; ("TAB" . company-complete-selection)
-        ("<tab>" . company-complete-selection)
-        )
-)
