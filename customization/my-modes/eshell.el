@@ -1,51 +1,63 @@
 ;; eshell
-(require 'helm-eshell)
+(use-package eshell
+  :ensure
+  :commands (eshell eshell-mode eshell-command)
 
-;; just for *Help*
-(mapc #'require '(em-alias em-banner em-basic em-cmpl em-dirs
-      em-glob em-hist em-ls em-prompt em-rebind em-script
-      em-smart em-term em-tramp em-unix em-xtra esh-arg esh-cmd
-      esh-ext esh-groups esh-io esh-mode esh-module esh-opt
-      esh-proc esh-util esh-var eshell))
+  :config
 
-;; modules
-(add-to-list 'eshell-modules-list 'eshell-rebind)
-(setq eshell-modules-list
-   (delete 'eshell-pred eshell-modules-list))
+  (message "use-package eshell")
 
-;; don't rebind <up> and <down> as history scroll keys
-(setq eshell-hist-rebind-keys-alist
-  (--remove (member (car it) '([up] [down])) 
-            eshell-hist-rebind-keys-alist))
+  ;; just for *Help*
+  (mapc #'require '(em-alias em-banner em-basic em-cmpl em-dirs
+                             em-glob em-hist em-ls em-prompt em-rebind em-script
+                             em-smart em-term em-tramp em-unix em-xtra esh-arg esh-cmd
+                             esh-ext esh-groups esh-io esh-mode esh-module esh-opt
+                             esh-proc esh-util esh-var eshell))
 
-;; customization of eshell
-(add-hook 'eshell-mode-hook 
-  (lambda () 
-    ;; ignore case in completions
-    (setq eshell-cmpl-ignore-case t)
-    (eshell-cmpl-initialize)
-    ;; prompt colour
-    (set-face-attribute 'eshell-prompt nil :foreground "chartreuse4")
-    (push-mark) ;; ??
-    ;; custom keybindings
-    (define-keys eshell-mode-map 
-      (kbd "M-]") 'helm-eshell-history
-      [remap eshell-pcomplete] 'helm-esh-pcomplete
-      (kbd "<home>") 'eshell-bol
-      )
-    ;; left and right cannot move into the prompt string
-    (many 1 (lambda (c) (add-to-list 'eshell-cannot-leave-input-list c))
-      'left-char 
-      'right-char
-      )
-    ))
+  (require 'helm-eshell)
 
-;; customize prompt
-(setq eshell-prompt-function #'(lambda ()
-   (let ((sp (propertize " " 'face '(:background "#fff"))))
-     (concat
-      sp (abbreviate-file-name (eshell/pwd)) "\n"
-      sp (if (= (user-uid) 0) "#" "$") " ")) ))
+  ;; modules
+  (add-to-list 'eshell-modules-list 'eshell-rebind)
+  (setq eshell-modules-list
+        (delete 'eshell-pred eshell-modules-list))
+
+  ;; don't rebind <up> and <down> as history scroll keys
+  (setq eshell-hist-rebind-keys-alist
+        (--remove (member (car it) '([up] [down])) 
+                  eshell-hist-rebind-keys-alist))
+
+  ;; customization of eshell
+  (add-hook 'eshell-mode-hook 
+            (lambda () 
+              ;; ignore case in completions
+              (setq eshell-cmpl-ignore-case t)
+              (eshell-cmpl-initialize)
+              ;; prompt colour
+              (set-face-attribute 'eshell-prompt nil :foreground "chartreuse4")
+              (push-mark) ;; ??
+              ;; custom keybindings
+              (define-keys eshell-mode-map 
+                (kbd "M-]") 'helm-eshell-history
+                [remap eshell-pcomplete] 'helm-esh-pcomplete
+                (kbd "<home>") 'eshell-bol
+                )
+              ;; left and right cannot move into the prompt string
+              (many 1 (lambda (c) (add-to-list 'eshell-cannot-leave-input-list c))
+                    'left-char 
+                    'right-char
+                    )
+              ))
+
+  ;; customize prompt
+  (setq eshell-prompt-function #'(lambda ()
+     (let ((sp (propertize " " 'face '(:background "#fff"))))
+       (concat
+        sp (abbreviate-file-name (eshell/pwd)) "\n"
+        sp (if (= (user-uid) 0) "#" "$") " ")) ))
+
+
+  (advice-add 'eshell :override #'my--eshell)
+)
 
 ;; copied almost verbatim from eshell.el (***). The behaviour which is
 ;; overridden is: "A nonnumeric prefix arg means to create a new session."
@@ -73,9 +85,9 @@ created)."
     (unless (derived-mode-p 'eshell-mode)
       (eshell-mode))
     buf))
-(fset 'eshell 'my--eshell)
 
 ;;; eshell functions
+;;;###autoload
 (defun eshell/buffer-contents (buf)
   "Echo the contents of a given buffer"
   (interactive)

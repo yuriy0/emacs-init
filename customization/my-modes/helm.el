@@ -1,6 +1,8 @@
 (use-package helm
   :ensure
 
+  :autoload (find-file-create-if-nonexistant)
+
   :bind
   (
    ("M-x" . helm-M-x)
@@ -46,15 +48,21 @@
         )
 
   ;; find-file - when the file doesn't exist, create it
-  (defun find-file-create-if-nonexistant (_)
-    (when (not (file-exists-p (buffer-file-name)))
-      (save-buffer) ) )
   (advice-add 'helm-find-files :after 'find-file-create-if-nonexistant)
 )
 
+
+;;;###autoload
+(defun find-file-create-if-nonexistant (_)
+  (when-let*
+      ((bfnm  (buffer-file-name))
+       (notex (not (file-exists-p))))
+    (save-buffer)
+    ))
+
 (use-package helm-ag
   :ensure
-  :requires (helm)
+  :after (helm)
 
   :bind
   (
@@ -65,6 +73,8 @@
    )
 
   :config
+  (message "use-package helm-ag")
+
   (setq helm-ag-base-command "ag --vimgrep --no-color")
   (setq helm-ag-fuzzy-match t)
 
