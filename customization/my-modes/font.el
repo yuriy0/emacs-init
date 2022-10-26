@@ -31,7 +31,7 @@
 ;;;###autoload
 (defun maybe-unicode-fonts-setup (&rest _unused)
   (when (any-non-displayable)
-    (unicode-fonts-setup)
+    (run-with-timer 0.5 nil #'unicode-fonts-setup)
     (remove-hook 'window-buffer-change-functions 'maybe-unicode-fonts-setup
     )))
 
