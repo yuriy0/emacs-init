@@ -6,6 +6,8 @@
   (helm-autoresize-mode t)
   (helm-adaptive-mode t)
 
+
+
   ;; handles a very strange issue in which M-x looks at the text at point
   ;; and if it looks like a URL it tries to ping that URL...
   ;; see https://github.com/emacs-helm/helm/issues/648
@@ -33,6 +35,7 @@
         helm-default-external-file-browser  "explorer.exe"
         helm-buffer-max-length nil             ; don't truncate buffer names 
         helm-M-x-always-save-history t         ; save command to history even if it produces an error
+        history-delete-duplicates t            ; dont put duplicate commands in the command history
    )
 
   (many 1 (apply-partially 'add-to-list 'helm-boring-buffer-regexp-list)

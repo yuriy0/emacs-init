@@ -69,7 +69,7 @@
   (advice-add 'markdown-follow-thing-at-point :around #'lsp-ui-follow-thing-at-point/advice-around)
 
   ;; for completeness
-  (define-key help-mode-map (kbd "<return>") #'markdown-follow-thing-at-point)
+  (define-key help-mode-map (kbd "<return>") #'universal-follow-thing-at-point)
 )
 
 ;; this is identical to `lsp-ui-doc--open-markdown-link' except:
@@ -99,3 +99,10 @@
   (interactive)
   (setq lsp-ui-sideline-show-hover (not lsp-ui-sideline-show-hover))
 )
+
+
+(defun universal-follow-thing-at-point()
+  (interactive)
+  (or (push-button)
+      (lsp-ui-follow-thing-at-point)
+      (markdown-follow-thing-at-point nil)))
