@@ -1,6 +1,8 @@
 
 (use-package php-mode
   :ensure
+  :commands (php-mode)
+
   :config
 
   (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))

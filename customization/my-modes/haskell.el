@@ -3,6 +3,7 @@
 ;; Haskell mode
 (use-package haskell-mode
   :ensure
+  :commands (haskell-mode)
 
   :config
 

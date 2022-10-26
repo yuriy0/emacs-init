@@ -1,13 +1,7 @@
-(use-package json-mode
-  :ensure
-  :config
-
-  (add-to-list 'auto-mode-alist '("\\.shader\\'" . json-mode))
-  (add-to-list 'auto-mode-alist '("\\.materialtype\\'" . json-mode))
-)
-
 (use-package cc-mode
   :ensure
+  :commands (c-mode c++-mode)
+
   :config
 
   ;; Lumberyard/CryEngine shader files

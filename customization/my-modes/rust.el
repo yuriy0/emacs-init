@@ -1,6 +1,7 @@
 ;; see https://github.com/rksm/emacs-rust-config/blob/master/init.el
 (use-package rustic
   :ensure
+  :commands (rustic-mode)
 
   :init
   (setq rustic-lsp-setup-p nil) ; setup ourselfs

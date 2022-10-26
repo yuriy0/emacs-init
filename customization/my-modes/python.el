@@ -1,5 +1,7 @@
 (use-package python-mode
   :ensure
+  :commands (python-mode)
+
   :config
 
   ;; Don't use electric indent in python mode
