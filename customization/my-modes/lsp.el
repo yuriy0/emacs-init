@@ -70,6 +70,9 @@
 
   ;; for completeness
   (define-key help-mode-map (kbd "<return>") #'universal-follow-thing-at-point)
+
+  ;; lsp modeline will usually contain some funky unicode
+  (unicode-fonts-setup)
 )
 
 ;; this is identical to `lsp-ui-doc--open-markdown-link' except:
