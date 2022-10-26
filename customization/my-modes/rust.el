@@ -2,6 +2,9 @@
 (use-package rustic
   :ensure
 
+  :init
+  (setq rustic-lsp-setup-p nil) ; setup ourselfs
+
   :config
   ;; find rust analyzer
   (progn
@@ -19,6 +22,11 @@
       (setq tab-width 2)
       (setq default-tab-width 2)
       (setq rust-indent-offset 2)
+
+      ;; required for lsp in rustic mode
+      ;; rustic-mode would do this for us if `rustic-lsp-setup-p' was `t' except it doesn't use deferred lsp
+      (rustic-lsp-mode-setup)
+      (lsp-deferred)
     ))
 
   ;; faces for compilation output (inherit from defaults)
