@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 ;; Haskell mode
 (use-package haskell-mode
   :ensure
@@ -64,7 +66,7 @@
 
       :config
 
-      (setq lsp-haskell-server-path (get-haskell-language-server-path))
+      (setq lsp-haskell-server-path hls-path)
 
       (setq
        ;; disables all hlint diagnostics which are very aggressive...
