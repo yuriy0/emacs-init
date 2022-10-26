@@ -1,3 +1,7 @@
+(defvar profiler-emacs-init nil)
+(when profiler-emacs-init
+  (profiler-start 'cpu))
+
 ;;;;;;;;;;;
 ;; fonts ;;
 ;;;;;;;;;;;
@@ -106,6 +110,11 @@
 ;; require user packages
 (mapc (lambda (p) (require p)) package-selected-packages)
 
+;; use package loading statistics
+(when profiler-emacs-init
+  (setq use-package-compute-statistics t)
+  (setq use-package-verbose t))
+
 ;; whenever you install/update a package, the `package' package will (through
 ;; 'customize') automatically clobber `package-selected-packages'. 
 ;;;###autoload
@@ -172,3 +181,7 @@
 
 ;; this fails if the window is hidden because the user can't interact...
 ;; (package-autoremove) ;; remove packages which shouldn't be here
+
+(when profiler-emacs-init
+  (profiler-stop))
+
