@@ -64,6 +64,7 @@
     (use-package lsp-haskell
       :ensure
       :after (lsp-mode)
+      :hook ((haskell-mode . lsp-deferred) (haskell-mode . yas-minor-mode))
 
       :config
 
@@ -87,15 +88,5 @@
       ;;   :group 'lsp-haskell-plugins
       ;;   :type 'boolean
       ;;   :lsp-path "haskell.plugin.ghcide-code-actions-fill-holes.globalOn")
-      )
-
-    (use-package lsp-mode
-      :hook (haskell-mode . lsp-deferred)
-      :commands (lsp lsp-deferred)
-      )
-
-    (use-package yasnippet
-      :hook (haskell-mode . yas-minor-mode)
-      :commands (yas-minor-mode)
       )
     ))

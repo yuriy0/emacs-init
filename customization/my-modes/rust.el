@@ -24,6 +24,8 @@
       (setq default-tab-width 2)
       (setq rust-indent-offset 2)
 
+      (yas-minor-mode)
+
       ;; required for lsp in rustic mode
       ;; rustic-mode would do this for us if `rustic-lsp-setup-p' was `t' except it doesn't use deferred lsp
       (rustic-lsp-mode-setup)
@@ -61,13 +63,3 @@
   ;; see https://rust-analyzer.github.io/manual.html#diagnostics
   ;; (lsp-rust-analyzer-diagnostics-disabled [])
 )
-
-
-(use-package flycheck :ensure)
-
-(use-package yasnippet
-  :ensure
-  :config
-  (yas-reload-all)
-  (add-hook 'rustic-mode-hook 'yas-minor-mode)
-  )

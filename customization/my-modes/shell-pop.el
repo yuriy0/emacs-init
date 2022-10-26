@@ -1,11 +1,14 @@
 (use-package shell-pop
   :ensure
-  :config
+  :bind ("C-'" . shell-pop)
 
+  :config
   (customize-set-variable
    'shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))) )
-  (global-set-keys (kbd "C-'") 'shell-pop)
+
   (setq shell-pop-restore-window-configuration nil)
+
+  (fset 'shell-pop-split-window 'my--shell-pop-split-window)
 )
 
 (defun extremal-windows (dirs)
@@ -32,7 +35,6 @@ directions (a direction being that which which can be passed to
        win
        (shell-pop--calculate-window-size)
        (shell-pop--translate-position shell-pop-window-position)))))
-(fset 'shell-pop-split-window 'my--shell-pop-split-window)
 
 (defun shell-pop--shell-buffer-name (index)
   (if (string-match-p "*\\'" shell-pop-internal-mode-buffer)

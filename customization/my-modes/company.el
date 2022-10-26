@@ -1,5 +1,6 @@
 (use-package company
   :ensure
+  :commands (company-mode)
 
   :custom
 
@@ -30,4 +31,12 @@
         ;; ("TAB" . company-complete-selection)
         ("<tab>" . company-complete-selection)
         )
+)
+
+
+(use-package yasnippet
+  :ensure
+  :commands (yas-minor-mode)
+  :config
+  (yas-reload-all)
 )
