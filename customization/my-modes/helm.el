@@ -56,7 +56,7 @@
 (defun find-file-create-if-nonexistant (_)
   (when-let*
       ((bfnm  (buffer-file-name))
-       (notex (not (file-exists-p))))
+       (notex (not (file-exists-p bfnm))))
     (save-buffer)
     ))
 
