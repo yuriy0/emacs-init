@@ -49,6 +49,7 @@
         ("C-c C-c >" . #'lsp-describe-thing-at-point)
         ("M-j" . #'lsp-ui-imenu)
         ("C-c C-c a" . #'lsp-execute-code-action)
+        ("C-c C-c y" . #'lsp-ui-flycheck-list)
 
         ;; standard xref jump using lsp-ui instead
         (([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
