@@ -44,8 +44,10 @@
 (fset 'display-startup-echo-area-message
       'check-emacs-init-finished)
 
-;; don't use custom
-(setq custom-file "NUL")
+;; custom
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file t)
+(setq custom-safe-themes t)
 
 ;; Packages to be installed for this file to work. Emacs 25>
 (setq package-selected-packages `(
@@ -175,6 +177,10 @@
 ;;;;;;;;;;;;;;;;;;
 (load-dir-one "~/.emacs.d/customization/my-modes/")
 
+;;;;;;;;;;;;;;;;;;;
+;; Themes ;;
+;;;;;;;;;;;;;;;;;;;
+(load-file "~/.emacs.d/customization/theme.el")
 
 ;;; fin
 (setq emacs-init-finished t)
@@ -185,4 +191,3 @@
 
 (when profiler-emacs-init
   (profiler-stop))
-

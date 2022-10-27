@@ -23,6 +23,9 @@ transient/*
 var/pcache/*
 projects
 
+# not used directly but other configs might write to it
+custom.el
+
 # needs seperate installation
 fonts/
 
