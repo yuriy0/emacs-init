@@ -1,7 +1,6 @@
 (use-package helm
   :ensure
 
-  :delight helm-mode
   :autoload (find-file-create-if-nonexistant)
 
   :bind
@@ -23,6 +22,8 @@
   (helm-mode 1)
   (helm-autoresize-mode t)
   (helm-adaptive-mode t)
+
+  (diminish 'helm-mode)
 
   ;; handles a very strange issue in which M-x looks at the text at point
   ;; and if it looks like a URL it tries to ping that URL...
