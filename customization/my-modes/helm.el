@@ -1,6 +1,7 @@
 (use-package helm
   :ensure
 
+  :delight helm-mode
   :autoload (find-file-create-if-nonexistant)
 
   :bind

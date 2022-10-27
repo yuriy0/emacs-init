@@ -1,6 +1,7 @@
 (use-package company
   :ensure
   :commands (company-mode)
+  :delight company-mode
 
   :custom
 
@@ -37,6 +38,7 @@
 (use-package yasnippet
   :ensure
   :commands (yas-minor-mode)
+  :delight yas-minor-mode
   :config
   (yas-reload-all)
 )

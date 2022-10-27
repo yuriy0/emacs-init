@@ -55,6 +55,7 @@
   anaphora
   dash
   dash-functional
+  delight ;; (used by use-package during construction phase)
   list-utils
   gnu-elpa-keyring-update
   load-dir
@@ -105,13 +106,13 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; install any missing packages
-(dolist (package package-selected-packages)
+(defun package-install-and-require(package)
   (unless (package-installed-p package)
-    (package-install package)))
+    (package-install package))
+  (require package))
 
-;; require user packages
-(mapc (lambda (p) (require p)) package-selected-packages)
+;; install & require packages
+(mapc #'package-install-and-require package-selected-packages)
 
 ;; use package loading statistics
 (when profiler-emacs-init
