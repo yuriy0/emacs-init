@@ -30,11 +30,11 @@
   ;; (setq lsp-enable-symbol-highlighting nil)
   ;; (setq lsp-signature-auto-activate nil)
 
-  (diminish 'eldoc-mode)
-  (diminish 'lsp-lens-mode)
-
-
-
+  (run-with-timer 0.1 nil
+    (lambda()
+      (diminish 'eldoc-mode)
+      (diminish 'lsp-lens-mode)
+      ))
 
   ;; improves lsp-mode performance
   (setq read-process-output-max (expt 2 16))

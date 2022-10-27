@@ -214,3 +214,12 @@ the same window)."
 
 ;; line numbers
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+;; line wrap
+(use-package simple
+  :config
+
+  (diminish 'visual-line-mode)
+  (global-visual-line-mode)
+  (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+)

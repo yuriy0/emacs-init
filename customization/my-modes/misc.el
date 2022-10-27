@@ -5,7 +5,6 @@
 (use-package cmake-mode :ensure  :commands (cmake-mode))
 (use-package csharp-mode :ensure :commands (csharp-mode))
 (use-package deferred :ensure)
-(use-package diminish :ensure)
 (use-package f :ensure)
 (use-package font-utils :ensure)
 (use-package fringe-helper :ensure)

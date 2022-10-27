@@ -56,6 +56,7 @@
   dash
   dash-functional
   delight ;; (used by use-package during construction phase)
+  diminish
   list-utils
   gnu-elpa-keyring-update
   load-dir
