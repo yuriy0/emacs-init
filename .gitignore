@@ -22,6 +22,7 @@ transient/*
 .lsp-session*
 var/pcache/*
 projects
+.cache/*
 
 # not used directly but other configs might write to it
 custom.el

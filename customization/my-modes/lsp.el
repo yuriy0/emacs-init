@@ -53,7 +53,7 @@
         ("C-c C-c s" . #'toggle-lsp-ui-sideline-show-hover)
         ("C-c C-c t" . #'lsp-ui-doc-mode)
         ("C-c C-c >" . #'lsp-describe-thing-at-point)
-        ("M-j" . #'lsp-ui-imenu)
+        ("M-j" . #'lsp-treemacs-symbols)
         ("C-c C-c a" . #'lsp-execute-code-action)
         ("C-c C-c y" . #'lsp-ui-flycheck-list)
 
@@ -74,6 +74,9 @@
   ;; fixes a bug with lsp-ui-doc / lsp help buffers
   ;; see https://github.com/emacs-lsp/lsp-ui/issues/452
   (advice-add 'markdown-follow-thing-at-point :around #'lsp-ui-follow-thing-at-point/advice-around)
+
+  ;; fixes a bug with the modeline mouse click action, it uses `lsp-treemacs-errors-list' which doesn't work for me
+  (advice-add 'lsp-modeline-diagnostics-statistics :override #'my--lsp-modeline-diagnostics-statistics)
 
   ;; for completeness
   (define-key help-mode-map (kbd "<return>") #'universal-follow-thing-at-point)
@@ -116,3 +119,76 @@
   (or (push-button)
       (lsp-ui-follow-thing-at-point)
       (markdown-follow-thing-at-point nil)))
+
+;;;###autoload
+(defun my--lsp-modeline-diagnostics-statistics ()
+  "Calculate diagnostics statistics based on `lsp-modeline-diagnostics-scope'."
+  (let ((diagnostics (cond
+                      ((equal :file lsp-modeline-diagnostics-scope)
+                       (list (lsp--get-buffer-diagnostics)))
+                      (t (->> (eq :workspace lsp-modeline-diagnostics-scope)
+                              (lsp-diagnostics)
+                              (ht-values)))))
+        (stats (make-vector lsp/diagnostic-severity-max 0))
+        strs
+        (i 0))
+    (mapc (lambda (buf-diags)
+            (mapc (lambda (diag)
+                    (-let [(&Diagnostic? :severity?) diag]
+                      (when severity?
+                        (cl-incf (aref stats severity?)))))
+                  buf-diags))
+          diagnostics)
+    (while (< i lsp/diagnostic-severity-max)
+      (when (> (aref stats i) 0)
+        (setq strs
+              (nconc strs
+                     `(,(propertize
+                         (format "%s" (aref stats i))
+                         'face
+                         (cond
+                          ((= i lsp/diagnostic-severity-error) 'error)
+                          ((= i lsp/diagnostic-severity-warning) 'warning)
+                          ((= i lsp/diagnostic-severity-information) 'success)
+                          ((= i lsp/diagnostic-severity-hint) 'success)))))))
+      (cl-incf i))
+    (-> (s-join "/" strs)
+        (propertize 'mouse-face 'mode-line-highlight
+                    'help-echo "mouse-1: Show diagnostics"
+                    'local-map (when t ;; modified HERE
+                                 (make-mode-line-mouse-map
+                                  'mouse-1 #'lsp-ui-flycheck-list)))))) ;; modified HERE
+(use-package lsp-treemacs
+  :ensure
+  :commands (lsp-treemacs-symbols)
+  :config
+
+  (lsp-treemacs-sync-mode 1)
+)
+
+(use-package treemacs-all-the-icons
+  :ensure
+  :after (all-the-icons)
+
+  )
+
+(use-package treemacs
+  :defer t
+  :config
+
+  ;; fixes a bug where the treemacs icons have the wrong background until you change
+  ;; a theme or have set a theme before requiring treemacs. if we use the default theme
+  ;; the icon colors are somehow wrong?
+  (when (eq custom-enabled-themes nil) (treemacs--updated-icon-background-colors))
+)
+
+;;;###autoload
+(defun treemacs--updated-icon-background-colors()
+  (dolist (theme treemacs--themes)
+    (treemacs--maphash (treemacs-theme->gui-icons theme) (_ icon)
+      (treemacs--set-img-property
+       (get-text-property 0 'img-selected icon)
+       :background treemacs--selected-icon-background)
+      (treemacs--set-img-property
+       (get-text-property 0 'img-unselected icon)
+       :background treemacs--not-selected-icon-background))))
