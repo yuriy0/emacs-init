@@ -74,6 +74,9 @@ If the new path's directories does not exist, create them."
       tramp-backup-directory-alist backup-directory-alist
       auto-save-file-name-transforms nil)
 
+;; no lock file
+(setq create-lockfiles nil)
+
 ;; no autosave
 (setq auto-save-default nil)
 
