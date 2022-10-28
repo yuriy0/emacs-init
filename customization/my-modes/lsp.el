@@ -30,12 +30,6 @@
   ;; (setq lsp-enable-symbol-highlighting nil)
   ;; (setq lsp-signature-auto-activate nil)
 
-  (run-with-timer 0.1 nil
-    (lambda()
-      (diminish 'eldoc-mode)
-      (diminish 'lsp-lens-mode)
-      ))
-
   ;; improves lsp-mode performance
   (setq read-process-output-max (expt 2 16))
   (setq gc-cons-threshold (* 3 (expt 10 8)))
@@ -43,6 +37,13 @@
   ;; auto start lsp-ui
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
+(use-package eldoc
+  :defer t
+  :diminish)
+
+(use-package lsp-lens
+  :defer t
+  :diminish)
 
 (use-package lsp-ui
   :ensure
