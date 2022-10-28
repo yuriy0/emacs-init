@@ -1,4 +1,6 @@
-;;;###autoload 
+;;;  -*- lexical-binding: t; -*- 
+
+;;;###autoload
 (defmacro with-negated-prefix-arg (fn) 
   "Defines a lambda which takes a prefix arg
 and passes the negated version to the given function, 
@@ -341,3 +343,27 @@ current buffer."
         (error (message "Failed to delete file %s" filename)) ) )
     (kill-buffer)))
 (global-set-key (kbd "C-c D") 'delete-file-and-kill-buffer)
+
+
+
+;;;###autoload
+(defun add-hook-once (hook-var hook-fn)
+  "Add `hook-fn' to all of hooks found in `hook-vars' (list or single hook); the first time that `hook-fn' returns `t', all of the installed hooks will be removed"
+  (letrec
+      ((wrapped-hook-fn
+        (lambda (&rest args)
+          (if (apply hook-fn args) (funcall remove-hooks))))
+       (remove-hooks
+         (if (listp hook-var)
+             (lambda ()
+               (mapc (lambda(h) (remove-hook h wrapped-hook-fn)) hook-var))
+             (lambda ()
+               (remove-hook hook-var wrapped-hook-fn))
+             )
+         )
+       )
+    (if (listp hook-var)
+        (mapc (lambda(h) (add-hook h wrapped-hook-fn)) hook-var)
+        (add-hook hook-var wrapped-hook-fn)
+      )
+    ))

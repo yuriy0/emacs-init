@@ -159,36 +159,10 @@
                                  (make-mode-line-mouse-map
                                   'mouse-1 #'lsp-ui-flycheck-list)))))) ;; modified HERE
 (use-package lsp-treemacs
-  :ensure
+  :ensure t
+  :after (treemacs lsp-mode)
   :commands (lsp-treemacs-symbols)
   :config
 
   (lsp-treemacs-sync-mode 1)
 )
-
-(use-package treemacs-all-the-icons
-  :ensure
-  :after (all-the-icons)
-
-  )
-
-(use-package treemacs
-  :defer t
-  :config
-
-  ;; fixes a bug where the treemacs icons have the wrong background until you change
-  ;; a theme or have set a theme before requiring treemacs. if we use the default theme
-  ;; the icon colors are somehow wrong?
-  (when (eq custom-enabled-themes nil) (treemacs--updated-icon-background-colors))
-)
-
-;;;###autoload
-(defun treemacs--updated-icon-background-colors()
-  (dolist (theme treemacs--themes)
-    (treemacs--maphash (treemacs-theme->gui-icons theme) (_ icon)
-      (treemacs--set-img-property
-       (get-text-property 0 'img-selected icon)
-       :background treemacs--selected-icon-background)
-      (treemacs--set-img-property
-       (get-text-property 0 'img-unselected icon)
-       :background treemacs--not-selected-icon-background))))
