@@ -29,3 +29,8 @@
   :after (all-the-icons)
 
   )
+
+(use-package treemacs-icons-dired
+  :ensure t
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+)

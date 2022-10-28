@@ -1,30 +1,47 @@
-;; general
-(setq dired-recursive-copies (quote always))
-(setq dired-recursive-deletes (quote top))
-(save-place-mode 1)
+(use-package dired
+  :defer
+  :commands (dired)
 
-;; find file with `a' in same buffer
-(put 'dired-find-alternate-file 'disabled nil)
+  :bind
+  (:map dired-mode-map
+        ("a" . dired-find-file)
 
-;; find parent dir with `^' in same buffer
-;; https://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer
-(add-hook 'dired-mode-hook
- (lambda ()
-  (define-key dired-mode-map (kbd "^")
-    (lambda () (interactive) (find-alternate-file "..")))))
+        ;; https://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer
+        ("^" . (lambda () (interactive) (find-alternate-file "..")))
+        )
 
-(use-package dired-hacks-utils :ensure :requires (dired))
+  :config
+  (setq dired-recursive-copies (quote always))
+  (setq dired-recursive-deletes (quote top))
+  (save-place-mode 1)
 
-(use-package dired-rainbow :ensure :requires (dired))
+  ;; find file with `a' in same buffer
+  (put 'dired-find-alternate-file 'disabled nil)
+  )
 
-(use-package dired-subtree :ensure :requires (dired)
+(use-package dired-hacks-utils
+  :ensure t
+  :after (dired)
+)
+
+(use-package dired-rainbow
+  :ensure t
+  :after (dired)
+)
+
+(use-package dired-subtree
+  :ensure t
+  :defer t
+
   :config
   (setq dired-subtree-use-backgrounds nil)
-  (many 2 (apply-partially 'define-key dired-mode-map)
-        (kbd "i") #'dired-subtree-insert
-        (kbd "<tab>") #'dired-subtree-toggle
-        (kbd "<backtab>") #'dired-subtree-cycle
-        (kbd "<RET>") #'dired-find-alternate-file
-        (kbd "a") #'dired-find-file
+
+  :bind
+  (:map dired-mode-map
+        ("i" . dired-subtree-insert)
+        ("<tab>" . dired-subtree-toggle)
+        ("<backtab>" . dired-subtree-cycle)
+        ("<RET>" . dired-find-alternate-file)
+        ("a" . dired-find-file)
         )
 )
