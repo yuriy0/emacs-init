@@ -1,6 +1,7 @@
 (use-package lsp-mode
   :ensure
   :commands (lsp lsp-deferred)
+  :autoload (my--lsp-modeline-diagnostics-statistics)
   :custom
 
   ;;"lens" = count references to symbols
@@ -84,6 +85,9 @@
 
   ;; lsp modeline will usually contain some funky unicode
   (unicode-fonts-setup)
+
+  :custom-face
+  '(lsp-modeline-code-actions-preferred-face ((t (:foreground "dark goldenrod"))))
 )
 
 ;; this is identical to `lsp-ui-doc--open-markdown-link' except:
@@ -156,9 +160,10 @@
     (-> (s-join "/" strs)
         (propertize 'mouse-face 'mode-line-highlight
                     'help-echo "mouse-1: Show diagnostics"
-                    'local-map (when t ;; modified HERE
+                    'local-map (when t
                                  (make-mode-line-mouse-map
-                                  'mouse-1 #'lsp-ui-flycheck-list)))))) ;; modified HERE
+                                  'mouse-1 #'lsp-ui-flycheck-list))))))
+
 (use-package lsp-treemacs
   :ensure t
   :after (treemacs lsp-mode)
