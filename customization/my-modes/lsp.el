@@ -1,7 +1,8 @@
+;; -*- lexical-binding: t; -*-
+
 (use-package lsp-mode
   :ensure
   :commands (lsp lsp-deferred)
-  :autoload (my--lsp-modeline-diagnostics-statistics)
   :custom
 
   ;;"lens" = count references to symbols
@@ -77,9 +78,6 @@
   ;; see https://github.com/emacs-lsp/lsp-ui/issues/452
   (advice-add 'markdown-follow-thing-at-point :around #'lsp-ui-follow-thing-at-point/advice-around)
 
-  ;; fixes a bug with the modeline mouse click action, it uses `lsp-treemacs-errors-list' which doesn't work for me
-  (advice-add 'lsp-modeline-diagnostics-statistics :override #'my--lsp-modeline-diagnostics-statistics)
-
   ;; for completeness
   (define-key help-mode-map (kbd "<return>") #'universal-follow-thing-at-point)
 
@@ -125,44 +123,6 @@
       (lsp-ui-follow-thing-at-point)
       (markdown-follow-thing-at-point nil)))
 
-;;;###autoload
-(defun my--lsp-modeline-diagnostics-statistics ()
-  "Calculate diagnostics statistics based on `lsp-modeline-diagnostics-scope'."
-  (let ((diagnostics (cond
-                      ((equal :file lsp-modeline-diagnostics-scope)
-                       (list (lsp--get-buffer-diagnostics)))
-                      (t (->> (eq :workspace lsp-modeline-diagnostics-scope)
-                              (lsp-diagnostics)
-                              (ht-values)))))
-        (stats (make-vector lsp/diagnostic-severity-max 0))
-        strs
-        (i 0))
-    (mapc (lambda (buf-diags)
-            (mapc (lambda (diag)
-                    (-let [(&Diagnostic? :severity?) diag]
-                      (when severity?
-                        (cl-incf (aref stats severity?)))))
-                  buf-diags))
-          diagnostics)
-    (while (< i lsp/diagnostic-severity-max)
-      (when (> (aref stats i) 0)
-        (setq strs
-              (nconc strs
-                     `(,(propertize
-                         (format "%s" (aref stats i))
-                         'face
-                         (cond
-                          ((= i lsp/diagnostic-severity-error) 'error)
-                          ((= i lsp/diagnostic-severity-warning) 'warning)
-                          ((= i lsp/diagnostic-severity-information) 'success)
-                          ((= i lsp/diagnostic-severity-hint) 'success)))))))
-      (cl-incf i))
-    (-> (s-join "/" strs)
-        (propertize 'mouse-face 'mode-line-highlight
-                    'help-echo "mouse-1: Show diagnostics"
-                    'local-map (when t
-                                 (make-mode-line-mouse-map
-                                  'mouse-1 #'lsp-ui-flycheck-list))))))
 
 (use-package lsp-treemacs
   :ensure t
@@ -172,3 +132,60 @@
 
   (lsp-treemacs-sync-mode 1)
 )
+
+
+;; customize the lsp-modeline diagnostics display
+;; fixes a bug with the modeline mouse click action, it uses `lsp-treemacs-errors-list' which doesn't work for me
+(with-eval-after-load "lsp-modeline"
+  ;; this strange require mode is used because the pattern matching `-let' forms below are macro-expanded during compilation
+  ;; but their expansion is ill-defined until some other functions are defined in lsp-modeline (in particular the symbols `&Diagnostic?'
+  ;; have a user-specified meaning which is given in lsp-modeline
+  (eval-and-compile (require 'lsp-modeline))
+
+  (defun lsp-count-diagnostics-of-types()
+    (let ((diagnostics (cond
+                        ((equal :file lsp-modeline-diagnostics-scope)
+                         (list (lsp--get-buffer-diagnostics)))
+                        (t (->> (eq :workspace lsp-modeline-diagnostics-scope)
+                                (lsp-diagnostics)
+                                (ht-values)))))
+          (stats (make-vector lsp/diagnostic-severity-max 0))
+          )
+
+      (mapc (lambda (buf-diags)
+              (mapc (lambda (diag)
+                      (-let [(&Diagnostic? :severity?) diag]
+                        (when severity?
+                          (cl-incf (aref stats severity?)))))
+                    buf-diags))
+            diagnostics)
+
+      stats
+      ))
+
+  (defun my--lsp-modeline-diagnostics-statistics ()
+    "Calculate diagnostics statistics based on `lsp-modeline-diagnostics-scope'."
+    (let ((stats (lsp-count-diagnostics-of-types))
+          strs
+          (i 0))
+      (while (< i lsp/diagnostic-severity-max)
+        (when (> (aref stats i) 0)
+          (setq strs
+                (nconc strs
+                       `(,(propertize
+                           (format "%s" (aref stats i))
+                           'face
+                           (cond
+                            ((= i lsp/diagnostic-severity-error) 'error)
+                            ((= i lsp/diagnostic-severity-warning) 'warning)
+                            ((= i lsp/diagnostic-severity-information) 'success)
+                            ((= i lsp/diagnostic-severity-hint) 'success)))))))
+        (cl-incf i))
+      (-> (s-join "/" strs)
+          (propertize 'mouse-face 'mode-line-highlight
+                      'help-echo "mouse-1: Show diagnostics"
+                      'local-map (when t
+                                   (make-mode-line-mouse-map
+                                    'mouse-1 #'lsp-ui-flycheck-list))))))
+
+  (advice-add 'lsp-modeline-diagnostics-statistics :override #'my--lsp-modeline-diagnostics-statistics))
