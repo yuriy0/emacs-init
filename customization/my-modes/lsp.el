@@ -25,16 +25,6 @@
   ;; see https://rust-analyzer.github.io/manual.html#diagnostics
   ;; (lsp-rust-analyzer-diagnostics-disabled [])
 
-
-  ;; fixes a bug in windows, where paths are case-insensitive so the canonical form
-  ;; should be case-normalized
-  (when (system-type-windowslike-p)
-    (defun my/lsp-f-canonical (file-name)
-      "Return the canonical FILE-NAME, without a trailing slash."
-      (downcase (directory-file-name (expand-file-name file-name))))
-
-    (advice-add 'lsp-f-canonical :override #'my/lsp-f-canonical))
-
   :config
 
   ;; uncomment for less flashiness
@@ -47,7 +37,17 @@
   (setq gc-cons-threshold (* 3 (expt 10 8)))
 
   ;; auto start lsp-ui
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
+  ;; fixes a bug in windows, where paths are case-insensitive so the canonical form
+  ;; should be case-normalized
+  (when (system-type-windowslike-p)
+    (defun my/lsp-f-canonical (file-name)
+      "Return the canonical FILE-NAME, without a trailing slash."
+      (downcase (directory-file-name (expand-file-name file-name))))
+
+    (advice-add 'lsp-f-canonical :override #'my/lsp-f-canonical))
+  )
 
 (use-package eldoc
   :defer t
