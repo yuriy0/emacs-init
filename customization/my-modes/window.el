@@ -90,7 +90,7 @@ is multiplied by the given delta to determine the true delta."
 (defun other-window-target (count &optional all-frames)
   (interactive "sTarget window: ")
   (funcall 'other-window (string-to-number count) all-frames))
-(global-set-keys (kbd "C-c p") 'other-window-target)
+(global-set-keys (kbd "C-c w") 'other-window-target)
 
 
 ;;;###autoload
