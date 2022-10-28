@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (defvar profiler-emacs-init nil)
 (when profiler-emacs-init
   (setq debug-on-error t)
@@ -48,19 +50,6 @@
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file t)
 (setq custom-safe-themes t)
-
-;; Packages to be installed for this file to work. Emacs 25>
-(setq package-selected-packages `(
-  use-package
-  anaphora
-  dash
-  dash-functional
-  delight ;; (used by use-package during construction phase)
-  diminish
-  list-utils
-  gnu-elpa-keyring-update
-  load-dir
-))
 
 ;; suppress all warnings
 (setq warning-minimum-level :error
@@ -113,19 +102,23 @@
   (require package))
 
 ;; install & require packages
-(mapc #'package-install-and-require package-selected-packages)
+(setq bootstrap-packages `(
+  use-package
+  anaphora
+  dash
+  dash-functional
+  delight ;; (used by use-package during construction phase)
+  diminish
+  list-utils
+  gnu-elpa-keyring-update
+  load-dir
+))
+(mapc #'package-install-and-require bootstrap-packages)
 
 ;; use package loading statistics
 (when profiler-emacs-init
   (setq use-package-compute-statistics t)
   (setq use-package-verbose t))
-
-;; whenever you install/update a package, the `package' package will (through
-;; 'customize') automatically clobber `package-selected-packages'. 
-;;;###autoload
-(defun package--dont-save-selected-packages (&optional val) 
-  (progn (message "Override package--dont-save-selected-packages called!") nil))
-(advice-add 'package--save-selected-packages :override 'package--dont-save-selected-packages)
 
 ;;;;;;;;;;;;;;;;;;;
 ;; begin logging ;;
