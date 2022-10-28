@@ -25,6 +25,16 @@
   ;; see https://rust-analyzer.github.io/manual.html#diagnostics
   ;; (lsp-rust-analyzer-diagnostics-disabled [])
 
+
+  ;; fixes a bug in windows, where paths are case-insensitive so the canonical form
+  ;; should be case-normalized
+  (when (system-type-windowslike-p)
+    (defun my/lsp-f-canonical (file-name)
+      "Return the canonical FILE-NAME, without a trailing slash."
+      (downcase (directory-file-name (expand-file-name file-name))))
+
+    (advice-add 'lsp-f-canonical :override #'my/lsp-f-canonical))
+
   :config
 
   ;; uncomment for less flashiness
@@ -204,11 +214,12 @@
                             ((= i lsp/diagnostic-severity-information) 'success)
                             ((= i lsp/diagnostic-severity-hint) 'success)))))))
         (cl-incf i))
-      (-> (s-join "/" strs)
+      (-> (s-join "•" strs)
           (propertize 'mouse-face 'mode-line-highlight
                       'help-echo "mouse-1: Show diagnostics"
-                      'local-map (when t
-                                   (make-mode-line-mouse-map
-                                    'mouse-1 #'lsp-ui-flycheck-list))))))
+                      'local-map (make-mode-line-mouse-map
+                                  'mouse-1
+                                  (if (require 'lsp-treemacs nil t) #'lsp-treemacs-errors-list #'lsp-ui-flycheck-list))
+                      ))))
 
   (advice-add 'lsp-modeline-diagnostics-statistics :override #'my--lsp-modeline-diagnostics-statistics))

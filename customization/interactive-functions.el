@@ -367,3 +367,8 @@ current buffer."
         (add-hook hook-var wrapped-hook-fn)
       )
     ))
+
+
+;;;###autoload
+(defun system-type-windowslike-p()
+  (memq system-type '(ms-dos windows-nt cygwin)))
