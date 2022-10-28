@@ -87,6 +87,19 @@
                       )
 )
 
+(use-package helm-swoop
+  :ensure
+  :commands (helm-swoop helm-swoop-back-to-last-point helm-multi-swoop helm-multi-swoop-all helm-swoop-from-isearch)
+
+  :config
+
+  ;; When doing isearch, hand the word over to helm-swoop
+  (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+
+  ;; From helm-swoop to helm-multi-swoop-all
+  (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)
+)
+
   ;; misc.
 (use-package ac-helm :ensure
   :after (helm))
