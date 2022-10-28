@@ -84,6 +84,10 @@
   ;; lsp modeline will usually contain some funky unicode
   (unicode-fonts-setup)
 
+  ;; better display for sideline
+  (advice-add 'lsp-ui-sideline--align :override #'my/lsp-ui-sideline--align)
+  (advice-add 'lsp-ui-sideline--compute-height :override #'my/lsp-ui-sideline--compute-height)
+
   :custom-face
   '(lsp-modeline-code-actions-preferred-face ((t (:foreground "dark goldenrod"))))
 )
@@ -115,6 +119,25 @@
   (interactive)
   (setq lsp-ui-sideline-show-hover (not lsp-ui-sideline-show-hover))
 )
+
+(defvar lsp-ui-sideline-height-mult 0.8 "Relative line hieght of lsp-ui-sideline text")
+
+(defun my/lsp-ui-sideline--align (len margin)
+  "Align sideline string by LENGTHS from the right of the window."
+  (+ margin
+     (if (display-graphic-p) 1 2)
+     (* lsp-ui-sideline-height-mult len)
+     ))
+
+(defun my/lsp-ui-sideline--compute-height ()
+  "Return a fixed size for text in sideline."
+  (if (null text-scale-mode-remapping)
+      `(height ,lsp-ui-sideline-height-mult)
+    ;; Readjust height when text-scale-mode is used
+    (list 'height
+          (/ 1 (or (plist-get (cdar text-scale-mode-remapping) :height)
+                   1)))))
+
 
 
 (defun universal-follow-thing-at-point()
