@@ -41,12 +41,16 @@
 
   ;; fixes a bug in windows, where paths are case-insensitive so the canonical form
   ;; should be case-normalized
-  (when (system-type-windowslike-p)
-    (defun my/lsp-f-canonical (file-name)
-      "Return the canonical FILE-NAME, without a trailing slash."
-      (downcase (directory-file-name (expand-file-name file-name))))
 
-    (advice-add 'lsp-f-canonical :override #'my/lsp-f-canonical))
+  ;; temp: disabled because this in fact breaks a ton of things ? ...
+
+  ;; (when (system-type-windowslike-p)
+  ;;   (defun my/lsp-f-canonical (file-name)
+  ;;     "Return the canonical FILE-NAME, without a trailing slash."
+  ;;     (downcase (directory-file-name (expand-file-name file-name))))
+
+  ;;   (advice-add 'lsp-f-canonical :override #'my/lsp-f-canonical))
+
   )
 
 (use-package eldoc
