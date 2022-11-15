@@ -31,6 +31,8 @@
 
         ;; ("TAB" . company-complete-selection)
         ("<tab>" . company-complete-selection)
+
+        ("`" . company-complete-common-or-show-delayed-tooltip)
         )
 )
 
