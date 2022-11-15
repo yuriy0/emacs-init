@@ -161,15 +161,6 @@
       (markdown-follow-thing-at-point nil)))
 
 
-(use-package lsp-treemacs
-  :ensure t
-  :after (treemacs lsp-mode)
-  :commands (lsp-treemacs-symbols)
-  :config
-
-  (lsp-treemacs-sync-mode 1)
-)
-
 
 ;; customize the lsp-modeline diagnostics display
 ;; fixes a bug with the modeline mouse click action, it uses `lsp-treemacs-errors-list' which doesn't work for me
