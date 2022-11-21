@@ -1,3 +1,7 @@
+;; Basic Configuration
+(add-to-list 'default-frame-alist '(width . 85))
+(add-to-list 'default-frame-alist '(font . "Iosevka Extended 11"))
+
 (use-package all-the-icons
   :ensure
   :if (display-graphic-p))

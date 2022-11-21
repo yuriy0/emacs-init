@@ -104,6 +104,12 @@
 
   :custom-face
   '(lsp-modeline-code-actions-preferred-face ((t (:foreground "dark goldenrod"))))
+
+  ;; '(lsp-face-highlight-write
+  ;;   ((t
+  ;;     (:height 1
+  ;;      :weight normal
+  ;;      :inherit (highlight)))))
 )
 
 ;; this is identical to `lsp-ui-doc--open-markdown-link' except:

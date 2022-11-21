@@ -197,9 +197,3 @@ as a string."
       (if did-quit nil res)))
   )
 
-;;;;;;;;;;;;;;;;;
-; Configuration ;
-;;;;;;;;;;;;;;;;;
-
-(add-to-list 'default-frame-alist '(width . 85))
-

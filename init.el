@@ -5,17 +5,6 @@
   (setq debug-on-error t)
   (profiler-start 'cpu))
 
-;;;;;;;;;;;
-;; fonts ;;
-;;;;;;;;;;;
-(set-face-attribute 'default nil 
-  :family "Courier New" 
-  :foundry "outline" 
-  :slant 'normal 
-  :weight 'normal 
-  :height 120
-  :width 'normal)
-
 ;; same behaviour as default, but allows customization of 
 ;; the behaviour for specific modes by using add-to-list 
 (setq font-lock-maximum-decoration '((t . t)))
