@@ -2,6 +2,7 @@
 (use-package rustic
   :ensure
   :commands (rustic-mode)
+  :autoload (my/rustic-make-process-advice)
 
   :init
   (setq rustic-lsp-setup-p nil) ; setup ourselfs
@@ -16,9 +17,9 @@
       )
    )
 
-  ;; indent settings
   (add-hook 'rustic-mode-hook
     (lambda ()
+      ;; indent settings
       (setq indent-tabs-mode nil)
       (setq tab-width 2)
       (setq default-tab-width 2)
@@ -32,6 +33,7 @@
       (lsp-deferred)
     ))
 
+  (advice-add 'rustic-make-process :around 'my/rustic-make-process-advice)
   ;; faces for compilation output (inherit from defaults)
   :custom-face
    (rustic-compilation-column ((t (:inherit compilation-column-number))))
@@ -39,6 +41,19 @@
    (rustic-compilation-error ((t (:inherit compilation-error))))
    (rustic-compilation-warning ((t (:inherit compilation-warning))))
 )
+
+;;;###autoload
+(defun my/rustic-make-process-advice (fn &rest args)
+  (let (
+        ;; setup environment variables for rust related processes before
+        ;; spawning those processes.
+        (process-environment
+         (nconc (list "CARGO_TERM_COLOR=always") process-environment))
+
+        ;; workaround bug fix for "rustic-make-process", which treats this as a `symbolp'
+        ;; but is actually a `listp'
+        (default-process-coding-system 'utf-8-unix))
+    (apply fn args)))
 
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
