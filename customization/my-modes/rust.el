@@ -34,6 +34,18 @@
     ))
 
   (advice-add 'rustic-make-process :around 'my/rustic-make-process-advice)
+
+  ;; ansi coloring of rustc/cargo output buffers
+  (setq rustic-ansi-faces
+        ["dark slate gray"
+         "red3"
+         "green3"
+         "DarkGoldenrod4"
+         "blue2"
+         "DarkOrchid4"
+         "dark cyan"
+         "black"])
+
   ;; faces for compilation output (inherit from defaults)
   :custom-face
    (rustic-compilation-column ((t (:inherit compilation-column-number))))
