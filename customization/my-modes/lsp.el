@@ -231,5 +231,8 @@
   :load-path "lisp-pkg/lsp-ui-sideline-companions"
   :config
 
-  (add-hook 'lsp-ui-sideline-mode-hook (lambda() (lsp-ui-sideline-companions-mode 'toggle)))
+  (add-hook 'lsp-ui-sideline-mode-hook
+            (lambda()
+              (lsp-ui-sideline-companions-mode (if lsp-ui-sideline-mode 1 -1)))
+            )
 )

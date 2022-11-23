@@ -319,4 +319,8 @@ CALLBACK is the status callback passed by Flycheck."
    )
 )
 
+(defun lsp-ui-sideline-companions-mode-toggle()
+  (interactive)
+  (lsp-ui-sideline-companions-mode 'toggle))
+
 (provide 'lsp-ui-sideline-companions)
