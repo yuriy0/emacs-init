@@ -125,6 +125,14 @@ CALLBACK is the status callback passed by Flycheck."
 
 (defvar-local my/lsp-all-buffer-diags nil)
 
+(defface lsp-ui-sideline-companions-inline-highlight
+  '((t
+     :box (:line-width (-1 . -1)
+           :color "dark slate gray"
+           :style nil))
+     )
+  "Face for inline highlighting of affected text when displaying lsp diagnostics")
+
 (defun my/lsp-diagnostics-find-exact-range (diags range)
   (-filter (lambda (i) (ht-equal?-rec (lsp:diagnostic-range i) range)) diags)
 )
@@ -145,12 +153,7 @@ CALLBACK is the status callback passed by Flycheck."
           ((p0 p1) (get-logical-line-start-end (+ line-pos source-loc-offset)))
 
           (base-msg (or override-msg (lsp:diagnostic-message diag)))
-          (base-msg
-                (propertize
-                 (concat "↑" base-msg)
-                 ;; 'face '(:background "red")
-                 'face 'error
-                 ))
+          (base-msg (concat "↑" base-msg))
           (base-msg-len (length base-msg))
           (ignore
            (when text-properties
@@ -177,13 +180,7 @@ CALLBACK is the status callback passed by Flycheck."
     (overlay-put ov-subline 'companion-original-range diag-origin-range)
 
     (overlay-put ov-inline 'intangible t)
-    (overlay-put ov-inline
-                 'face
-                 '(
-                   :box '(:line-width (-1 . -1)
-                                    :color "dim grey"
-                                    :style nil))
-                 )
+    (overlay-put ov-inline 'face 'lsp-ui-sideline-companions-inline-highlight)
   ))
 
 
