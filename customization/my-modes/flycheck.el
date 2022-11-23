@@ -23,5 +23,3 @@
   ("p" flycheck-previous-error "prev")
   ("f" flycheck-first-error "first")
   ("q" nil "break"))
-
-)
