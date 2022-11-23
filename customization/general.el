@@ -210,7 +210,8 @@ the same window)."
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-language-environment 'utf-8)
-(set-selection-coding-system 'utf-8)
+
+(set-selection-coding-system 'utf-16-le) ;; must use this because Windows uses this for clipboard...
 
 ;; line numbers
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)

@@ -147,7 +147,7 @@ CALLBACK is the status callback passed by Flycheck."
           (base-msg (or override-msg (lsp:diagnostic-message diag)))
           (base-msg
                 (propertize
-                 (concat base-msg)
+                 (concat "↑" base-msg)
                  ;; 'face '(:background "red")
                  'face 'error
                  ))
@@ -163,8 +163,8 @@ CALLBACK is the status callback passed by Flycheck."
                 ))
 
           (ov-subline (make-overlay
-                       (+ -1 p1)
-                       (+ 0 p1) (current-buffer) nil t))
+                       (+ 1 p1)
+                       (+ 1 p1) (current-buffer) t t))
           (ov-inline (make-overlay
                       (+ char-pos p0)
                       (+ end-char-pos p0) (current-buffer) nil t))
@@ -173,7 +173,7 @@ CALLBACK is the status callback passed by Flycheck."
     (push ov-inline my/lsp-diags-overlays)
 
     (overlay-put ov-subline 'intangible t)
-    (overlay-put ov-subline 'after-string (concat "\n" msg))
+    (overlay-put ov-subline 'after-string (concat msg "\n"))
     (overlay-put ov-subline 'companion-original-range diag-origin-range)
 
     (overlay-put ov-inline 'intangible t)
