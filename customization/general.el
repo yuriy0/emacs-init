@@ -224,3 +224,10 @@ the same window)."
   (global-visual-line-mode)
   (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
 )
+
+;; disables secondary selection keybinds
+(global-unset-key [M-mouse-1] )
+(global-unset-key [M-drag-mouse-1] )
+(global-unset-key [M-down-mouse-1] )
+(global-unset-key [M-mouse-3] )
+(global-unset-key [M-mouse-2] )
