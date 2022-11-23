@@ -209,17 +209,26 @@ CALLBACK is the status callback passed by Flycheck."
   (if (not original)
       (my/lsp-diagnostics-clear-companion-overlays)
     (-let* (
-           (pos (overlay-get original 'position))
-           (line (line-number-at-pos pos))
-           (companions-for-line
-            (--filter
-             (my/lsp-range-contains-line (nth 0 it) line)
-             my/lsp-associated-overlays
+            ;; the companion messages corresponding to the current cursor line
+            ;; this is what lsp-ui-sideline does to render an overlay with the current error
+            (lines (list (- (line-number-at-pos) 1)))
+            (companions-for-line
+             (-filter
+              (lambda (it)
+                (-any
+                 (lambda(line)
+                   (my/lsp-range-contains-line (nth 0 it) line))
+                 lines))
+              my/lsp-associated-overlays
+              )
              )
-            )
-           (any-companion-for-line (car companions-for-line))
-           )
 
+            ;; in rare cases (for multiline diagnostic messages) we might have companion messages
+            ;; with multiple different source lines, but for now we assume its just one source line
+            (any-companion-for-line (car companions-for-line))
+            )
+
+      ;; render each companion which exists as a seperate diagnostic
       (-each companions-for-line
         (-lambda ((diag-origin-range diag))
           (let* (
