@@ -2,6 +2,8 @@
 
 (require 'dash)
 (require 'ht)
+(require 'lsp-ui-sideline)
+(require 'flycheck)
 
 (defun ht-equal?-rec (table1 table2)
   "Return t if TABLE1 and TABLE2 have the same keys and values.
@@ -149,13 +151,13 @@ CALLBACK is the status callback passed by Flycheck."
     (overlay-put overlay 'face '(:foreground "blue"))
     overlay))
 
-(defvar my/lsp-diags-overlays nil)
+(defvar-local my/lsp-diags-overlays nil)
 
-(defvar my/lsp-temp nil)
+(defvar-local my/lsp-temp nil)
 
-(defvar my/lsp-associated-overlays nil)
+(defvar-local my/lsp-associated-overlays nil)
 
-(defvar my/lsp-all-buffer-diags nil)
+(defvar-local my/lsp-all-buffer-diags nil)
 
 (defun my/lsp-diagnostics-find-exact-range (diags range)
   (-filter (lambda (i) (ht-equal?-rec (lsp:diagnostic-range i) range)) diags)
@@ -269,10 +271,7 @@ CALLBACK is the status callback passed by Flycheck."
 
 (defun my/lsp-diagnostics-pre-send-to-flycheck ()
   ;; (message (format "Deleting overlays: %s" my/lsp-diags-overlays))
-  (-each my/lsp-diags-overlays
-    (lambda(o)
-      (delete-overlay o)))
-  (setq my/lsp-diags-overlays nil)
+  (my/lsp-diagnostics-clear-companion-overlays)
   ;; (ht-clear my/lsp-associated-overlays)
   (setq my/lsp-associated-overlays nil)
   )
@@ -387,11 +386,25 @@ CALLBACK is the status callback passed by Flycheck."
       )
   )
 
-(advice-add 'lsp-ui-sideline--diagnostics :after #'my/lsp-ui-sideline--diagnostics--after)
-;; (advice-remove 'lsp-ui-sideline--diagnostics #'my/lsp-ui-sideline--diagnostics--after)
+(define-minor-mode lsp-ui-sideline-companions-mode
+  ""
+  :init-value nil
+  (cond
+   (lsp-ui-sideline-companions-mode
+    (advice-add 'lsp-ui-sideline--diagnostics :after #'my/lsp-ui-sideline--diagnostics--after)
+    (add-hook 'flycheck-process-error-functions #'my/flycheck-filtering -50)
+    (advice-add 'lsp-diagnostics--flycheck-start :around #'my/lsp-diagnostics--flycheck-start-around)
 
-(add-hook 'flycheck-process-error-functions #'my/flycheck-filtering -50)
-;; (remove-hook 'flycheck-process-error-functions #'my/flycheck-filtering)
+    (flycheck-buffer)
+    )
+   (t
+    (advice-remove 'lsp-ui-sideline--diagnostics #'my/lsp-ui-sideline--diagnostics--after)
+    (remove-hook 'flycheck-process-error-functions #'my/flycheck-filtering)
+    (advice-remove 'lsp-diagnostics--flycheck-start #'my/lsp-diagnostics--flycheck-start-around)
 
-(advice-add 'lsp-diagnostics--flycheck-start :around #'my/lsp-diagnostics--flycheck-start-around)
-;; (advice-remove 'lsp-diagnostics--flycheck-start #'my/lsp-diagnostics--flycheck-start-around)
+    (my/lsp-diagnostics-pre-send-to-flycheck)
+    )
+   )
+)
+
+(provide 'lsp-ui-sideline-companions)

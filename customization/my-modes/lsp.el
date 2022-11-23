@@ -224,3 +224,12 @@
                       ))))
 
   (advice-add 'lsp-modeline-diagnostics-statistics :override #'my--lsp-modeline-diagnostics-statistics))
+
+
+(use-package lsp-ui-sideline-companions
+  :after (lsp-ui)
+  :load-path "lisp-pkg/lsp-ui-sideline-companions"
+  :config
+
+  (add-hook 'lsp-ui-sideline-mode-hook (lambda() (lsp-ui-sideline-companions-mode 'toggle)))
+)
