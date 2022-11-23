@@ -11,8 +11,15 @@
   ;; completion starts with any # of characters
   (company-minimum-prefix-length 1)
 
-  ;; put completions from recent buffers at the top
-  (company-transformers '(company-sort-by-occurrence))
+  ;; sorting/filtering company candidates
+  (company-transformers
+   '(
+     ;; put completions from recent buffers at the top
+     ;; TODO: disabled because this breaks more sensible sort orders, like local variables before
+     ;; other things, and expressions in expression contexts
+     ;; company-sort-by-occurrence
+
+     ))
 
   (company-frontends
    '(
