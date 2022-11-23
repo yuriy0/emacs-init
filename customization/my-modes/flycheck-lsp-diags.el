@@ -161,11 +161,8 @@ CALLBACK is the status callback passed by Flycheck."
   (-filter (lambda (i) (ht-equal?-rec (lsp:diagnostic-range i) range)) diags)
 )
 
-(defun my/lsp-diagnostic-make-companion-overlap (all-diags diag diag-origin-range)
+(defun my/lsp-diagnostic-make-companion-overlap (origin-diag diag diag-origin-range text-properties &optional override-msg)
   (-let* (
-          (origin-diag
-           (car (my/lsp-diagnostics-find-exact-range all-diags diag-origin-range))
-           )
           (mode-inline nil)
           (source-loc-offset (if mode-inline 1 1))
           ;; (source-loc (lsp:diagnostic-range diag))
@@ -174,22 +171,43 @@ CALLBACK is the status callback passed by Flycheck."
 
           ((&Range :start
                   (&Position :line line-pos
-                             :character char-pos))
+                             :character char-pos)
+                  :end
+                  (&Position :line end-line-pos
+                             :character end-char-pos))
            (lsp:diagnostic-range diag)
            )
           ((p0 p1) (get-logical-line-start-end (+ line-pos source-loc-offset)))
-          (msg (concat
+
+          (base-msg (or override-msg (lsp:diagnostic-message diag)))
+
+          (base-msg
                 (propertize
-                 (apply 'concat (-repeat char-pos " "))
-                 'face '(:background "blue")
-                 )
-                (propertize
-                 (concat (lsp:diagnostic-message diag))
+                 (concat base-msg)
                  ;; 'face '(:background "red")
                  'face 'error
-                 )
+                 ))
+          (base-msg-len (length base-msg))
+          (ignore
+           (when text-properties
+             ;; (message (format "setting text properties %s" text-properties))
+             (set-text-properties 0 base-msg-len text-properties base-msg)
+
+             ))
+
+          (msg (concat
+                ;; (propertize
+                 (apply 'concat (-repeat char-pos " "))
+                 ;; 'face '(:background "blue")
+                 ;; )
+                base-msg
                 ))
-          (overlay (make-overlay (+ -1 p1) (+ 0 p1) (current-buffer) nil t))
+          (ov-subline (make-overlay (+ -1 p1) (+ 0 p1) (current-buffer) nil t))
+
+          (ov-inline (make-overlay
+                      (+ char-pos p0)
+                      (+ end-char-pos p0) (current-buffer) nil t))
+
           (err-level
            (or
 
@@ -204,11 +222,23 @@ CALLBACK is the status callback passed by Flycheck."
     ;;                  (yaml-encode diag-origin-range)
     ;;                  (yaml-encode diag)))
 
-    (push overlay my/lsp-diags-overlays)
-    (overlay-put overlay 'intangible t)
-    (overlay-put overlay 'face '(:background "orange"))
-    (overlay-put overlay 'after-string (concat "\n" msg))
-    (overlay-put overlay 'companion-original-range diag-origin-range)
+    (push ov-subline my/lsp-diags-overlays)
+    (push ov-inline my/lsp-diags-overlays)
+
+    (overlay-put ov-subline 'intangible t)
+
+    ;; (overlay-put overlay
+    ;;              'face 
+    ;;              ;; '(:background "orange")
+    ;;              '(
+    ;;                :box '(:line-width (-1 . -1)
+    ;;                                 :color "gtk_selection_bg_color"
+    ;;                                 :style nil))
+    ;;              )
+
+    (overlay-put ov-subline 'after-string (concat "\n" msg))
+    (overlay-put ov-subline 'companion-original-range diag-origin-range)
+
 
     ;; (overlay-put overlay 'invisible t)
 
@@ -216,6 +246,17 @@ CALLBACK is the status callback passed by Flycheck."
     ;;     (overlay-put overlay 'before-string (concat "" msg ""))
     ;;   (overlay-put overlay 'display msg)
     ;;   )
+
+
+    (overlay-put ov-inline 'intangible t)
+    (overlay-put ov-inline
+                 'face 
+                 ;; '(:background "orange")
+                 '(
+                   :box '(:line-width (-1 . -1)
+                                    :color "dim grey"
+                                    :style nil))
+                 )
   ))
 
 
@@ -245,7 +286,7 @@ CALLBACK is the status callback passed by Flycheck."
     )
 )
 
-(defun my/lsp-diags-overlays-switch-line (original)
+(defun my/lsp-diags-overlays-switch-line (original &optional text-properties)
   (if (not original)
       (my/lsp-diagnostics-clear-companion-overlays)
     (-let* (
@@ -257,6 +298,7 @@ CALLBACK is the status callback passed by Flycheck."
              my/lsp-associated-overlays
              )
             )
+           (any-companion-for-line (car companions-for-line))
            )
       (message (format "companion for line %s = %s " line
                        (--map (lsp:diagnostic-message (cadr it)) companions-for-line)
@@ -264,10 +306,61 @@ CALLBACK is the status callback passed by Flycheck."
 
       (-each companions-for-line
         (-lambda ((diag-origin-range diag))
-                  (my/lsp-diagnostic-make-companion-overlap my/lsp-all-buffer-diags diag diag-origin-range)))
-     )
+          (let* (
+                 (origin-diag
+                  (car (my/lsp-diagnostics-find-exact-range
+                        my/lsp-all-buffer-diags diag-origin-range)))
+                 )
+
+            (my/lsp-diagnostic-make-companion-overlap
+             origin-diag
+             diag
+             diag-origin-range
+             text-properties
+             )
+            )))
+
+      ;; sometimes the original diagnostic is actually a multi-line diagnostic
+      ;; which we treat as a "sideline" message for the first line + "subline"
+      ;; message for the rest of the lines
+      (if any-companion-for-line
+          (-let* (
+                  ((diag-origin-range diag) any-companion-for-line)
+                  (origin-diag
+                   (car (my/lsp-diagnostics-find-exact-range
+                         my/lsp-all-buffer-diags diag-origin-range)))
+                  (origin-diag-lines
+                   (s-split "\n" (lsp:diagnostic-message origin-diag)))
+                  )
+
+            (if (> (length origin-diag-lines) 1)
+                (-each (cdr origin-diag-lines)
+                  (lambda (submsg)
+
+                    (my/lsp-diagnostic-make-companion-overlap
+                     origin-diag
+                     origin-diag
+                     diag-origin-range
+                     text-properties
+                     submsg
+                     )
+
+                    ))
+              )
+            ))
+      )
     )
-)
+  )
+
+
+(defun get-text-properties (n from props)
+  (apply #'-concat (--map (list it (get-text-property n it from)) props)))
+
+(defun copy-text-properties (n from to props)
+  (set-text-properties 0 (if to (length to) 1000) (get-text-properties n from props) to)
+  to
+  )
+
 
 (defun my/lsp-ui-sideline--diagnostics--after (&rest _)
   (my/lsp-diags-overlays-switch-line nil)
@@ -280,14 +373,17 @@ CALLBACK is the status callback passed by Flycheck."
             lsp-ui-sideline--ovs)
            )
           (sideline-displayed-overlay (car diags-overlays))
+          (overlay-text (overlay-get sideline-displayed-overlay 'after-string))
+          (overlay-text-props (get-text-properties 1 overlay-text '(face display)))
           )
-    ;; (when sideline-displayed-overlay
-      (setq my/lsp-temp (overlay-get sideline-displayed-overlay 'after-string))
-      (message (format "diags overlays %s %s"
-                       sideline-displayed-overlay
-                       (overlay-get sideline-displayed-overlay 'after-string)
-                       ))
-      (my/lsp-diags-overlays-switch-line sideline-displayed-overlay)
+      (setq my/lsp-temp overlay-text)
+      ;; (message (format "diags overlays %s %s"
+      ;;                  sideline-displayed-overlay
+      ;;                  (overlay-get sideline-displayed-overlay 'after-string)
+      ;;                  ))
+      
+
+      (my/lsp-diags-overlays-switch-line sideline-displayed-overlay overlay-text-props)
       )
   )
 
