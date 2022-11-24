@@ -38,10 +38,9 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 (require 'gnutls)
 (global-set-key (kbd "<ESC> <ESC>") 'keyboard-escape-quit)  
 
-;; Copy-paste settings 
+;; Copy-paste settings
 ;; (setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
-(global-set-keys 
- (kbd "C-z") 'undo
+(global-set-keys
  (kbd "C-c c") 'copy-region-as-kill
  (kbd "C-v") 'yank)
 (setq delete-selection-mode t) 
@@ -221,7 +220,7 @@ the same window)."
   :config
 
   (diminish 'visual-line-mode)
-  (global-visual-line-mode)
+  (add-hook 'prog-mode-hook 'visual-line-mode) ;; TODO we really want to use global visual line mode, but it breaks some special modes!
   (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
 )
 
@@ -231,3 +230,7 @@ the same window)."
 (global-unset-key [M-down-mouse-1] )
 (global-unset-key [M-mouse-3] )
 (global-unset-key [M-mouse-2] )
+
+;; disable undo/redo default binds
+(global-unset-key (kbd "C-/"))
+(global-unset-key (kbd "C-?"))

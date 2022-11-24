@@ -27,6 +27,7 @@
         dabbrev-expand
         electric-indent-just-newline
         electric-newline-and-maybe-indent
+        end-of-visual-line
         haskell-indentation-delete-backward-char
         haskell-mode-contextual-space
         haskell-move-nested-right
