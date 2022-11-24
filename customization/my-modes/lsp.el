@@ -34,7 +34,7 @@
 
   ;; improves lsp-mode performance
   (setq read-process-output-max (expt 2 16))
-  (setq gc-cons-threshold (* 3 (expt 10 8)))
+  (setq gc-cons-threshold (round (* 0.75 (expt 10 8))))
 
   ;; auto start lsp-ui
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
