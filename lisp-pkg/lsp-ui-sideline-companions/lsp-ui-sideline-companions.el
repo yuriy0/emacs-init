@@ -289,10 +289,39 @@ CALLBACK is the status callback passed by Flycheck."
   to
   )
 
+(defvar-local my/lsp-ui-sideline-companions-create-closure nil)
+
+(defun lsp-ui-sideline-companions-set-enabled (enabled)
+  (interactive)
+  (if lsp-ui-sideline-companions-mode
+      (progn
+        (my/lsp-diags-overlays-switch-line nil)
+        (when (and enabled my/lsp-ui-sideline-companions-create-closure)
+              (funcall my/lsp-ui-sideline-companions-create-closure))
+        )
+    (message "Cannot enable sideline companions - mode is disable")
+    ))
+
+(defun lsp-ui-sideline-companions-enable ()
+  (interactive)
+  (lsp-ui-sideline-companions-set-enabled t))
+
+(defun lsp-ui-sideline-companions-disable ()
+  (interactive)
+  (lsp-ui-sideline-companions-set-enabled nil))
+
+(defun lsp-ui-sideline-companions-toggle ()
+  (interactive)
+  (lsp-ui-sideline-companions-set-enabled (not (lsp-ui-sideline-companions-companions-are-shown-p))))
+
+(defun lsp-ui-sideline-companions-companions-are-shown-p()
+  (not (equal nil my/lsp-diags-overlays)))
 
 (defun my/lsp-ui-sideline--diagnostics--after (&rest _)
-  (my/lsp-diags-overlays-switch-line nil)
+  ;; disable any presently disabled sideline companions
+  (lsp-ui-sideline-companions-disable)
 
+  ;; check if the current line has companions
   (-when-let*
       ((diags-overlays
         (--filter
@@ -305,14 +334,34 @@ CALLBACK is the status callback passed by Flycheck."
        (overlay-text (overlay-get sideline-displayed-overlay 'after-string))
        (overlay-text-props (get-text-properties 1 overlay-text '(face display)))
        )
-    (if (> lsp-ui-sideline-companions-delay 0.0)
-        (-let [timer
-               (run-with-idle-timer lsp-ui-sideline-companions-delay nil
-                #'my/lsp-diags-overlays-switch-line sideline-displayed-overlay overlay-text-props
-                )]
-          (push (lambda() (cancel-timer timer)) my/lsp-diags-overlays)
-          )
-         (my/lsp-diags-overlays-switch-line sideline-displayed-overlay overlay-text-props))
+
+    ;; create the closure which displays companions later
+    (setq my/lsp-ui-sideline-companions-create-closure
+          (lambda() (my/lsp-diags-overlays-switch-line sideline-displayed-overlay overlay-text-props)))
+
+    (cond
+     ;; do nothing (must be enabled manually)
+     ((equal lsp-ui-sideline-companions-delay nil)
+      nil
+      )
+
+     ;; enable by idle timer
+     ((and (numberp lsp-ui-sideline-companions-delay)
+           (> lsp-ui-sideline-companions-delay 0.0))
+      (-let [timer
+             (run-with-idle-timer
+              lsp-ui-sideline-companions-delay nil
+              #'lsp-ui-sideline-companions-enable
+              )]
+        (push (lambda() (cancel-timer timer)) my/lsp-diags-overlays)
+        )
+      )
+
+     ;; enable immediately (delay is zero or nonnil)
+     (t
+      (lsp-ui-sideline-companions-enable)
+      )
+     )
     )
   )
 
