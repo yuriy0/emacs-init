@@ -133,9 +133,14 @@ CALLBACK is the status callback passed by Flycheck."
      )
   "Face for inline highlighting of affected text when displaying lsp diagnostics")
 
+(defvar lsp-ui-sideline-companions-delay 0.0)
+
 (defun my/lsp-diagnostics-find-exact-range (diags range)
   (-filter (lambda (i) (ht-equal?-rec (lsp:diagnostic-range i) range)) diags)
 )
+
+(defun delete-overlay-closure(o)
+  (lambda() (delete-overlay o)))
 
 (defun my/lsp-diagnostic-make-companion-overlap (origin-diag diag diag-origin-range text-properties &optional override-msg)
   (-let* (
@@ -172,8 +177,8 @@ CALLBACK is the status callback passed by Flycheck."
                       (+ char-pos p0)
                       (+ end-char-pos p0) (current-buffer) nil t))
          )
-    (push ov-subline my/lsp-diags-overlays)
-    (push ov-inline my/lsp-diags-overlays)
+    (push (delete-overlay-closure ov-subline) my/lsp-diags-overlays)
+    (push (delete-overlay-closure ov-inline) my/lsp-diags-overlays)
 
     (overlay-put ov-subline 'intangible t)
     (overlay-put ov-subline 'after-string (concat msg "\n"))
@@ -185,9 +190,7 @@ CALLBACK is the status callback passed by Flycheck."
 
 
 (defun my/lsp-diagnostics-clear-companion-overlays ()
-  (-each my/lsp-diags-overlays
-    (lambda(o)
-      (delete-overlay o)))
+  (-each my/lsp-diags-overlays #'funcall)
   (setq my/lsp-diags-overlays nil)
   )
 
@@ -290,19 +293,27 @@ CALLBACK is the status callback passed by Flycheck."
 (defun my/lsp-ui-sideline--diagnostics--after (&rest _)
   (my/lsp-diags-overlays-switch-line nil)
 
-  (-when-let* ((diags-overlays
-           (--filter
-            (and
-             (equal (overlay-get it 'kind) 'diagnostics)
-             )
-            lsp-ui-sideline--ovs)
-           )
-          (sideline-displayed-overlay (car diags-overlays))
-          (overlay-text (overlay-get sideline-displayed-overlay 'after-string))
-          (overlay-text-props (get-text-properties 1 overlay-text '(face display)))
+  (-when-let*
+      ((diags-overlays
+        (--filter
+         (and
+          (equal (overlay-get it 'kind) 'diagnostics)
           )
-      (my/lsp-diags-overlays-switch-line sideline-displayed-overlay overlay-text-props)
-      )
+         lsp-ui-sideline--ovs)
+        )
+       (sideline-displayed-overlay (car diags-overlays))
+       (overlay-text (overlay-get sideline-displayed-overlay 'after-string))
+       (overlay-text-props (get-text-properties 1 overlay-text '(face display)))
+       )
+    (if (> lsp-ui-sideline-companions-delay 0.0)
+        (-let [timer
+               (run-with-idle-timer lsp-ui-sideline-companions-delay nil
+                #'my/lsp-diags-overlays-switch-line sideline-displayed-overlay overlay-text-props
+                )]
+          (push (lambda() (cancel-timer timer)) my/lsp-diags-overlays)
+          )
+         (my/lsp-diags-overlays-switch-line sideline-displayed-overlay overlay-text-props))
+    )
   )
 
 (define-minor-mode lsp-ui-sideline-companions-mode
