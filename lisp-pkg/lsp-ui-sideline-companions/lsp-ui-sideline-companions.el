@@ -365,9 +365,17 @@ CALLBACK is the status callback passed by Flycheck."
     )
   )
 
+
+(defvar lsp-ui-sideline-companions-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-/") #'lsp-ui-sideline-companions-toggle)
+    map)
+  "")
+
 (define-minor-mode lsp-ui-sideline-companions-mode
   ""
   :init-value nil
+  :keymap lsp-ui-sideline-companions-mode-map
   (cond
    (lsp-ui-sideline-companions-mode
     (advice-add 'lsp-ui-sideline--diagnostics :after #'my/lsp-ui-sideline--diagnostics--after)
