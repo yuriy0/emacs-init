@@ -21,6 +21,9 @@
         ("C-M-z" . undo-tree-redo)
         )
 
+  (:map undo-tree-visualizer-mode-map
+        ("<return>" . undo-tree-visualizer-quit))
+
   :custom
   (undo-tree-mode-lighter "")
   (undo-tree-auto-save-history t)
