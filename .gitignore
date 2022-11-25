@@ -25,6 +25,7 @@ projects
 .cache/*
 persp-confs/*
 undo-tree-history/*
+quelpa/*
 
 # not used directly but other configs might write to it
 custom.el

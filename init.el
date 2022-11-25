@@ -101,8 +101,16 @@
   list-utils
   gnu-elpa-keyring-update
   load-dir
+  quelpa
 ))
 (mapc #'package-install-and-require bootstrap-packages)
+
+;; bootstrap quelpa-use-package
+(quelpa
+ '(quelpa-use-package
+   :fetcher git
+   :url "https://github.com/quelpa/quelpa-use-package.git"))
+(require 'quelpa-use-package)
 
 ;; use package loading statistics
 (when profiler-emacs-init
