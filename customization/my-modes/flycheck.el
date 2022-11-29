@@ -17,9 +17,15 @@
   (flycheck-list-errors)
   (hydra-flycheck/body))
 
+;;;###autoload
+(defun flycheck-errors-list-kill-buffer ()
+  (interactive)
+  (with-current-buffer "*Flycheck errors*" (kill-buffer-and-window)))
+
 (defhydra hydra-flycheck ()
   "Move around flycheck errors"
   ("n" flycheck-next-error "next")
   ("p" flycheck-previous-error "prev")
   ("f" flycheck-first-error "first")
-  ("q" nil "break"))
+  ("q" nil "break")
+  ("Q" flycheck-errors-list-kill-buffer "close"))
