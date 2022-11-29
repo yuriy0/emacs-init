@@ -380,3 +380,13 @@ current buffer."
        ,symbol
      (setq ,symbol (progn ,@body)))
 )
+
+
+;;;###autoload
+(defun filter-buffer-list-frame-parameters (frame filter &optional filter-burried)
+  (set-frame-parameter nil
+                       'buffer-list
+                       (-filter (-partial #'funcall filter) (frame-parameter nil 'buffer-list)))
+  (set-frame-parameter nil
+                       'buried-buffer-list
+                       (-filter (-partial #'funcall (or filter-burried filter)) (frame-parameter nil 'buried-buffer-list))))

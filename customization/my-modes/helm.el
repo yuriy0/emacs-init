@@ -17,6 +17,9 @@
    ("<tab>" . helm-execute-persistent-action) ; rebind tab to run persistent action
    ("C-i" . helm-execute-persistent-action)   ; make TAB works in terminal
    ("C-z" . helm-select-action)             ; list actions using C-z
+
+   :map helm-buffer-map
+   ("M-E" . helm-buffer-remove-from-tab-buffers)
    )
 
   :config
@@ -55,6 +58,23 @@
 
   ;; find-file - when the file doesn't exist, create it
   (advice-add 'helm-find-files :after 'find-file-create-if-nonexistant)
+
+  ;; helm buffers command which removes the marked buffers from the current tabs buffer list
+  (defun helm-buffer-remove-from-tab-buffers-fn (_candidate)
+    "Removes any buffers from the frame 'buffer-list parameter which are marked helm candidates"
+    (-let [cands (mapcar #'buffer-name (helm-marked-candidates))]
+      (filter-buffer-list-frame-parameters
+       nil
+       (lambda(b)
+         (not (--any (member (buffer-name b) cands) cands))
+         )
+       )
+      )
+    )
+  (helm-make-command-from-action helm-buffer-remove-from-tab-buffers
+    "Switch buffer from tabs buffer list"
+    'helm-buffer-remove-from-tab-buffers-fn)
+  (add-to-list 'helm-type-buffer-actions '("Switch buffer from tabs buffer list" . helm-buffer-remove-from-tab-buffers-fn))
 )
 
 (defvar helm-source-tab-buffers-list nil)
