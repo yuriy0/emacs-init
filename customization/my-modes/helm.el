@@ -74,7 +74,7 @@
   (helm-make-command-from-action helm-buffer-remove-from-tab-buffers
     "Switch buffer from tabs buffer list"
     'helm-buffer-remove-from-tab-buffers-fn)
-  (add-to-list 'helm-type-buffer-actions '("Switch buffer from tabs buffer list" . helm-buffer-remove-from-tab-buffers-fn))
+  (add-to-list 'helm-type-buffer-actions '("Switch buffer from tabs buffer list" . helm-buffer-remove-from-tab-buffers-fn) :append)
 )
 
 (defvar helm-source-tab-buffers-list nil)
