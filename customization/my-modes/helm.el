@@ -11,6 +11,7 @@
    ("C-x C-f" . helm-find-files)
    ("C-x b" . helm-buffers-list)
    ("C-x q" . helm-resume)
+   ("C-x C-b" . helm-tab-buffers-list)
 
    :map helm-map
    ("<tab>" . helm-execute-persistent-action) ; rebind tab to run persistent action
@@ -40,6 +41,8 @@
         helm-buffer-max-length nil             ; don't truncate buffer names 
         helm-M-x-always-save-history t         ; save command to history even if it produces an error
         history-delete-duplicates t            ; dont put duplicate commands in the command history
+
+        helm-buffers-maybe-switch-to-tab t
    )
 
   (many 1 (apply-partially 'add-to-list 'helm-boring-buffer-regexp-list)
@@ -47,12 +50,54 @@
         "\\*magit-diff:"
         "\\*Quail Completions*"
         "\\*Backtrace*"
+        "\\*quelpa-build-checkout*"
         )
 
   ;; find-file - when the file doesn't exist, create it
   (advice-add 'helm-find-files :after 'find-file-create-if-nonexistant)
 )
 
+(defvar helm-source-tab-buffers-list nil)
+(defvar helm-source-lsp-workspace-buffers-list nil)
+
+;;;###autoload
+(defun helm-tab-buffers-list ()
+  (interactive)
+
+  (init-once
+   helm-source-tab-buffers-list
+   (helm-make-source "Tab Buffers" 'helm-source-buffers
+     :buffer-list
+     (lambda()
+       (when (fboundp 'tab-bar-mode) (mapcar #'buffer-name (frame-parameter nil 'buffer-list)))
+       )
+     ))
+
+  (init-once
+   helm-source-lsp-workspace-buffers-list
+   (helm-make-source "LSP Workspace Buffers" 'helm-source-buffers
+     :buffer-list
+     (lambda()
+       (when-let ((lsp-wss (-uniq (--mapcat (lsp-workspace-folders it) (lsp-workspaces)))))
+         (mapcar #'buffer-name  (-filter
+                                 (lambda(b)
+                                   (when-let ((buf-visiting-fname (buffer-file-name b)))
+                                     (--any (string-prefix-p it buf-visiting-fname) lsp-wss)
+                                     )
+                                   )
+                                 (buffer-list)))
+         )
+       )
+     )
+   )
+
+  (helm :sources
+        '(helm-source-tab-buffers-list
+          helm-source-lsp-workspace-buffers-list
+          helm-source-buffers-list
+          helm-source-buffer-not-found)
+        :keymap helm-buffer-map
+        :truncate-lines helm-buffers-truncate-lines))
 
 ;;;###autoload
 (defun find-file-create-if-nonexistant (_)
@@ -75,8 +120,6 @@
    )
 
   :config
-  (message "use-package helm-ag")
-
   (setq helm-ag-base-command "ag --vimgrep --no-color")
   (setq helm-ag-fuzzy-match t)
 
@@ -111,4 +154,4 @@
 (use-package helm-tramp :ensure
   :after (helm))
 (use-package helm-lsp
-  :commands helm-lsp-workspace-symbol)
+  :after (helm lsp-mode))

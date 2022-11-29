@@ -372,3 +372,11 @@ current buffer."
 ;;;###autoload
 (defun system-type-windowslike-p()
   (memq system-type '(ms-dos windows-nt cygwin)))
+
+
+(defmacro init-once (symbol &rest body)
+  "If SYMBOL is nil, execute the forms in BODY and bind the result to the value of SYMBOL"
+  `(if ,symbol
+       ,symbol
+     (setq ,symbol (progn ,@body)))
+)
