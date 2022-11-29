@@ -105,7 +105,7 @@
   (advice-add 'lsp-ui-sideline--compute-height :override #'my/lsp-ui-sideline--compute-height)
 
   :custom-face
-  '(lsp-modeline-code-actions-preferred-face ((t (:foreground "dark goldenrod"))))
+  (lsp-modeline-code-actions-preferred-face ((t (:foreground "dark goldenrod"))))
 
   ;; '(lsp-face-highlight-write
   ;;   ((t
