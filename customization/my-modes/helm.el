@@ -11,7 +11,8 @@
    ("C-x C-f" . helm-find-files)
    ("C-x b" . helm-buffers-list)
    ("C-x q" . helm-resume)
-   ("C-x C-b" . helm-tab-buffers-list)
+   ("C-x b" . helm-tab-buffers-list)
+   ("C-x C-b" . helm-mini)
 
    :map helm-map
    ("<tab>" . helm-execute-persistent-action) ; rebind tab to run persistent action
