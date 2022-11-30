@@ -390,3 +390,15 @@ current buffer."
   (set-frame-parameter nil
                        'buried-buffer-list
                        (-filter (-partial #'funcall (or filter-burried filter)) (frame-parameter nil 'buried-buffer-list))))
+
+
+(defmacro unquote (arg)
+  (if (and (consp arg)
+           (eq (car arg) 'quote))
+      (cadr arg)
+    arg))
+
+(defmacro add-to-list-at (list index el)
+  (let ((list-exp `(unquote ,list)))
+    `(setq ,list-exp (-insert-at ,index ,el ,list-exp))
+  ))
