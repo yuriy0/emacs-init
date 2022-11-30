@@ -38,4 +38,8 @@
   ;; use tab bar mode
   (tab-bar-mode +1)
   (tab-bar-history-mode +1)
+
+  :custom-face
+  (tab-bar-tab ((t (:box (:line-width (1 . 1) :color "#cce8ff" :style released-button) :background "#e5f3ff" :inherit tab-bar))))
+  (tab-bar-tab-inactive ((t (:box (:line-width (1 . 1) :style released-button) :background "grey75" :inherit tab-bar-tab))))
 )
