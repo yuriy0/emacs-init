@@ -92,7 +92,15 @@
    (helm-make-source "Tab Buffers" 'helm-source-buffers
      :buffer-list
      (lambda()
-       (when (fboundp 'tab-bar-mode) (mapcar #'buffer-name (frame-parameter nil 'buffer-list)))
+       (when (fboundp 'tab-bar-mode)
+         (-let [tabbar-bufs (frame-parameter nil 'buffer-list)]
+           (->> (helm-buffer-list)
+                (-map #'get-buffer)
+                (-filter (lambda(b) (memq b tabbar-bufs)))
+                (-map #'buffer-name)
+                )
+           )
+         )
        )
      ))
 
@@ -102,17 +110,18 @@
      :buffer-list
      (lambda()
        (when-let ((lsp-wss (-uniq (--mapcat (lsp-workspace-folders it) (lsp-workspaces)))))
-         (mapcar #'buffer-name  (-filter
-                                 (lambda(b)
-                                   (when-let ((buf-visiting-fname (buffer-file-name b)))
-                                     (--any (string-prefix-p it buf-visiting-fname) lsp-wss)
-                                     )
-                                   )
-                                 (buffer-list)))
+         (->> (helm-buffer-list)
+              (-map #'get-buffer)
+              (-filter (lambda(b)
+                         (when-let ((buf-visiting-fname (buffer-file-name b)))
+                           (--any (string-prefix-p it buf-visiting-fname) lsp-wss)
+                           )
+                         ))
+              (-map #'buffer-name)
+              )
          )
        )
-     )
-   )
+     ))
 
   (helm :sources
         '(helm-source-tab-buffers-list
