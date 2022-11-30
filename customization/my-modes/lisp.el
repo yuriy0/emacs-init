@@ -17,3 +17,24 @@
   :ensure
   :hook ((emacs-lisp-mode . highlight-parentheses))
 )
+
+(use-package elisp-mode
+  :config
+
+  (defun eval-macroexpand-last-sexp()
+    (interactive)
+    (insert "\n")
+    (pp-macroexpand-last-sexp t))
+
+
+  (defun eval-macroexpand-all-last-sexp()
+    (interactive)
+    (insert "\n")
+    (insert (pp-to-string (macroexpand-all (pp-last-sexp)))))
+
+  :bind
+  (:map lisp-interaction-mode-map
+        ("C-M-j" . eval-macroexpand-last-sexp)
+        ("C-M-S-J" . eval-macroexpand-all-last-sexp)
+        )
+)
