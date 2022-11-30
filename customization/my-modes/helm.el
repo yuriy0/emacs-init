@@ -155,7 +155,12 @@
 
 (use-package helm-swoop
   :ensure
-  :commands (helm-swoop helm-swoop-back-to-last-point helm-multi-swoop helm-multi-swoop-all helm-swoop-from-isearch)
+  :commands
+  (helm-swoop helm-swoop-back-to-last-point helm-multi-swoop helm-multi-swoop-all helm-swoop-from-isearch
+  ;; since we primarily access swoop via isearch we should load it when isearch first starts
+  ;; for some reason loading via the `iswoop' command in minibuffer doesn't work?
+   isearch-forward isearch-backward
+  )
 
   :config
 
