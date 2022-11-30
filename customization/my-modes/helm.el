@@ -63,6 +63,7 @@
   ;; helm buffers command which removes the marked buffers from the current tabs buffer list
   (defun helm-buffer-remove-from-tab-buffers-fn (_candidate)
     "Removes any buffers from the frame 'buffer-list parameter which are marked helm candidates"
+    (if (not tab-bar-mode) (message "Tab Bar mode is disabled")
     (-let [cands (mapcar #'buffer-name (helm-marked-candidates))]
       (filter-buffer-list-frame-parameters
        nil
@@ -70,8 +71,9 @@
          (not (--any (member (buffer-name b) cands) cands))
          )
        )
+      (message "Removed %s buffers from tab \"%s\"" (length cands) (alist-get 'name (tab-bar--tab)))
       )
-    )
+    ))
   (helm-make-command-from-action helm-buffer-remove-from-tab-buffers
     "Switch buffer from tabs buffer list"
     'helm-buffer-remove-from-tab-buffers-fn)
