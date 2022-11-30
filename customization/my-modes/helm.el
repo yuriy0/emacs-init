@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (use-package helm
   :ensure
 
@@ -84,43 +86,51 @@
 (defvar helm-source-lsp-workspace-buffers-list nil)
 
 ;;;###autoload
+(defun helm-buffer-list-filtering-by (filterfn)
+  (when filterfn
+    (->> (helm-buffer-list)
+         (-map #'get-buffer)
+         (-filter (-partial 'funcall filterfn))
+         (-map #'buffer-name)
+         )
+    )
+  )
+
+;;;###autoload
+(defmacro helm-make-buffers-source-filtered (source-name filterfn)
+  `(helm-make-source ,source-name 'helm-source-buffers
+     :buffer-list
+     (lambda()
+       (helm-buffer-list-filtering-by
+        ,filterfn
+        )
+       )
+     )
+  )
+
+;;;###autoload
 (defun helm-tab-buffers-list ()
   (interactive)
 
   (init-once
    helm-source-tab-buffers-list
-   (helm-make-source "Tab Buffers" 'helm-source-buffers
-     :buffer-list
-     (lambda()
-       (when (fboundp 'tab-bar-mode)
-         (-let [tabbar-bufs (frame-parameter nil 'buffer-list)]
-           (->> (helm-buffer-list)
-                (-map #'get-buffer)
-                (-filter (lambda(b) (memq b tabbar-bufs)))
-                (-map #'buffer-name)
-                )
-           )
-         )
-       )
-     ))
+   (helm-make-buffers-source-filtered
+    "Tab Buffers"
+    (when (fboundp 'tab-bar-mode)
+      (-let [tabbar-bufs (frame-parameter nil 'buffer-list)]
+        (lambda(b) (memq b tabbar-bufs)))
+      )))
 
   (init-once
    helm-source-lsp-workspace-buffers-list
-   (helm-make-source "LSP Workspace Buffers" 'helm-source-buffers
-     :buffer-list
-     (lambda()
-       (when-let ((lsp-wss (-uniq (--mapcat (lsp-workspace-folders it) (lsp-workspaces)))))
-         (->> (helm-buffer-list)
-              (-map #'get-buffer)
-              (-filter (lambda(b)
-                         (when-let ((buf-visiting-fname (buffer-file-name b)))
-                           (--any (string-prefix-p it buf-visiting-fname) lsp-wss)
-                           )
-                         ))
-              (-map #'buffer-name)
-              )
-         )
-       )
+   (helm-make-buffers-source-filtered
+    "LSP Workspace Buffers"
+    (when-let ((lsp-wss (-uniq (--mapcat (lsp-workspace-folders it) (lsp-workspaces)))))
+      (lambda(b)
+        (when-let ((buf-visiting-fname (buffer-file-name b)))
+          (--any (string-prefix-p it buf-visiting-fname) lsp-wss)
+          )
+        ))
      ))
 
   (helm :sources

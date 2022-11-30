@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (use-package lisp-extra-font-lock
   :quelpa
   ((lisp-extra-font-lock
