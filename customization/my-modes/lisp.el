@@ -13,6 +13,7 @@
 )
 
 (use-package highlight-parentheses
+  :disabled ;; gives random errors?
   :ensure
   :hook ((emacs-lisp-mode . highlight-parentheses))
 )

@@ -49,3 +49,11 @@
   (add-hook-once 'window-buffer-change-functions #'maybe-unicode-fonts-setup)
 )
 
+(use-package highlight-indent-guides
+  :ensure
+  :hook ((prog-mode . highlight-indent-guides-mode))
+  :config
+
+  (setq highlight-indent-guides-method 'character)
+  (setq highlight-indent-guides-responsive 'stack)
+)
