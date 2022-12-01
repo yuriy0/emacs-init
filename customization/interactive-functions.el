@@ -405,7 +405,10 @@ current buffer."
 
 (defmacro lam (&rest args)
   (-let [(vars body) (-split-on :-> args)]
-    `(lambda ,vars ,body)))
+    (if body
+        `(lambda ,vars ,body)
+      `(lambda () ,vars)
+    )))
 
 (defun lexographic< (a b)
   (if (and (listp a) (listp b))
