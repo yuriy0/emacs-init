@@ -83,6 +83,10 @@
   ;; completly replace helm-buffers-switch-to-buffer-or-tab with a more robust
   ;; implementation
   (advice-add 'helm-buffers-switch-to-buffer-or-tab :override #'my/helm-buffers-switch-to-buffer-or-tab)
+
+  ;; since we replace behaviour of helm buffer switching, add a new action type which preserves the non-tabbing behaviour
+  ;; i.e. just uses switch to buffer
+  (add-to-list-at 'helm-type-buffer-actions 1 '("Switch to buffer(s) (in current tab&window)" . helm-buffer-switch-buffers-this-tab))
 )
 
 (defvar helm-source-tab-buffers-list nil)
@@ -166,6 +170,10 @@
            helm-buffers-maybe-switch-to-tab)
       (or (tab-bar-raise-buffer buffer) (switch-to-buffer buffer))
     (switch-to-buffer buffer)))
+
+;;;###autoload
+(defun helm-buffer-switch-buffers-this-tab (_candidate)
+  (let ((helm-buffers-maybe-switch-to-tab nil)) (helm-buffer-switch-buffers _candidate)))
 
 (use-package helm-ag
   :ensure
