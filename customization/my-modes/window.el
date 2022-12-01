@@ -29,7 +29,7 @@
 
 (setq pull-window-base-mult 3)
 
-(defun pull-window-dir (delta dir &optional win) 
+(defun pull-window-dir-1 (delta dir &optional win) 
   "Pulls the edges of the given window in the given
 direction (`DIR-ARG') according to the following rules:
 
@@ -65,11 +65,14 @@ is multiplied by the given delta to determine the true delta."
               ))
     (error "pull-window-dir: invalid direction: %S" dir-arg) ))
 
-(--each pull-window-keymap (global-set-key (car it) '(lambda (delta) 
+;;;###autoload
+(defun pull-window-dir (delta)
   (interactive "p")
   (-when-let* ((key (this-command-keys))
                (dir (cdr (assoc key pull-window-keymap))))
-    (pull-window-dir delta dir) )) ))
+    (pull-window-dir delta dir)))
+
+(--each pull-window-keymap (global-set-key (car it) #'pull-window-dir))
 
 ;; when splitting windows, open a different buffer in the new window
 (defun split-window--new-buffer (do-split &rest do-split-args)
@@ -85,7 +88,8 @@ is multiplied by the given delta to determine the true delta."
 (advice-add 'split-window-right :around 'split-window--new-buffer)
 (advice-add 'split-window-below :around 'split-window--new-buffer)
 
-(global-set-keys (kbd "C-c i" ) (with-negated-prefix-arg 'other-window))
+(defalias 'other-window-inverted (with-negated-prefix-arg 'other-window))
+(global-set-keys (kbd "C-c i") #'other-window-inverted)
 
 (defun other-window-target (count &optional all-frames)
   (interactive "sTarget window: ")
