@@ -215,10 +215,13 @@ the same window)."
 ;; line numbers
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-;; line wrap
 (use-package simple
+  :bind
+  ("C-M-<backspace>" . pop-to-mark-command)
+
   :config
 
+  ;; visual line mode
   (diminish 'visual-line-mode)
   (add-hook 'prog-mode-hook 'visual-line-mode) ;; TODO we really want to use global visual line mode, but it breaks some special modes!
   (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
