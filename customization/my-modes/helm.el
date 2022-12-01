@@ -2,7 +2,6 @@
 
 (use-package helm
   :ensure
-
   :autoload (find-file-create-if-nonexistant)
 
   :bind
@@ -80,6 +79,10 @@
     "Remove buffer from tabs buffer list"
     'helm-buffer-remove-from-tab-buffers-fn)
   (add-to-list-at 'helm-type-buffer-actions 6 '("Remove buffer from tabs buffer list" . helm-buffer-remove-from-tab-buffers-fn))
+
+  ;; completly replace helm-buffers-switch-to-buffer-or-tab with a more robust
+  ;; implementation
+  (advice-add 'helm-buffers-switch-to-buffer-or-tab :override #'my/helm-buffers-switch-to-buffer-or-tab)
 )
 
 (defvar helm-source-tab-buffers-list nil)
@@ -155,6 +158,14 @@
        (notex (not (file-exists-p bfnm))))
     (save-buffer)
     ))
+
+
+;;;###autoload
+(defun my/helm-buffers-switch-to-buffer-or-tab (buffer)
+  (if (and (fboundp 'tab-bar-mode)
+           helm-buffers-maybe-switch-to-tab)
+      (or (tab-bar-raise-buffer buffer) (switch-to-buffer buffer))
+    (switch-to-buffer buffer)))
 
 (use-package helm-ag
   :ensure

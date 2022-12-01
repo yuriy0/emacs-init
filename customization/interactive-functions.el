@@ -402,3 +402,18 @@ current buffer."
   (let ((list-exp `(unquote ,list)))
     `(setq ,list-exp (-insert-at ,index ,el ,list-exp))
   ))
+
+(defmacro lam (&rest args)
+  (-let [(vars body) (-split-on :-> args)]
+    `(lambda ,vars ,body)))
+
+(defun lexographic< (a b)
+  (if (and (listp a) (listp b))
+      (every 'lexographic< a b)
+    (< a b)
+    ))
+
+(defun -sort-by-key (compare keyfn seq)
+  (cl-stable-sort seq compare :key keyfn))
+
+;; (defmacro when-
