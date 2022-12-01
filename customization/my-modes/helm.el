@@ -112,6 +112,13 @@
 (defun helm-tab-buffers-list ()
   (interactive)
 
+  ;; HACK we rely on helm lazy initialization of its own internals
+  ;; if this is the first helm-buffers-like command you call after startup,
+  ;; this variable is not yet initialized
+  (unless helm-source-buffers-list
+    (setq helm-source-buffers-list
+          (helm-make-source "Buffers" 'helm-source-buffers)))
+
   (init-once
    helm-source-tab-buffers-list
    (helm-make-buffers-source-filtered
