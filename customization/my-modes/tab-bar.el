@@ -145,3 +145,34 @@ switched-to tab in either case. Otherwise, return `nil'"
 ;;;###autoload
 (defun tab-bar-raise-or-switch-to-buffer (buffer)
   (or (tab-bar-raise-buffer buffer) (switch-to-buffer buffer)))
+
+
+;;;###autload
+(defun tab-bar-remove-buffers-from-invisible-tabs (buffers &optional silent)
+  "Remove `BUFFERS' from the \"buffer list\"s of all other
+  tabs, other than the currently visible one."
+  (modf buffers (mapcar #'get-buffer))
+  (when tab-bar-mode
+    (cl-flet ((filter-buf-list
+               (tab bufs)
+               (--filter
+                (if (member (get-buffer it) buffers)
+                    (progn
+                      (if (not silent) (message "Removing buffer '%s' from tab '%s'" it (alist-get 'name tab)))
+                      nil
+                      )
+                  t)
+                bufs)
+               ))
+      (-let [tabs (tab-bar-tabs)]
+        (dolist (tab tabs)
+          (when (eq (car tab) 'tab) ;; excludes the current tab
+            (modf (alist-get 'wc-bl tab) (filter-buf-list tab))
+            (modf (alist-get 'wc-bbl tab) (filter-buf-list tab))
+            )
+          )
+        (set-frame-parameter nil 'tabs tabs)
+        )
+      )
+    )
+)

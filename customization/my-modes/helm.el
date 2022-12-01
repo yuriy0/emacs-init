@@ -87,6 +87,9 @@
   ;; since we replace behaviour of helm buffer switching, add a new action type which preserves the non-tabbing behaviour
   ;; i.e. just uses switch to buffer
   (add-to-list-at 'helm-type-buffer-actions 1 '("Switch to buffer(s) (in current tab&window)" . helm-buffer-switch-buffers-this-tab))
+
+  ;; helm mark ring & global mark ring actions which raise the buffer in its current tab
+  ;; TODO
 )
 
 (defvar helm-source-tab-buffers-list nil)
@@ -173,34 +176,12 @@
 
 ;;;###autoload
 (defun helm-buffer-switch-buffers-this-tab (_candidate)
-  (let ((buffers (mapcar #'get-buffer (helm-marked-candidates))))
-    ;; actually switch buffers
+  (let ((buffers (helm-marked-candidates)))
+    ;; switch buffers
     (let ((helm-buffers-maybe-switch-to-tab nil)) (helm-buffer-switch-buffers _candidate))
 
-    ;; remove these buffers from the "buffer list"s of all other tabs (other than the current one)
-    (when tab-bar-mode
-      (cl-flet ((filter-buf-list
-                 (tab bufs)
-                 (--filter
-                  (if (member (get-buffer it) buffers)
-                      (progn
-                        (message "Removing buffer '%s' from tab '%s'" it (alist-get 'name tab))
-                        nil
-                        )
-                    t)
-                  bufs)
-                 ))
-        (-let [tabs (tab-bar-tabs)]
-          (dolist (tab tabs)
-            (when (eq (car tab) 'tab) ;; excludes the current tab
-              (modf (alist-get 'wc-bl tab) (filter-buf-list tab))
-              (modf (alist-get 'wc-bbl tab) (filter-buf-list tab))
-              )
-            )
-          (set-frame-parameter nil 'tabs tabs)
-          )
-        )
-      )
+    ;; remove from the other tabs' buffer lists
+    (tab-bar-remove-buffers-from-invisible-tabs buffers)
     )
   )
 
