@@ -215,18 +215,6 @@ the same window)."
 ;; line numbers
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-(use-package simple
-  :bind
-  ("C-M-<backspace>" . pop-to-mark-command)
-
-  :config
-
-  ;; visual line mode
-  (diminish 'visual-line-mode)
-  (add-hook 'prog-mode-hook 'visual-line-mode) ;; TODO we really want to use global visual line mode, but it breaks some special modes!
-  (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
-)
-
 ;; disables secondary selection keybinds
 (global-unset-key [M-mouse-1] )
 (global-unset-key [M-drag-mouse-1] )

@@ -127,18 +127,21 @@ switched-to tab in either case. Otherwise, return `nil'"
            (-sort-by-key 'lexographic< (-partial #'nth 0))
            ;; take the best, if any
            car cadr
-           ;; our indices are zero based but tab-bar mode is 1 based
-           1+
            )
+      )
      )
-     )
-  (when tab-index
-    (tab-bar-select-tab tab-index)
-    (-if-let (desired-buf-window (get-buffer-window desired-buf))
-        (select-window desired-buf-window)
-      (switch-to-buffer desired-buf))
-    tab-index
+    (when tab-index
+      ;; our indices are zero based but tab-bar mode is 1 based
+      (setq tab-index (1+ tab-index))
+      (tab-bar-select-tab tab-index)
+      (-if-let (desired-buf-window (get-buffer-window desired-buf))
+          (select-window desired-buf-window)
+        (switch-to-buffer desired-buf))
+      tab-index
+      )
     )
   )
-)
 
+;;;###autoload
+(defun tab-bar-raise-or-switch-to-buffer (buffer)
+  (or (tab-bar-raise-buffer buffer) (switch-to-buffer buffer)))

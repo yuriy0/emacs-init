@@ -416,4 +416,28 @@ current buffer."
 (defun -sort-by-key (compare keyfn seq)
   (cl-stable-sort seq compare :key keyfn))
 
-;; (defmacro when-
+
+(defmacro override-fun-nonrecursive (orignm overridenm &rest body)
+  "Within the scope of BODY, the function symbol `originm' will in fact refer to `overridenm',
+except that if the function `overridenm' actually calls the
+function symbol `originm', that second (recursive) call will
+invoke the original function."
+  (declare (indent defun))
+  `(let ((inside-inner nil)
+         (original (symbol-function ,(quote orignm)))
+         )
+     (cl-letf
+         (
+          ((symbol-function ,(quote orignm))
+           (lambda (&rest innerargs)
+             (if inside-inner
+                 (apply original innerargs)
+               (let ((inside-inner t))
+                 (apply ,overridenm innerargs)
+                 ))
+             ))
+          )
+       (progn ,@body)
+       )
+     )
+  )
