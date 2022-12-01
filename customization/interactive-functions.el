@@ -441,3 +441,20 @@ invoke the original function."
        )
      )
   )
+
+
+(defmacro modf (place func)
+  "Apply `FUNC' to `PLACE' (a gv) and set the value of `PLACE' to the return of the `FUNC'"
+  `(setf ,place
+         ,(if (listp func) (append func (list place)) (list func place))
+     )
+  )
+
+(defmacro modf-v (place var &rest args)
+  "Retrieve the value of the `PLACE', bind it to the variable
+`VAR' and execute `ARGS', then set the value of `PLACE' to the
+value produced by `ARGS'"
+  `(setf ,place (let ((,var ,place)) (progn ,@args))))
+
+(defun buffer-name-or-string (name-or-buffer)
+  (if (stringp name-or-buffer) name-or-buffer (buffer-name name-or-buffer)))
