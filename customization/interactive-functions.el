@@ -424,16 +424,16 @@ function symbol `originm', that second (recursive) call will
 invoke the original function."
   (declare (indent defun))
   `(let ((inside-inner nil)
-         (original (symbol-function ,(quote orignm)))
+         (original (symbol-function (quote ,orignm)))
          )
      (cl-letf
          (
-          ((symbol-function ,(quote orignm))
+          ((symbol-function (quote ,orignm))
            (lambda (&rest innerargs)
              (if inside-inner
                  (apply original innerargs)
                (let ((inside-inner t))
-                 (apply ,overridenm innerargs)
+                 (apply (function ,overridenm) innerargs)
                  ))
              ))
           )
