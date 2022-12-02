@@ -56,6 +56,7 @@
         "\\*Quail Completions*"
         "\\*Backtrace*"
         "\\*quelpa-build-checkout*"
+        "\\*Flycheck errors*"
         )
 
   ;; find-file - when the file doesn't exist, create it
@@ -83,6 +84,10 @@
   ;; completly replace helm-buffers-switch-to-buffer-or-tab with a more robust
   ;; implementation
   (advice-add 'helm-buffers-switch-to-buffer-or-tab :override #'my/helm-buffers-switch-to-buffer-or-tab)
+
+  ;; completely replace helm-buffers-switch-to-buffer-other-tab with an implementation
+  ;; which opens ONE new tab with the selected buffers; and removes them from other buffer lists
+  (advice-add 'helm-buffers-switch-to-buffer-other-tab :override #'my/helm-buffers-switch-to-buffer-other-tab)
 
   ;; since we replace behaviour of helm buffer switching, add a new action type which preserves the non-tabbing behaviour
   ;; i.e. just uses switch to buffer
@@ -174,16 +179,29 @@
       (or (tab-bar-raise-buffer buffer) (switch-to-buffer buffer))
     (switch-to-buffer buffer)))
 
+
+;;;###autoload
+(defun my/helm-buffers-switch-to-buffer-other-tab (_candidate)
+  (when (fboundp 'switch-to-buffer-other-tab)
+    (let ((bufs (helm-marked-candidates)))
+      ;; switch to the first buffer in another tab
+      (switch-to-buffer-other-tab (pop bufs))
+      ;; show the other buffers in the same tab
+      (helm-buffer-switch-buffers-this-tab-1 bufs)
+      )))
+
+
+;;;###autoload
+(defun helm-buffer-switch-buffers-this-tab-1 (buffers)
+  ;; switch buffers
+  (let ((helm-buffers-maybe-switch-to-tab nil)) (helm-buffer-switch-buffers nil))
+
+  ;; remove from the other tabs' buffer lists
+  (tab-bar-remove-buffers-from-invisible-tabs buffers))
+
 ;;;###autoload
 (defun helm-buffer-switch-buffers-this-tab (_candidate)
-  (let ((buffers (helm-marked-candidates)))
-    ;; switch buffers
-    (let ((helm-buffers-maybe-switch-to-tab nil)) (helm-buffer-switch-buffers _candidate))
-
-    ;; remove from the other tabs' buffer lists
-    (tab-bar-remove-buffers-from-invisible-tabs buffers)
-    )
-  )
+  (helm-buffer-switch-buffers-this-tab-1 (helm-marked-candidates)))
 
 (use-package helm-ag
   :ensure
@@ -238,3 +256,9 @@
   :after (helm))
 (use-package helm-lsp
   :after (helm lsp-mode))
+
+(use-package helm-flycheck
+  :after (:all helm flycheck)
+  :disabled ;; not very pretty...
+  :config
+)

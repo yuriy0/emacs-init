@@ -35,11 +35,15 @@
 
   (setq
    tab-bar-tab-hints t  ; index displayed beside tab name
+   tab-bar-new-tab-to 'rightmost ; new tabs go to the end of the tab list
    )
 
   ;; use tab bar mode
   (tab-bar-mode +1)
   (tab-bar-history-mode +1)
+
+  ;; custom behaviour for display-buffer-in-tab
+  (advice-add 'display-buffer-in-tab :around #'my/display-buffer-in-tab)
 
   :custom-face
   (tab-bar-tab ((t (:box (:line-width (1 . 1) :color "#cce8ff" :style released-button) :background "#e5f3ff" :inherit tab-bar))))
@@ -47,20 +51,20 @@
 )
 
 ;;;###autoload
-(defun tab-bar-tabs-real()
+(defun tab-bar-tabs-real(&optional frame)
   "Whereas `tab-bar-tabs' returns a special form of data for the
 current the current tab, this returns the actual tab-bar
 information for the current tab as well"
   (-map
    (lambda(tab)
      (if (eq (car tab) 'current-tab)
-         (let ((tt (tab-bar--tab)))
+         (let ((tt (tab-bar--tab frame)))
            (setf (car tt) 'current-tab)
            tt
            )
        tab)
      )
-   (tab-bar-tabs)))
+   (tab-bar-tabs frame)))
 
 
 ;;;###autoload
@@ -106,7 +110,7 @@ information for the current tab as well"
   )
 
 ;;;###autoload
-(defun tab-bar-raise-buffer (desired-buf)
+(defun tab-bar-raise-buffer (desired-buf &optional frame)
   "If the buffer is visible in some tab, switch to that tab and to the window containing the buffer,
 or if the buffer was opened in some tab, switch to that tab and
 make the buffer visible there; and return the index of the
@@ -114,7 +118,7 @@ switched-to tab in either case. Otherwise, return `nil'"
   (-let*
     ((desired-buf (get-buffer desired-buf))
      (tab-index
-      (->> (tab-bar-tabs-real)
+      (->> (tab-bar-tabs-real frame)
            ;; zip the tab bar index with the score for switching to the desired buffer
            (--map-indexed
             (list
@@ -134,13 +138,27 @@ switched-to tab in either case. Otherwise, return `nil'"
       ;; our indices are zero based but tab-bar mode is 1 based
       (setq tab-index (1+ tab-index))
       (tab-bar-select-tab tab-index)
-      (-if-let (desired-buf-window (get-buffer-window desired-buf))
+      (-if-let (desired-buf-window (get-buffer-window desired-buf frame))
           (select-window desired-buf-window)
         (switch-to-buffer desired-buf))
       tab-index
       )
     )
   )
+
+;;;###autoload
+(defun my/display-buffer-in-tab (basefn buffer alist)
+  (-if-let (raise-mode (alist-get 'raise alist))
+      (or
+       ;; try to raise the buffer in an existing tab if so configured by the ALIST properties
+       (tab-bar-raise-buffer
+        buffer
+        (if (framep raise-mode) raise-mode nil))
+
+       ;; .. otherwise apply default behaviour
+       (funcall basefn buffer alist))
+    (funcall basefn buffer alist)
+  ))
 
 ;;;###autoload
 (defun tab-bar-raise-or-switch-to-buffer (buffer)
