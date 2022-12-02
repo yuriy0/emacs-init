@@ -10,7 +10,9 @@
         which-key-show-prefix 'top
         which-key-side-window-max-width 0.45
         which-key-idle-delay 2.5
-        which-key-show-early-on-C-h t)
+        which-key-idle-secondary-delay 0.05
+        which-key-show-early-on-C-h t
+        )
 
   (define-key global-map (kbd "C-h /") 'which-key-show-major-mode)
 )
