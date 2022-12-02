@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (setq mouse-buffer-menu-mode-mult 0 ; right click menu
       inhibit-startup-screen t)     ; turn off startup screen
 
@@ -24,15 +26,28 @@ by NARGS, the final trailing group of length < NARGS is ignored."
 ;;;###autoload 
 (defun really-kill-emacs ()
  (interactive)
- (setq really-kill-emacs t)
  (desktop-save-in-desktop-dir)
- ;; (wg-save-session)
- (save-buffers-kill-emacs))
+ (let ((really-kill-emacs t)) (save-buffers-kill-emacs)))
 
-;;;###autoload 
-(defadvice kill-emacs (around really-exit activate)
-   "Only kill emacs if the variable is true"
-   (if really-kill-emacs ad-do-it) (make-frame-invisible nil t))
+(defun my/kill-emacs (fn &rest args)
+  "Only kill emacs if the variable is true"
+  (if really-kill-emacs
+      (apply fn args)
+    (message "kill-emacs - not killing, instead making frame invisible")
+    (make-frame-invisible nil t)))
+(advice-add 'kill-emacs :around #'my/kill-emacs)
+
+;; used by `save-buffers-kill-emacs' to avoid quitting emacs based on user defined conditions
+;; strangely, somehow `save-buffers-kill-emacs' will quit even though it seems to call `kill-emacs'?
+;; i.e. it is somehow skipping our advice?
+(add-hook #'kill-emacs-query-functions
+          (lambda()
+            (if really-kill-emacs t
+              (message "save-buffers-kill-emacs - not killing, instead making frame invisible")
+              (make-frame-invisible nil t)
+              nil))
+          99
+          )
 
 ;; easy keyboard escape (2<Esc> instead of 3<Esc>)
 (require 'gnutls)
@@ -130,7 +145,7 @@ If the new path's directories does not exist, create them."
 
 ;; highlight parens
 (setq show-paren-delay 0)
-(add-hook 'prog-mode-hook '(lambda () (show-paren-mode 1)))
+(add-hook 'prog-mode-hook (lambda () (show-paren-mode 1)))
 
 ;; display the next buffer in the same window if the current buffer is a help
 ;; buffer
@@ -150,7 +165,7 @@ the same window)."
 
 ;; confusing
 (add-hook 'sh-mode-hook
-  '(lambda () (setq-local inhibit-eol-conversion t)))
+  (lambda () (setq-local inhibit-eol-conversion t)))
 
 ;; column numbers
 (column-number-mode t)

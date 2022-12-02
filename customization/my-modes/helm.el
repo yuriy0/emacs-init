@@ -129,6 +129,8 @@
 (defun helm-tab-buffers-list ()
   (interactive)
 
+  (require 'helm) ;; we may call this function BEFORE helm is required? not sure how to fix...
+
   ;; HACK we rely on helm lazy initialization of its own internals
   ;; if this is the first helm-buffers-like command you call after startup,
   ;; this variable is not yet initialized
