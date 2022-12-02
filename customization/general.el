@@ -240,3 +240,7 @@ the same window)."
 ;; disable undo/redo default binds
 (global-unset-key (kbd "C-/"))
 (global-unset-key (kbd "C-?"))
+
+;; in tty mode disable the menu bar
+(when (not (display-graphic-p))
+  (menu-bar-mode -1))
