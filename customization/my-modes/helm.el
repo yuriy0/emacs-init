@@ -258,7 +258,7 @@
 )
 (use-package helm-tramp :ensure
   :after (helm))
-(use-package helm-lsp
+(use-package helm-lsp :ensure
   :after (helm lsp-mode))
 
 (use-package helm-flycheck
