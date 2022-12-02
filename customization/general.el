@@ -29,12 +29,21 @@ by NARGS, the final trailing group of length < NARGS is ignored."
  (desktop-save-in-desktop-dir)
  (let ((really-kill-emacs t)) (save-buffers-kill-emacs)))
 
+(defun non-kill-emacs()
+  "Replacement action for trying to kill emacs when running in
+server mode. For GUI, hides the current frame; for TTY, deletes
+it, since making the frame invisible is impossible there"
+  (if (display-graphic-p)
+      (make-frame-invisible nil t)
+    (delete-frame)))
+
+
 (defun my/kill-emacs (fn &rest args)
   "Only kill emacs if the variable is true"
   (if really-kill-emacs
       (apply fn args)
     (message "kill-emacs - not killing, instead making frame invisible")
-    (make-frame-invisible nil t)))
+    (non-kill-emacs)))
 (advice-add 'kill-emacs :around #'my/kill-emacs)
 
 ;; used by `save-buffers-kill-emacs' to avoid quitting emacs based on user defined conditions
@@ -44,7 +53,7 @@ by NARGS, the final trailing group of length < NARGS is ignored."
           (lambda()
             (if really-kill-emacs t
               (message "save-buffers-kill-emacs - not killing, instead making frame invisible")
-              (make-frame-invisible nil t)
+              (non-kill-emacs)
               nil))
           99
           )
