@@ -70,7 +70,7 @@ is multiplied by the given delta to determine the true delta."
   (interactive "p")
   (-when-let* ((key (this-command-keys))
                (dir (cdr (assoc key pull-window-keymap))))
-    (pull-window-dir delta dir)))
+    (pull-window-dir-1 delta dir)))
 
 (--each pull-window-keymap (global-set-key (car it) #'pull-window-dir))
 
