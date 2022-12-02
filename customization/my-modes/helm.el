@@ -42,13 +42,15 @@
         helm-split-window-in-side-p t           ; prevent helm from temporarily hiding other buffers
         helm-split-window-default-side 'below
         helm-apropos-fuzzy-match t
-        helm-default-external-file-browser  "explorer.exe"
         helm-buffer-max-length nil             ; don't truncate buffer names 
         helm-M-x-always-save-history t         ; save command to history even if it produces an error
         history-delete-duplicates t            ; dont put duplicate commands in the command history
 
         helm-buffers-maybe-switch-to-tab t
    )
+
+  (when (system-type-windowslike-p)
+    (setq helm-default-external-file-browser "explorer.exe"))
 
   (many 1 (apply-partially 'add-to-list 'helm-boring-buffer-regexp-list)
         "\\*magit-process:" 

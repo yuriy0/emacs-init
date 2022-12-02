@@ -15,7 +15,8 @@ this emacs think its running in a linux-like environment. Specifically, handles 
   (setq url (browse-url-encode-url url))
   (shell-command (concat "powershell.exe 'start " url "'"))
 )
-(advice-add 'browse-url-default-windows-browser :override #'my/browse-url-default-windows-browser)
+(when (system-type-windowslike-p)
+  (advice-add 'browse-url-default-windows-browser :override #'my/browse-url-default-windows-browser))
 
 
 

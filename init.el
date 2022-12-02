@@ -58,28 +58,35 @@
 ;; local packages
 (add-to-list 'load-path (concat user-emacs-directory "/emacswiki-pkg"))
 
-;;;; cygwin bash hacks (required otherwise shell commands will always fail)
-;; do this early because some package requires are going to try shell commands
-(require 'cygwin-mount)
-(require 'setup-cygwin)
+(defun system-type-windowslike-p()
+  (memq system-type '(ms-dos windows-nt cygwin)))
 
-(cygwin-mount-activate)
+(when (system-type-windowslike-p)
+  ;;;; cygwin bash hacks (required otherwise shell commands will always fail)
+  ;; do this early because some package requires are going to try shell commands
+  (require 'cygwin-mount)
+  (require 'setup-cygwin)
+
+  (cygwin-mount-activate)
+
+  ;; remove windows line endings from comint shells
+  (add-hook 'comint-output-filter-functions
+            'shell-strip-ctrl-m nil t)
+
+  ;; external shell
+  (setq explicit-shell-file-name "bash.exe")
+
+  ;; For subprocesses invoked via the shell
+  ;; (e.g., "shell -c command")
+  (setq shell-file-name explicit-shell-file-name)
+  ;;(setq-default coding-system-for-read 'utf-8-unix)
+  ;;(setq-default coding-system-for-write 'utf-8)
+  ;;(set-coding-system-priority 'utf-8-unix 'utf-8-dos)
+  ;;;; end cygwin bash hacks
+  )
 
 (add-hook 'comint-output-filter-functions
-    'shell-strip-ctrl-m nil t)
-(add-hook 'comint-output-filter-functions
-    'comint-watch-for-password-prompt nil t)
-
-;; external shell
-(setq explicit-shell-file-name "bash.exe")
-
-;; For subprocesses invoked via the shell
-;; (e.g., "shell -c command")
-(setq shell-file-name explicit-shell-file-name)
-;;(setq-default coding-system-for-read 'utf-8-unix)
-;;(setq-default coding-system-for-write 'utf-8)
-;;(set-coding-system-priority 'utf-8-unix 'utf-8-dos)
-;;;; end cygwin bash hacks
+          'comint-watch-for-password-prompt nil t)
 
 ;; refresh package contents
 (unless package-archive-contents
