@@ -12,7 +12,7 @@
         ("q" . #'flycheck-errors-list-kill-buffer))
 
   :config
-  (eval-after-load 'hercules
+  (with-eval-after-load 'hercules
     (hercules-def
      :show-funs #'flycheck-list-errors
      :hide-funs '(flycheck-errors-list-kill-buffer)
