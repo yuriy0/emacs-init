@@ -1,78 +1,40 @@
 ;; -*- lexical-binding: t; -*-
 
-(defun window-anchored (&optional win)
-  (-zip-with 'eq 
-   (window-edges (frame-root-window win) nil nil t)
-   (window-edges nil nil nil t)))
+(use-package windresize
+  :ensure
+  :commands (windresize)
+  :defer t
+  :config
 
-(setq dir-to-ix  
-      '((left   . 0)
-        (top    . 1) 
-        (right  . 2)
-        (bottom . 3) ))
-(setq opp-dir
-      '((left   . right )
-        (top    . bottom) 
-        (right  . left  )
-        (bottom . top   ) ))
-(setq dir-to-side 
-      '((left   . right)
-        (top    . above) 
-        (right  . right)
-        (bottom . above)))
+  ;;replaces these two functions which are bugged upstream
+  ;;(they are called without optional prefix arguments by some keybinds!)
+  (defun windresize-up-force-up (&optional n)
+    "If two movable borders, move the upper border.
+N is the number of lines by which moving borders."
+    (interactive "P")
+    (let ((i (if n (prefix-numeric-value n)
+	       windresize-increment)))
+      (windresize-up i t)))
 
-(setq pull-window-keymap
-  `(( ,(kbd "C-c <C-down>" ) . bottom )
-    ( ,(kbd "C-c <C-up>"   ) . top    )
-    ( ,(kbd "C-c <C-left>" ) . left   )
-    ( ,(kbd "C-c <C-right>") . right  )  ))
+  (defun windresize-down-force-up (&optional n)
+    "If two movable borders, move the upper border.
+N is the number of lines by which moving borders."
+    (interactive)
+    (let ((i (if n (prefix-numeric-value n)
+	       windresize-increment)))
+      (windresize-down i t)))
 
-(setq pull-window-base-mult 3)
+  ;; disabled because buggy...
+  ;; (with-eval-after-load 'hercules
+  ;;   (hercules-def
+  ;;    :show-funs 'windresize
+  ;;    :hide-funs '(windresize-exit windresize-cancel-and-quit)
+  ;;    :keymap 'windresize-map
+  ;;    :transient t
+  ;;    )
+  ;;   )
+  )
 
-(defun pull-window-dir-1 (delta dir &optional win) 
-  "Pulls the edges of the given window in the given
-direction (`DIR-ARG') according to the following rules:
-
-If the window is anchored (attached to the edge of its frame) in
-the specified cardinal direction (up/down or left/right), pulls
-the non-anchored edge in the given direction.
-
-If the window has an adjacent window (in the specified cardinal
-direction), pulls the edge of both the given window and the
-adjacent window in the given direction (effectively resizing the
-given window, and leaving the others unchanged if the resize
-would not leave any window smaller than its minimum size).
-
-`DELTA' determines by how much edges should be pulled. A negative
-delta is treated as its absolute value. `pull-window-base-mult'
-is multiplied by the given delta to determine the true delta."
-  (-if-let* 
-      ((dir-ix (alist-get dir dir-to-ix)) )
-      (-let* 
-          ((c-crd (if (memq dir '(left right)) t nil))
-           (ws (window-anchored))
-           (c-dir (nth dir-ix ws))
-           (c-odir (nth (alist-get (alist-get dir opp-dir) dir-to-ix) ws))
-           (c-val (* pull-window-base-mult (if c-dir -1 1) (abs delta)))
-           (m-side (window-in-direction (alist-get dir dir-to-side) win t))
-           (m-delta (* pull-window-base-mult (if (memq dir '(top left)) -1 1) (abs delta)))
-           )
-        (cond ((or c-odir c-dir) 
-               (window-resize win c-val c-crd))
-              (m-side
-               (--each (list win m-side) (adjust-window-trailing-edge it m-delta c-crd)))
-              (t (message "pull-window-dir(%S): don't know what to do" dir))
-              ))
-    (error "pull-window-dir: invalid direction: %S" dir-arg) ))
-
-;;;###autoload
-(defun pull-window-dir (delta)
-  (interactive "p")
-  (-when-let* ((key (this-command-keys))
-               (dir (cdr (assoc key pull-window-keymap))))
-    (pull-window-dir-1 delta dir)))
-
-(--each pull-window-keymap (global-set-key (car it) #'pull-window-dir))
 
 ;; when splitting windows, open a different buffer in the new window
 (defun split-window--new-buffer (do-split &rest do-split-args)
