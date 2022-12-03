@@ -7,6 +7,22 @@
              tab-bar-switch-to-next-tab
              tab-bar-switch-to-prev-tab)
 
+  :bind
+
+  ;; bindings for tab switching left/right and tab re-ordering left/right
+  ;; in both tab prefix keymap and repeat-mode maps
+  (:map tab-bar-switch-repeat-map
+        ("<left>" . tab-previous)
+        ("<right>" . tab-next))
+  (:map tab-bar-move-repeat-map
+        ("C-<left>" . tab-bar-move-tab-backward)
+        ("C-<right>" . tab-move))
+  (:map tab-prefix-map
+        ("<left>" . tab-previous)
+        ("<right>" . tab-next)
+        ("C-<left>" . tab-bar-move-tab-backward)
+        ("C-<right>" . tab-move))
+
   :config
 
   (defvar tab-bar-default-shared-buffer-names
@@ -44,6 +60,9 @@
 
   ;; custom behaviour for display-buffer-in-tab
   (advice-add 'display-buffer-in-tab :around #'my/display-buffer-in-tab)
+
+  ;; enable repeat mode in tab-bar mode
+  (add-hook 'tab-bar-mode-hook #'repeat-mode)
 
   :custom-face
   (tab-bar-tab ((t (:box (:line-width (1 . 1) :color "#cce8ff" :style released-button) :background "#e5f3ff" :inherit tab-bar))))
