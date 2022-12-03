@@ -4,7 +4,6 @@
 
   :config
   (bind-keys
-   `(
-     ,(if (display-graphic-p) "C-=" "C-]") ;; TODO: how to use all keybinds correctly in TTY?
-     . er/expand-region))
+   ((if (display-graphic-p) "C-=" "C-]") ;; TODO: how to use all keybinds correctly in TTY?
+    . er/expand-region))
   )
