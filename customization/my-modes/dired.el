@@ -5,9 +5,11 @@
   :bind
   (:map dired-mode-map
         ("a" . dired-find-file)
+        ("<RET>" . dired-find-alternate-file)
 
         ;; https://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer
         ("^" . (lambda () (interactive) (find-alternate-file "..")))
+
         )
 
   :config
@@ -31,7 +33,7 @@
 
 (use-package dired-subtree
   :ensure t
-  :defer t
+  :after (dired)
 
   :config
   (setq dired-subtree-use-backgrounds nil)
@@ -41,7 +43,5 @@
         ("i" . dired-subtree-insert)
         ("<tab>" . dired-subtree-toggle)
         ("<backtab>" . dired-subtree-cycle)
-        ("<RET>" . dired-find-alternate-file)
-        ("a" . dired-find-file)
         )
 )
