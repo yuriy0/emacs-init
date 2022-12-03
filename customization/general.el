@@ -53,9 +53,14 @@ it, since making the frame invisible is impossible there"
           (lambda()
             (if really-kill-emacs t
               (message "save-buffers-kill-emacs - not killing, instead making frame invisible")
-              (non-kill-emacs)
+
+               ;; we want to make sure that deleting frame doesn't interfere
+               ;; with anything else that save-buffers-kill-emacs might want to
+               ;; do. It's unlikely that we care, especially since we install
+               ;; our hook very early, so other hooks don't run at this point.
+              (run-with-timer 0.01 nil #'non-kill-emacs)
               nil))
-          99
+          -99
           )
 
 ;; easy keyboard escape (2<Esc> instead of 3<Esc>)
