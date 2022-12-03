@@ -234,7 +234,11 @@ the same window)."
 (set-default-coding-systems 'utf-8)
 (set-language-environment 'utf-8)
 
-(set-selection-coding-system 'utf-16-le) ;; must use this because Windows uses this for clipboard...
+(set-selection-coding-system
+ (if (system-type-windowslike-p)
+     'utf-16-le  ;; must use this because Windows uses UTF16 for clipboard...
+   'utf-8-auto)
+)
 
 ;; line numbers
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
