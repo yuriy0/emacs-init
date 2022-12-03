@@ -393,7 +393,7 @@ current buffer."
     arg))
 
 (defmacro add-to-list-at (list index el)
-  (let ((list-exp `(unquote ,list)))
+  (let ((list-exp (macroexpand `(unquote ,list))))
     `(setq ,list-exp (-insert-at ,index ,el ,list-exp))
   ))
 
