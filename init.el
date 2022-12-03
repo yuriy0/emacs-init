@@ -102,7 +102,6 @@
   use-package
   anaphora
   dash
-  dash-functional
   delight ;; (used by use-package during construction phase)
   diminish
   list-utils
