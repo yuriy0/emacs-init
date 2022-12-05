@@ -10,6 +10,7 @@
   (fset 'shell-pop-split-window 'my--shell-pop-split-window)
 
   (add-hook 'shell-pop-in-after-hook #'my/shell-pop-in-after-hook)
+  (advice-add 'shell-pop-out :override #'my/shell-pop-out)
 )
 
 (defun extremal-windows (dirs)
@@ -49,3 +50,25 @@ directions (a direction being that which which can be passed to
    ;; find-file from the popped shell, which would replace that shell buffer
   (set-window-dedicated-p nil t)
   )
+
+(defun my/shell-pop-out()
+  (run-hooks 'shell-pop-out-hook)
+  (if (shell-pop--full-p)
+      (let ((window-conf (cl-first shell-pop-window-configuration))
+            (marker (cl-second shell-pop-window-configuration)))
+        (set-window-configuration window-conf)
+        (when (marker-buffer marker)
+          (goto-char marker)))
+    (when (and (not (one-window-p)) (not (= shell-pop-window-height 100)))
+      ;; fixes a bug with the default implemenentation of shell-pop
+      ;; bury-buffer will **sometimes** delete the window, in which case
+      ;; calling delete-window later does the wrong thing.
+      (let ((starting-window (selected-window)))
+        (bury-buffer)
+        (when (eq starting-window (selected-window)) (delete-window))
+        (when (and shell-pop-last-window (window-live-p shell-pop-last-window))
+          (select-window shell-pop-last-window))
+        )
+      )
+    (when shell-pop-restore-window-configuration
+      (switch-to-buffer shell-pop-last-buffer))))
