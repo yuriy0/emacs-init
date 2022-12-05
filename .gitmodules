@@ -9,3 +9,7 @@
 	path = lisp-pkg/lsp-treemacs
 	url = https://github.com/yuriy0/lsp-treemacs
 	branch = master
+[submodule "lisp-pkg/auto-compile"]
+	path = lisp-pkg/auto-compile
+	url = https://github.com/emacscollective/auto-compile
+	branch = main
