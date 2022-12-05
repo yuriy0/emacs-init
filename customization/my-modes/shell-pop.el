@@ -7,8 +7,9 @@
    'shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))) )
 
   (setq shell-pop-restore-window-configuration nil)
-
   (fset 'shell-pop-split-window 'my--shell-pop-split-window)
+
+  (add-hook 'shell-pop-in-after-hook #'my/shell-pop-in-after-hook)
 )
 
 (defun extremal-windows (dirs)
@@ -41,3 +42,10 @@ directions (a direction being that which which can be passed to
       (replace-regexp-in-string
        "*\\'" (format "*<%d>" index) shell-pop-internal-mode-buffer)
     (format "%s<%d>" shell-pop-internal-mode-buffer index)))
+
+;;;###autoload
+(defun my/shell-pop-in-after-hook()
+   ;; make shell pop windows dedicated. this is especially important when using
+   ;; find-file from the popped shell, which would replace that shell buffer
+  (set-window-dedicated-p nil t)
+  )
