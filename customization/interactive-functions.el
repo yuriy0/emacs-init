@@ -347,7 +347,7 @@ current buffer."
 
 
 ;;;###autoload
-(defun add-hook-once (hook-var hook-fn)
+(defun add-hook-once (hook-var hook-fn &optional depth local)
   "Add `hook-fn' to all of hooks found in `hook-vars' (list or single hook); the first time that `hook-fn' returns `t', all of the installed hooks will be removed"
   (letrec
       ((wrapped-hook-fn
@@ -356,15 +356,15 @@ current buffer."
        (remove-hooks
          (if (listp hook-var)
              (lambda ()
-               (mapc (lambda(h) (remove-hook h wrapped-hook-fn)) hook-var))
+               (mapc (lambda(h) (remove-hook h wrapped-hook-fn local)) hook-var))
              (lambda ()
-               (remove-hook hook-var wrapped-hook-fn))
+               (remove-hook hook-var wrapped-hook-fn local))
              )
          )
        )
     (if (listp hook-var)
-        (mapc (lambda(h) (add-hook h wrapped-hook-fn)) hook-var)
-        (add-hook hook-var wrapped-hook-fn)
+        (mapc (lambda(h) (add-hook h wrapped-hook-fn depth local)) hook-var)
+        (add-hook hook-var wrapped-hook-fn depth local)
       )
     ))
 
