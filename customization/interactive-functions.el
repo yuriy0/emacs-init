@@ -455,3 +455,41 @@ value produced by `ARGS'"
 
 (defun buffer-name-or-string (name-or-buffer)
   (if (stringp name-or-buffer) name-or-buffer (buffer-name name-or-buffer)))
+
+
+(defmacro with-temp-buffer-var (var &rest body)
+  "Like `with-temp-buffer' except that in the context of `BODY' the symbol `var' is bound to the temporary buffer. Useful if you want to create multiple temporary buffers"
+  (declare (indent defun) (debug t))
+  (macroexpand
+   `(with-temp-buffer
+      (let ((,var (current-buffer)))
+        (progn ,@body)
+        ))))
+
+(defun shell-command-with-stdin (cmd stdin)
+  "Call a shell command and pipe the given string to the standard
+input of the process. This is exactly like
+`shell-command-on-region' except with a literal string. Use this
+instead of trying to format piping to stdin of shell commands
+manually (i.e. by writing `shell-command-to-string (format \"echo %s | CMD\")`) because
+this uses `shell-command-on-region' which correctly handles all
+sorts of exotic text contents.
+
+Returns a list `(ERRORCODE STDOUTANDERR)'"
+  (let ((stdoutstr) (resultcode)
+        )
+    (with-temp-buffer
+         (insert stdin)
+         (list
+          (call-shell-region
+           (point-min) (point-max)
+           cmd
+           t ; delete contents
+           '(t t) ; write stdout AND stderr to current buffer
+           )
+
+          ;; at this point call-shell-region has written the stdout/err to the buffer
+          (buffer-string))
+         )
+    )
+  )

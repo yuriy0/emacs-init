@@ -61,6 +61,11 @@
 (defun system-type-windowslike-p()
   (memq system-type '(ms-dos windows-nt cygwin)))
 
+(defun system-type-wsl-p()
+  "A predicate which is non-nil when we're running on WSL"
+  (and (not (system-type-windowslike-p))
+       (executable-find "cmd.exe")))
+
 (when (system-type-windowslike-p)
   ;;;; cygwin bash hacks (required otherwise shell commands will always fail)
   ;; do this early because some package requires are going to try shell commands
