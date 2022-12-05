@@ -8,3 +8,4 @@
 [submodule "lisp-pkg/lsp-treemacs"]
 	path = lisp-pkg/lsp-treemacs
 	url = https://github.com/yuriy0/lsp-treemacs
+	branch = master
