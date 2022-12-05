@@ -26,7 +26,7 @@
 
 (use-package treemacs-all-the-icons
   :ensure t
-  :after (all-the-icons)
+  :after (:all treemacs all-the-icons)
 
   )
 
