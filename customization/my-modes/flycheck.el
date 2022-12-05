@@ -12,6 +12,8 @@
         ("q" . #'flycheck-errors-list-kill-buffer))
 
   :config
+  (require 'yaml)
+
   (with-eval-after-load 'hercules
     (hercules-def
      :show-funs #'flycheck-list-errors
@@ -25,3 +27,8 @@
 (defun flycheck-errors-list-kill-buffer ()
   (interactive)
   (with-current-buffer "*Flycheck errors*" (kill-buffer-and-window)))
+
+;; something inside flycheck wants to use `yaml' but doesn't correctly depend on it?
+(use-package yaml
+  :ensure
+  :defer t)

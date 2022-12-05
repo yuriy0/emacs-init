@@ -381,7 +381,7 @@ CALLBACK is the status callback passed by Flycheck."
     (advice-add 'lsp-ui-sideline--diagnostics :after #'my/lsp-ui-sideline--diagnostics--after)
     (add-hook 'flycheck-process-error-functions #'my/flycheck-filtering -50)
     (advice-add 'lsp-diagnostics--flycheck-start :around #'my/lsp-diagnostics--flycheck-start-around)
-    (flycheck-buffer)
+    (when flycheck-mode (flycheck-buffer))
     )
    (t
     (advice-remove 'lsp-ui-sideline--diagnostics #'my/lsp-ui-sideline--diagnostics--after)
