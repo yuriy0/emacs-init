@@ -25,15 +25,14 @@
     (let ((desktop-first-buffer nil)
           (desktop-buffer-ok-count 0)
           (desktop-buffer-fail-count 0))
-      (funcall act)
-      )
+      (funcall act))
     ))
 
-(defun my-around/desktop-create-buffer(fn
-                                       file-version
-                                       buffer-filename
-                                       buffer-name &rest args)
-
+(defun my-around/desktop-create-buffer
+    (fn
+     file-version
+     buffer-filename
+     buffer-name &rest args)
   (let ((do-it
          (lambda() (apply fn file-version buffer-filename buffer-name args))))
 
@@ -79,67 +78,26 @@
         )
     ;; (message "%s" `(funcall ,fn ,filename))
     (message "Did not find existing buffer to reuse for file %s" filename)
-    (funcall fn filename)
-    )
-
-  ;; (funcall fn filename)
+    (funcall fn filename))
   )
 
-;; (defun create-real-buffer-if-visible(visible-bufs buf-file-name dummy-buf make-buf-act)
-;;   ;; (when (member (buffer-name dummy-buf) visible-bufs)
-;;   ;;   (with-selected-window (window-buffer
-;;   ;;   (funcall make-buf-act)
-;;   ;;   t
-;;   ;; )
-;;   )
-
 (defun my-after/desktop-read(&rest _args)
-  ;; (-let [pending-by-buf
-  ;;        (--> desktop-lazy-restore-pending-buffers
-  ;;             ht->alist
-  ;;             (-map (-lambda() ?))
-  ;;             ht<-alist)
-  ;;        ]
-  
   ;; find all visible windows, and if any is displaying one of our dummy buffers, fill that buffer now
   (dolist (wind (my/get-visible-windows))
     (-let*
         ((wind-buf (window-buffer wind))
          ((buf-fname (_ mk-buf-act)) (ht-find (-lambda(_ (b _)) (eq b wind-buf)) desktop-lazy-restore-pending-buffers))
          )
-      ;; 
+      ;; if we have found a corresponding lazy restore buffer for the given window...
       (when buf-fname
         (message "Restoring initially visible buffer %s /file %s from desktop" wind-buf buf-fname)
-        (with-selected-window wind 
-          ;; (message "%s" `(lazy-restore-buffer-invoke ,mk-buf-act))
-          (lazy-restore-buffer-invoke mk-buf-act)
-          )
+        (with-selected-window wind
+          (lazy-restore-buffer-invoke mk-buf-act))
 
         ;; just in case the restore fails, make sure to clear this dummy buffer and action (so we don't try again)
         (ht-remove! desktop-lazy-restore-pending-buffers buf-fname)
         )
       )
-    ;; (let ((visible-bufs (get-visible-buffers)))
-    ;;   (setq desktop-lazy-restore-pending-buffers
-    ;;         (--> (ht->alist desktop-lazy-restore-pending-buffers)
-    ;;              (-filter (-lambda((a (b . c))) (not (create-real-buffer-if-visible visible-bufs a b c))))
-    ;;              ht<-alist))
-
-    ;;   ;; (ht<-alist
-    ;;   ;; (mapcar (lambda(x) (create-real-buffer-if-visible visible-bufs (nth 0 x) (nth 1 x)) (ht->alist desktop-lazy-restore-pending-buffers))
-    ;;   ;; )
-
-    ;; ;; (dolist (buf+act (get-visible-buffers))
-    
-
-    ;; ;;   ;; (when-let (buf (ht-get desktop-lazy-restore-pending-buffers (f-canonical filename)))
-    ;; ;;   ;;   (message "Found buffer %s for file %s" buf filename)
-    ;; ;;   ;;   (ht-remove! desktop-lazy-restore-pending-buffers filename)
-    ;; ;;   ;;   buf
-    ;; ;;   ;;   )
-    ;; ;;   ;; )
-    ;; ;; )
-    ;; )
     ))
 
 (advice-add 'create-file-buffer :around #'my-around/create-file-buffer '((depth . -100)))
