@@ -1,4 +1,4 @@
-;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; read-symbol-shorthands: (("my" . "desktop-lazy-read--")) -*-
 
 (require 'ht)
 (require 'dash)
@@ -49,6 +49,10 @@
                   buffer-name
                   t;inhibit hooks
                   )))
+
+        ;; mark the dummy buffer as such
+        (with-current-buffer buf
+          (desktop-deferred-load-mode))
 
         ;; save our dummy buffer for later...
         (message "Desktop: created dummy buffer '%s' for file '%s'" buf buffer-filename)
@@ -116,6 +120,44 @@
     (setq desktop-lazy-restore-read-desktopfile-completed nil)
     (run-hooks 'desktop-lazy-restore-completed-hook)
   ))
+
+(define-derived-mode desktop-deferred-load-mode special-mode
+  "Deferred Load"
+  "This mode has no special semantics or usage. You should never
+place a buffer in this mode manually. This mode is used solely to
+mark deferred loading buffers as such in buffer selection
+dialogues which would display the mode of the buffer")
+
+(with-eval-after-load 'helm-buffers
+  (defface helm-buffer-deferred-load
+    `((t ,@(and (>= emacs-major-version 27) '(:extend t))
+         :foreground "violet red" :background "grey85"))
+    "Face used for deferred desktop loading buffers."
+    :group 'helm-buffers-faces)
+
+  (defun my/around-helm-buffer--details (fn bufnm &optional details)
+    (if-let ((buf (get-buffer bufnm))
+             (lazy-restore-buf (ht-find (-lambda(_ (b _)) (equal b buf)) desktop-lazy-restore-pending-buffers))
+             )
+        (helm-buffer--show-details
+         bufnm ; name
+         nil ; prefix
+         (car lazy-restore-buf) ; filename
+         (propertize "???" 'face 'helm-buffer-deferred-load) ; size
+         (propertize "???" 'face 'helm-buffer-deferred-load) ; mode
+         (file-name-directory (car lazy-restore-buf)) ; directory
+         'helm-buffer-deferred-load
+         'helm-buffer-process
+         nil ; proc
+         details
+         'nofile
+         )
+      (funcall fn buf details))
+    )
+  (advice-add 'helm-buffer--details :around #'my/around-helm-buffer--details)
+  (add-hook 'desktop-lazy-restore-completed-hook
+            (lambda() (advice-remove 'helm-buffer--details #'my/around-helm-buffer--details)))
+)
 
 ;; we need these settings to work properly.
 ;; - must be using eager restore, because we need to create buffers right away.
