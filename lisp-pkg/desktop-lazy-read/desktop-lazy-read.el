@@ -21,7 +21,7 @@
     result))
 
 (defun lazy-restore-buffer-invoke(act)
-  (with-demoted-errors "Restoring buffer from desktop file failed: %S"
+  (with-demoted-errors "Desktop: restoring buffer failed: %S"
     (let ((desktop-first-buffer nil)
           (desktop-buffer-ok-count 0)
           (desktop-buffer-fail-count 0))
@@ -47,24 +47,9 @@
                   )))
 
         ;; save our dummy buffer for later...
-        (message "Created dummy buffer %s for file %s" buf buffer-filename)
+        (message "Desktop: created dummy buffer '%s' for file '%s'" buf buffer-filename)
         (ht-set! desktop-lazy-restore-pending-buffers (f-canonical buffer-filename)
                  (list buf do-it))
-
-        ;; add a buffer-local hook to `window-selection-change-functions', which
-        ;; will be called any time this buffer is displayed. This hook will
-        ;; actually initialize the buffer as desktop would normally do it.
-        (with-current-buffer buf
-          (add-hook-once
-           'window-selection-change-functions
-           (lambda (_visible-window)
-             (message "Restoring buffer %s /file %s from desktop" buf buffer-filename)
-             (lazy-restore-buffer-invoke do-it)
-             t) ;; returning t removes the "once" hook
-           nil;depth(default)
-           t;local
-           )
-          nil)
         )
       )))
 
@@ -72,7 +57,7 @@
   (setq filename (f-canonical filename))
   (if-let (buf (nth 0 (ht-get desktop-lazy-restore-pending-buffers filename)))
       (progn
-        (message "Found buffer %s for file %s" buf filename)
+        (message "Desktop: found buffer '%s' for file '%s'" buf filename)
         (ht-remove! desktop-lazy-restore-pending-buffers filename)
         buf
         )
@@ -81,7 +66,7 @@
     (funcall fn filename))
   )
 
-(defun my-after/desktop-read(&rest _args)
+(defun my/check-restore-any-visible-windows(&rest _args)
   ;; find all visible windows, and if any is displaying one of our dummy buffers, fill that buffer now
   (dolist (wind (my/get-visible-windows))
     (-let*
@@ -90,9 +75,8 @@
          )
       ;; if we have found a corresponding lazy restore buffer for the given window...
       (when buf-fname
-        (message "Restoring initially visible buffer %s /file %s from desktop" wind-buf buf-fname)
-        (with-selected-window wind
-          (lazy-restore-buffer-invoke mk-buf-act))
+        (message "Restoring visible buffer '%s' (file '%s') from desktop" wind-buf buf-fname)
+        (with-selected-window wind (lazy-restore-buffer-invoke mk-buf-act))
 
         ;; just in case the restore fails, make sure to clear this dummy buffer and action (so we don't try again)
         (ht-remove! desktop-lazy-restore-pending-buffers buf-fname)
@@ -102,7 +86,8 @@
 
 (advice-add 'create-file-buffer :around #'my-around/create-file-buffer '((depth . -100)))
 (advice-add 'desktop-create-buffer :around #'my-around/desktop-create-buffer)
-(add-hook 'desktop-after-read-hook #'my-after/desktop-read)
+(add-hook 'desktop-after-read-hook #'my/check-restore-any-visible-windows)
+(add-hook 'window-selection-change-functions #'my/check-restore-any-visible-windows)
 
 ;; we need these settings to work properly.
 ;; - must be using eager restore, because we need to create buffers right away.
