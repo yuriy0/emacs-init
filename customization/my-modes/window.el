@@ -86,7 +86,7 @@ the first buffer in the buffer list if `NIL'."
        (wins (list first-win))
        )
     (while (not (equal first-win next-win))
-      (add-to-list 'wins next-win) 
+      (push next-win wins)
       (setq next-win (next-window (car wins))))
     (-filter (-compose 'not 'transitive-bufferp 'window-buffer) (reverse wins))
     ))
