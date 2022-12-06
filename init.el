@@ -127,34 +127,46 @@
       (auto-compile-on-load-mode)
       (auto-compile-on-save-mode)
 
-      (defvar-local my/auto-compile-pending-files nil)
+      (defvar my/auto-compile-pending-files nil)
+      (defcustom auto-compile-background-max-timeslice 0.15 "")
 
-      (defun my/auto-compile-later()
-        (while my/auto-compile-pending-files
-          (-let [(file nosuffix) (pop my/auto-compile-pending-files)]
-            (unless (member file auto-compile--loading)
-              (let ((auto-compile--loading (cons file auto-compile--loading))
-                    byte-compile-verbose el elc el*)
-                (with-demoted-errors (format "Byte compiling '%s' failed: %s" file "%s")
-                  (when (setq el (auto-compile--locate-library file nosuffix))
-                    (setq elc (byte-compile-dest-file el))
-                    (when (not (file-exists-p elc))
-                      (message "Compiling %s..." el)
-                      (auto-compile--byte-compile-file el)
-                      (message "Compiling %s...done" el)
-                      )))
-                ))
+      (defun my/try-byte-compile-file(el)
+        (-let (did-compile)
+          (when (not (member el auto-compile--loading))
+            (let ((auto-compile--loading (cons el auto-compile--loading))
+                  byte-compile-verbose elc)
+              (with-demoted-errors (format "Byte compiling '%s' failed: %s" el "%s")
+                (when (setq elc (byte-compile-dest-file el))
+                  (if (not (file-exists-p elc))
+                      (progn
+                        (message "Compiling %s..." el)
+                        (auto-compile--byte-compile-file el)
+                        (setq did-compile t)
+                        (message "Compiling %s...done" el))
+                    )
+                  ))
+              )
             )
-          )
-        )
+          did-compile
+          ))
 
+      (defun my/auto-compile-later(&optional max-timeslice)
+        ;; (when my/auto-compile-pending-files (message "Idle byte-compiling start, %s to check" (length my/auto-compile-pending-files)))
+        (-let ((t0 (float-time)) (k 0))
+          (while (and my/auto-compile-pending-files
+                      (< (- (float-time) t0) (or max-timeslice auto-compile-background-max-timeslice)))
+            (when (my/try-byte-compile-file (pop my/auto-compile-pending-files))
+              (setq k (+ 1 k))))
+          (when (> k 1) (message "Idle byte-compiling ran for %s seconds and compiled %s files" (- (float-time) t0) k))
+          ))
       (run-with-idle-timer 0.5 t #'my/auto-compile-later)
 
       ;; the auto-compile package explicitly does not byte-compile files on load
       ;; unless they're already byte compiled. This adds the functionality to ALWAYS
       ;; byte compile loaded file
       (defun my/after-auto-compile-on-load (file &optional nosuffix)
-        (push (list file nosuffix) my/auto-compile-pending-files))
+        (when-let (f (auto-compile--locate-library file nosuffix))
+          (push f my/auto-compile-pending-files)))
       (advice-add 'auto-compile-on-load :after #'my/after-auto-compile-on-load)
 
       ;; advise `load-file' in the same was as `load'
