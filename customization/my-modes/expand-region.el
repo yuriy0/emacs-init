@@ -9,7 +9,7 @@
 
   (add-hook
    'after-make-frame-functions
-   (lambda ()
+   (lambda (&optional _frame)
      ;; in TTY frames on Windows Terminal and other terminal emulators,
      ;; some keybinds like `C-=' don't work, so when such a frame is created,
      ;; bind a different key...
