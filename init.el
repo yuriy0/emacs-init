@@ -1,4 +1,4 @@
-;; -*- lexical-binding: t; -*-
+;;; init.el  -*- no-byte-compile: t; lexical-binding: t; -*-
 
 (defvar profiler-emacs-init nil)
 (when profiler-emacs-init
@@ -113,8 +113,57 @@
   gnu-elpa-keyring-update
   load-dir
   quelpa
+  auto-compile
 ))
 (mapc #'package-install-and-require bootstrap-packages)
+
+;; autocompile for lisp files
+;; as per its docs, run this as soon as possible
+(setq load-prefer-newer t)
+(if (require 'auto-compile nil t)
+    (progn
+      (setq auto-compile-display-buffer nil)
+      (setq auto-compile-mode-line-counter t)
+      (auto-compile-on-load-mode)
+      (auto-compile-on-save-mode)
+
+      (defvar-local my/auto-compile-pending-files nil)
+
+      (defun my/auto-compile-later()
+        (while my/auto-compile-pending-files
+          (-let [(file nosuffix) (pop my/auto-compile-pending-files)]
+            (unless (member file auto-compile--loading)
+              (let ((auto-compile--loading (cons file auto-compile--loading))
+                    byte-compile-verbose el elc el*)
+                (with-demoted-errors (format "Byte compiling '%s' failed: %s" file "%s")
+                  (when (setq el (auto-compile--locate-library file nosuffix))
+                    (setq elc (byte-compile-dest-file el))
+                    (when (not (file-exists-p elc))
+                      (message "Compiling %s..." el)
+                      (auto-compile--byte-compile-file el)
+                      (message "Compiling %s...done" el)
+                      )))
+                ))
+            )
+          )
+        )
+
+      (run-with-idle-timer 0.5 t #'my/auto-compile-later)
+
+      ;; the auto-compile package explicitly does not byte-compile files on load
+      ;; unless they're already byte compiled. This adds the functionality to ALWAYS
+      ;; byte compile loaded file
+      (defun my/after-auto-compile-on-load (file &optional nosuffix)
+        (push (list file nosuffix) my/auto-compile-pending-files))
+      (advice-add 'auto-compile-on-load :after #'my/after-auto-compile-on-load)
+
+      ;; advise `load-file' in the same was as `load'
+      (define-advice load-file
+          (:before (file))
+        (when auto-compile-on-load-mode
+          (auto-compile-on-load file t)))
+      )
+  (message "auto-compile not installed"))
 
 ;; bootstrap quelpa-use-package
 (quelpa
@@ -191,6 +240,15 @@
 
 ;; this fails if the window is hidden because the user can't interact...
 ;; (package-autoremove) ;; remove packages which shouldn't be here
+
+;; Display the init time in messages 
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
 
 (when profiler-emacs-init
   (profiler-stop))
