@@ -184,7 +184,7 @@ switched-to tab in either case. Otherwise, return `nil'"
   (or (tab-bar-raise-buffer buffer) (switch-to-buffer buffer)))
 
 
-;;;###autload
+;;;###autoload
 (defun tab-bar-remove-buffers-from-invisible-tabs (buffers &optional silent)
   "Remove `BUFFERS' from the \"buffer list\"s of all other
   tabs, other than the currently visible one."
@@ -213,3 +213,22 @@ switched-to tab in either case. Otherwise, return `nil'"
       )
     )
 )
+
+;;;###autoload
+(defun tab-bar-buffer-list(&optional frame-or-tab)
+  "Returns the buffer list corresponding to the given frame or tab.
+
+The returned buffer list depends on FRAME-OR-TAB:
+- if a frame, the buffer list of the current tab in that frame.
+- if a tab (as produced by tab-bar-tabs), the buffer list of that tab.
+- if nil, the buffer list of the current tab in the current frame."
+  (pcase-exhaustive frame-or-tab
+    ((pred framep)
+     (frame-parameter frame-or-tab 'buffer-list))
+
+    ((or `(current-tab . ,_) `nil)
+     (frame-parameter nil 'buffer-list))
+
+    (`(tab . ,the-tab)
+     (alist-get 'wc-bl the-tab))))
+

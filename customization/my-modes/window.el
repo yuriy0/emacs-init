@@ -39,7 +39,7 @@ N is the number of lines by which moving borders."
 ;; when splitting windows, open a different buffer in the new window
 (defun split-window--new-buffer (do-split &rest do-split-args)
   (interactive)
-  (let* ((buf (nth (length (window-list)) (-filter 'buffer-file-name (buffer-list))))
+  (let* ((buf (nth (length (window-list)) (-filter 'buffer-file-name (tab-bar-buffer-list))))
          (res (apply do-split do-split-args))
          )
     (save-selected-window
