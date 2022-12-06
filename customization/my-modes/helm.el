@@ -151,13 +151,14 @@
    helm-source-lsp-workspace-buffers-list
    (helm-make-buffers-source-filtered
     "LSP Workspace Buffers"
-    (when-let ((lsp-wss (-uniq (--mapcat (lsp-workspace-folders it) (lsp-workspaces)))))
+    (when-let ((lsp-wss (and (fboundp 'lsp-workspaces) (-uniq (--mapcat (lsp-workspace-folders it) (lsp-workspaces))))))
       (lambda(b)
         (when-let ((buf-visiting-fname (buffer-file-name b)))
           (--any (string-prefix-p it buf-visiting-fname) lsp-wss)
           )
         ))
-     ))
+    )
+   )
 
   (helm :sources
         '(helm-source-tab-buffers-list
