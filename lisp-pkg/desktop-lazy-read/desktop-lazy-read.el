@@ -7,10 +7,14 @@
 (require 'window)
 
 (defvar-local desktop-lazy-restore-pending-buffers (ht))
+(defvar-local desktop-lazy-restore-read-desktopfile-completed nil)
 
 (defvar desktop-first-buffer)
 (defvar desktop-buffer-ok-count)
 (defvar desktop-buffer-fail-count)
+
+(defcustom desktop-lazy-restore-completed-hook nil
+  "Hook to run when desktop lazy restoring is completed")
 
 (defun my/get-visible-windows ()
   "Returns windows visibles on current frame."
@@ -82,12 +86,35 @@
         (ht-remove! desktop-lazy-restore-pending-buffers buf-fname)
         )
       )
-    ))
+    )
+
+  ;; if there's no more buffers to restore, remove our hooks
+  (my/desktop-lazy-read-check-fin)
+  )
+
+(defun my/desktop-after-read-hook (&rest _args)
+  (setq desktop-lazy-restore-read-desktopfile-completed t)
+  (my/check-restore-any-visible-windows))
 
 (advice-add 'create-file-buffer :around #'my-around/create-file-buffer '((depth . -100)))
 (advice-add 'desktop-create-buffer :around #'my-around/desktop-create-buffer)
-(add-hook 'desktop-after-read-hook #'my/check-restore-any-visible-windows)
+(add-hook 'desktop-after-read-hook #'my/desktop-after-read-hook)
 (add-hook 'window-selection-change-functions #'my/check-restore-any-visible-windows)
+
+(defun desktop-lazy-ready-completed-p()
+  (and desktop-lazy-restore-read-desktopfile-completed
+       (ht-empty-p desktop-lazy-restore-pending-buffers)))
+
+(defun my/desktop-lazy-read-check-fin()
+  (when (desktop-lazy-ready-completed-p)
+    (message "Desktop lazy read completed; all buffers restored")
+    (advice-remove 'create-file-buffer #'my-around/create-file-buffer)
+    (advice-remove 'desktop-create-buffer #'my-around/desktop-create-buffer)
+    (remove-hook 'desktop-after-read-hook #'my/desktop-after-read-hook)
+    (remove-hook 'window-selection-change-functions #'my/check-restore-any-visible-windows)
+    (setq desktop-lazy-restore-read-desktopfile-completed nil)
+    (run-hooks 'desktop-lazy-restore-completed-hook)
+  ))
 
 ;; we need these settings to work properly.
 ;; - must be using eager restore, because we need to create buffers right away.
