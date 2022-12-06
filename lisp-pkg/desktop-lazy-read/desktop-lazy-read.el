@@ -6,8 +6,8 @@
 (require 'desktop)
 (require 'window)
 
-(defvar-local desktop-lazy-restore-pending-buffers (ht))
-(defvar-local desktop-lazy-restore-read-desktopfile-completed nil)
+(defvar desktop-lazy-restore-pending-buffers (ht))
+(defvar desktop-lazy-restore-read-desktopfile-completed nil)
 
 (defvar desktop-first-buffer)
 (defvar desktop-buffer-ok-count)
@@ -58,15 +58,16 @@
       )))
 
 (defun my-around/create-file-buffer(fn filename)
-  (setq filename (f-canonical filename))
-  (if-let (buf (nth 0 (ht-get desktop-lazy-restore-pending-buffers filename)))
+  (if-let
+      (
+       (filename (f-canonical filename))
+       (buf (nth 0 (ht-get desktop-lazy-restore-pending-buffers filename)))
+       )
       (progn
         (message "Desktop: found buffer '%s' for file '%s'" buf filename)
         (ht-remove! desktop-lazy-restore-pending-buffers filename)
         buf
         )
-    ;; (message "%s" `(funcall ,fn ,filename))
-    (message "Did not find existing buffer to reuse for file %s" filename)
     (funcall fn filename))
   )
 
@@ -79,7 +80,7 @@
          )
       ;; if we have found a corresponding lazy restore buffer for the given window...
       (when buf-fname
-        (message "Restoring visible buffer '%s' (file '%s') from desktop" wind-buf buf-fname)
+        (message "Desktop: restoring visible buffer '%s' (file '%s')" wind-buf buf-fname)
         (with-selected-window wind (lazy-restore-buffer-invoke mk-buf-act))
 
         ;; just in case the restore fails, make sure to clear this dummy buffer and action (so we don't try again)
