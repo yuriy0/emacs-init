@@ -259,6 +259,10 @@ the same window)."
 (global-unset-key (kbd "C-/"))
 (global-unset-key (kbd "C-?"))
 
+;; speeds up redisplay of long lines substantially...
+(setq bidi-inhibit-bpa t)
+(setq bidi-paragraph-direction 'left-to-right)
+
 ;; in tty mode disable the menu bar
 (when (not (display-graphic-p))
   (menu-bar-mode -1))

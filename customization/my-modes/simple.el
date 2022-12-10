@@ -7,8 +7,9 @@
 
   ;; visual line mode
   (diminish 'visual-line-mode)
-  (add-hook 'prog-mode-hook 'visual-line-mode) ;; TODO we really want to use global visual line mode, but it breaks some special modes!
+  ;; (add-hook 'prog-mode-hook 'visual-line-mode) ;; TODO we really want to use global visual line mode, but it breaks some special modes!
   (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+  ;; (setq bidi-display-reordering t)
 
   (advice-add 'pop-global-mark :around #'my/pop-global-mark)
 )
