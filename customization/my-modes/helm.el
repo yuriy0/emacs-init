@@ -240,16 +240,27 @@
    isearch-forward isearch-backward
   )
 
+  :bind
+  (
+   ("C-s" . helm-swoop)
+   ("C-S-s" . helm-multi-swoop-all)
+   )
+
   :config
+   ;; When doing isearch, hand the word over to helm-swoop
+   (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
 
-  ;; When doing isearch, hand the word over to helm-swoop
-  (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+   ;; From helm-swoop to helm-multi-swoop-all
+   (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)
 
-  ;; From helm-swoop to helm-multi-swoop-all
-  (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)
-)
+   ;; disable global isearch-backwards binding
+   (global-unset-key (kbd "C-r"))
 
-  ;; misc.
+  :custom-face
+  (helm-swoop-target-word ((t (:inherit (isearch))))) ;; keep the isearch face...
+  )
+
+;; misc.
 (use-package ac-helm :ensure
   :after (helm))
 (use-package helm-descbinds :ensure
