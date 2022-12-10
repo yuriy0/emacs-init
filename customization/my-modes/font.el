@@ -55,6 +55,50 @@
   :diminish highlight-indent-guides-mode
   :config
 
-  (setq highlight-indent-guides-method 'character)
+  (setq highlight-indent-guides-method 
+        ;; 'character ;; fastest and non intrusive but buggy??
+        'bitmap ;; slower but less buggy
+        )
   (setq highlight-indent-guides-responsive 'stack)
 )
+
+(use-package solaire-mode
+  :ensure
+  :defer 4
+  :diminish
+  :config
+  (solaire-global-mode +1)
+
+  ;; kind of a hack, this package seems to assume that we always use a theme, so
+  ;; configures this variable in advice to load-theme.
+  (setq solaire-mode--supported-p t)
+
+  ;; customization for what is considered a "real" buffer here
+  (defun my/solaire-mode-real-buffer-p()
+    (let*
+        ((buf (current-buffer))
+         (buf-name (buffer-name buf))
+         (base-buf (buffer-base-buffer))
+         (base-buf-file (buffer-file-name base-buf))
+         )
+      (or
+       ;; don't modify minibuffer
+       (minibufferp buf)
+
+       ;; don't modify faces for transient buffers, like helm buffers. they
+       ;; arent file-visiting buffers, but they typically have their own color
+       ;; conventions.
+       (transitive-bufferp buf)
+
+       ;; "scratch" buffer is real (we save it to disk!)
+       (equal buf-name "*scratch*")
+
+       ;; file visiting base buffer is real
+       base-buf-file
+      )))
+  (setq solaire-mode-real-buffer-fn #'my/solaire-mode-real-buffer-p)
+
+  :custom-face
+  (solaire-default-face ((t (:background "grey93"))))
+  ;; (solaire-default-face ((t (:background "orange"))))
+  )
