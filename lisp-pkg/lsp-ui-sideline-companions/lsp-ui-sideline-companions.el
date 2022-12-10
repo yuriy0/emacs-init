@@ -125,6 +125,12 @@ CALLBACK is the status callback passed by Flycheck."
 
 (defvar-local my/lsp-all-buffer-diags nil)
 
+(defface lsp-ui-sideline-companions-subline-base
+  '((t
+     :foreground "black"
+     ))
+  "Face for subline text for companion messages")
+
 (defface lsp-ui-sideline-companions-inline-highlight
   '((t
      :box (:line-width (-1 . -1)
@@ -159,11 +165,14 @@ CALLBACK is the status callback passed by Flycheck."
 
           (base-msg (or override-msg (lsp:diagnostic-message diag)))
           (base-msg (concat "↑" base-msg))
+
           (base-msg-len (length base-msg))
           (ignore
-           (when text-properties
+           (progn
+             (setf (plist-get text-properties 'face) (append (plist-get text-properties 'face) '(lsp-ui-sideline-companions-subline-base italic)))
              (set-text-properties 0 base-msg-len text-properties base-msg)
-             ))
+             )
+           )
 
           (msg (concat
                  (apply 'concat (-repeat char-pos " "))
