@@ -264,5 +264,4 @@ the same window)."
 (setq bidi-paragraph-direction 'left-to-right)
 
 ;; in tty mode disable the menu bar
-(when (not (display-graphic-p))
-  (menu-bar-mode -1))
+(add-hook 'tty-setup-hook (lambda() (menu-bar-mode -1)))
