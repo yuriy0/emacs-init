@@ -64,6 +64,9 @@
   ;; enable repeat mode in tab-bar mode
   (add-hook 'tab-bar-mode-hook #'repeat-mode)
 
+  ;; custom behaviour for frameset-save (work in progress, currently broken?)
+  ;; (advice-add 'frameset-filter-tabs :around #'my/frameset-filter-tabs)
+
   :custom-face
   (tab-bar-tab ((t (:box (:line-width (1 . 1) :color "#cce8ff" :style released-button) :background "#e5f3ff" :inherit tab-bar))))
   (tab-bar-tab-inactive ((t (:box (:line-width (1 . 1) :style released-button) :background "grey75" :inherit tab-bar-tab))))
@@ -232,3 +235,42 @@ The returned buffer list depends on FRAME-OR-TAB:
     (`(tab . ,the-tab)
      (alist-get 'wc-bl the-tab))))
 
+;;;###autoload
+(defun my/tab-buffer-to-name(buf)
+  (cond
+   ((bufferp buf) (when (buffer-file-name buf) (buffer-name buf)))
+   ((stringp buf) buf)
+   (t nil)))
+
+;;;###autoload
+(defun my/tab-name-to-buffer(buf-name)
+  (cond
+   ((stringp buf-name) (get-buffer buf-name))
+   ((bufferp buf-name buf-name))
+   (t nil)))
+
+;;;###autoload
+(defun my/frameset-filter-tabs (base-fn current _filtered _parameters saving)
+  (-let ((current (funcall base-fn current _filtered _parameters saving))
+         (modify-tab-fn (if saving #'my/tab-buffer-to-name #'my/tab-name-to-buffer))
+         )
+
+    ;; tab frameset data looks like `(tabs . ((tab ...) (tab ...)))'
+    (pcase current
+        (`(tabs . ,tabs) ;; = tabs = `((tab ...) (tab ...))'
+         (cons 'tabs
+         (--map ;; it = `(tab ... (wc-bl . <x>) ...)'
+          (progn
+            (setq it (copy-sequence it)) ;; Caution: these cons are SHARED with the live `tab-bar' data!
+            (modf-v (alist-get 'wc-bl it) tab-bl ;; tab-bl = `<x> (listp)'
+                    ;; (message "tab-bl(%s) = %s" (alist-get 'name it) tab-bl)
+                    (-map modify-tab-fn tab-bl))
+            it
+           )
+           tabs
+           ))
+         )
+      (t current)
+      )
+    )
+)
