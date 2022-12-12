@@ -21,7 +21,9 @@
         ("<left>" . tab-previous)
         ("<right>" . tab-next)
         ("C-<left>" . tab-bar-move-tab-backward)
-        ("C-<right>" . tab-move))
+        ("C-<right>" . tab-move)
+        ("T" . tab-bar-switch-to-tab-move-buffer)
+        )
 
   :config
 
@@ -274,3 +276,34 @@ The returned buffer list depends on FRAME-OR-TAB:
       )
     )
 )
+
+;;;###autoload
+(defun tab-bar-switch-to-tab-move-buffer (name)
+  "Same as `tab-bar-switch-to-tab', except it also raises the current buffer in the new tab
+and buries it in the previous tab"
+  (interactive
+   (let* ((recent-tabs (mapcar (lambda (tab)
+                                 (alist-get 'name tab))
+                               (tab-bar--tabs-recent))))
+     (list (completing-read (format-prompt "Switch to tab by name"
+                                           (car recent-tabs))
+                            recent-tabs nil nil nil nil recent-tabs))))
+  (let* ((tabs (funcall tab-bar-tabs-function))
+         (from-index (tab-bar--current-tab-index tabs))
+         (tab-number (1+ (or (tab-bar--tab-index-by-name name) 0)))
+         (to-number (cond ((< tab-number 0) (+ (length tabs) (1+ tab-number)))
+                          ((zerop tab-number) (1+ from-index))
+                          (t tab-number)))
+         (to-index (1- (max 1 (min to-number (length tabs)))))
+         (start-buf (current-buffer))
+        )
+    (if (= from-index to-index)
+        (message "Not changing tabs; already on the target tab")
+      (bury-buffer)
+      (tab-bar-select-tab tab-number)
+      (switch-to-buffer start-buf)
+      (tab-bar-remove-buffers-from-invisible-tabs (list start-buf))
+      )
+    )
+  )
+
