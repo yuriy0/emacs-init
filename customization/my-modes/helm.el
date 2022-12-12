@@ -228,12 +228,18 @@
   :config
   (setq helm-ag-base-command "ag --vimgrep --no-color")
   (setq helm-ag-fuzzy-match t)
+  (setq helm-ag-insert-at-point 'symbol)
 
   (set-face-attribute 'helm-grep-finish nil
                       :foreground "MediumSeaGreen"
                       :weight 'bold
                       :width 'expanded
                       )
+
+  ;; make helm-ag-project-root respect the LSP workspace location
+  (define-advice helm-ag--project-root
+      (:around (fn) my)
+    (or (car (get-lsp-workspaces)) (funcall fn)))
 )
 
 (use-package helm-swoop
@@ -246,9 +252,13 @@
   )
 
   :bind
-  (
-   ("C-s" . helm-swoop)
+  (("C-s" . helm-swoop)
    ("C-S-s" . helm-multi-swoop-all)
+
+   ;; isearch like keybinds
+   :map helm-swoop-map
+   ("C-s" . helm-swoop-next-line)
+   ("C-r" . helm-swoop-previous-line)
    )
 
   :config
@@ -262,7 +272,7 @@
    (global-unset-key (kbd "C-r"))
 
   :custom-face
-  (helm-swoop-target-word ((t (:inherit (isearch))))) ;; keep the isearch face...
+  (helm-swoop-target-word-face ((t (:background "medium sea green"))))
   )
 
 ;; misc.
