@@ -159,7 +159,7 @@
               (setq k (+ 1 k))))
           (when (> k 1) (message "Idle byte-compiling ran for %s seconds and compiled %s files" (- (float-time) t0) k))
           ))
-      (run-with-idle-timer 0.5 t #'my/auto-compile-later)
+      ;; (run-with-idle-timer 0.5 t #'my/auto-compile-later)
 
       ;; the auto-compile package explicitly does not byte-compile files on load
       ;; unless they're already byte compiled. This adds the functionality to ALWAYS
@@ -167,13 +167,13 @@
       (defun my/after-auto-compile-on-load (file &optional nosuffix)
         (when-let (f (auto-compile--locate-library file nosuffix))
           (push f my/auto-compile-pending-files)))
-      (advice-add 'auto-compile-on-load :after #'my/after-auto-compile-on-load)
+      ;; (advice-add 'auto-compile-on-load :after #'my/after-auto-compile-on-load)
 
       ;; advise `load-file' in the same was as `load'
-      (define-advice load-file
-          (:before (file))
+      (defun my/before-load-file (file)
         (when auto-compile-on-load-mode
           (auto-compile-on-load file t)))
+      ;; (advice-add 'load-file :before #'my/before-load-file)
       )
   (message "auto-compile not installed"))
 
