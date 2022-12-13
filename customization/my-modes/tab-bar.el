@@ -67,7 +67,7 @@
   (add-hook 'tab-bar-mode-hook #'repeat-mode)
 
   ;; custom behaviour for frameset-save (work in progress, currently broken?)
-  ;; (advice-add 'frameset-filter-tabs :around #'my/frameset-filter-tabs)
+  (advice-add 'frameset-filter-tabs :around #'my/frameset-filter-tabs)
 
   :custom-face
   (tab-bar-tab ((t (:box (:line-width (1 . 1) :color "#cce8ff" :style released-button) :background "#e5f3ff" :inherit tab-bar))))
@@ -255,10 +255,17 @@ The returned buffer list depends on FRAME-OR-TAB:
    (t nil)))
 
 ;;;###autoload
+(defun copy-sequence-rec (x)
+  (cond
+   ((consp x) (cons (copy-sequence-rec (car x)) (copy-sequence-rec (cdr x))))
+   (t x)
+  ))
+
+;;;###autoload
 (defun my/frameset-filter-tabs (base-fn current _filtered _parameters saving)
-  (-let ((current (funcall base-fn current _filtered _parameters saving))
-         (modify-tab-fn (if saving #'my/tab-buffer-to-name #'my/tab-name-to-buffer))
-         )
+  (-let (
+         (current (copy-sequence-rec current)) ;; Caution: these cons are SHARED with the live `tab-bar' data, so we clone them
+         (modify-tab-fn (if saving #'my/tab-buffer-to-name #'my/tab-name-to-buffer)))
 
     ;; tab frameset data looks like `(tabs . ((tab ...) (tab ...)))'
     (pcase current
@@ -266,12 +273,25 @@ The returned buffer list depends on FRAME-OR-TAB:
          (cons 'tabs
          (--map ;; it = `(tab ... (wc-bl . <x>) ...)'
           (progn
-            (setq it (copy-sequence it)) ;; Caution: these cons are SHARED with the live `tab-bar' data!
-            (modf-v (alist-get 'wc-bl it) tab-bl ;; tab-bl = `<x> (listp)'
-                    ;; (message "tab-bl(%s) = %s" (alist-get 'name it) tab-bl)
-                    (-map modify-tab-fn tab-bl))
-            it
-           )
+            (when (and (consp it) (eq (car it) 'tab))
+              ;; note that tab-bar-mode relies on `tab' or `current-tab' being
+              ;; the `car' of each tab, however none of the alist methods will
+              ;; preserve this (in fact, the tab data technically isn't even a
+              ;; valid alist, the fact that this works is a happy accident!)
+              (setq it (cdr it))
+
+              (modf-v (alist-get 'wc-bl it) tab-bl ;; tab-bl = `<x> (listp)'
+                      (-keep modify-tab-fn tab-bl))
+
+              ;; these are unprintable so we remove them
+              (-each
+                  '(wc wc-point wc-bbl
+                       wc-history-back wc-history-forward)
+                (lambda(sym) (setf (alist-get sym it) nil)))
+
+              (setq it (cons 'tab it))
+              )
+            it)
            tabs
            ))
          )
