@@ -96,18 +96,20 @@ information for the current tab as well"
   (->> tab
        (alist-get 'ws)
        window-state-buffers
-       (mapcar #'get-buffer)))
+       (mapcar #'get-buffer)
+       -distinct))
 
 ;;;###autoload
 (defun tab-bar-raise-buffer-score (desired-buf tab tabindex)
   (let ((tab-visible-bufs (tab-bar-tab-visible-buffers tab))
         (tab-buf-list (alist-get 'wc-bl tab))
+        (is-current-tab (memq 'current-tab tab))
         (desired-buf-ix-in-tab-buf-list)
         )
     (cond
      ;; pick tabs where the desired buffer is visible
      ((memq desired-buf tab-visible-bufs)
-      (if (alist-get 'is-current tab)
+      (if is-current-tab
           ;; if its the current tab, then switch focus to the window which already displays it
            (list 0 0)
 
@@ -119,10 +121,11 @@ information for the current tab as well"
 
      ;; otherwise prefer tabs whose local buffer-list property contains the
      ;; desired buffer; this may be multiple tabs so we score by the position
-     ;; in the buffer list
+     ;; in the buffer list, but preferring always keeping the current tab,
+     ;; even if another tab has the buffer higher in its buffer list
      ((setq desired-buf-ix-in-tab-buf-list
             (-elem-index desired-buf tab-buf-list))
-       (list 2 desired-buf-ix-in-tab-buf-list)
+       (list 2 (if is-current-tab 0 1) desired-buf-ix-in-tab-buf-list)
       )
 
      ;; otherwise we can't raise this buffer in a tab
