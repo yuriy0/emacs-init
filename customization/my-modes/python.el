@@ -34,4 +34,16 @@
   (add-to-list 'auto-mode-alist
      '("[\\/]wscript\\'" . python-mode)
   )
+
+  (defvar python-mode-repeat-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "<") #'python-indent-shift-left)
+      (define-key map (kbd ">") #'python-indent-shift-right)
+      map))
+
+  (with-eval-after-load 'hercules (hercules-def
+   :show-funs '(python-indent-shift-left python-indent-shift-right)
+   :keymap 'python-mode-repeat-map
+   :transient t
+   :flatten t))
 )

@@ -24,15 +24,15 @@ N is the number of lines by which moving borders."
 	       windresize-increment)))
       (windresize-down i t)))
 
-  ;; disabled because buggy...
-  ;; (with-eval-after-load 'hercules
-  ;;   (hercules-def
-  ;;    :show-funs 'windresize
-  ;;    :hide-funs '(windresize-exit windresize-cancel-and-quit)
-  ;;    :keymap 'windresize-map
-  ;;    :transient t
-  ;;    )
-  ;;   )
+  (global-set-key (kbd "C-c C-w") #'windresize)
+
+  (with-eval-after-load 'hercules
+    (hercules-def
+     :show-funs 'windresize
+     :hide-funs '(windresize-exit windresize-cancel-and-quit)
+     :keymap 'windresize-map
+     )
+    )
   )
 
 
