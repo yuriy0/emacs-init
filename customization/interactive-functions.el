@@ -405,13 +405,32 @@ current buffer."
     )))
 
 (defun lexographic< (a b)
-  (if (and (listp a) (listp b))
-      (every 'lexographic< a b)
-    (< a b)
-    ))
+  (pcase (list a b)
+    (`((,a0 . ,as) (,b0 . ,bs))
+     (cond
+      ((lexographic< a0 b0) t) ;; lt
+      ((lexographic< b0 a0) nil) ;; gt
+      (t (lexographic< as bs))
+      )
+     )
+
+    (`(nil nil)
+     nil) ;;eq
+
+    (`(nil ,_)
+     t) ;;lt
+
+    (`(,_ nil)
+     nil) ;;gt
+
+    (t (< a b)) ;;not two lists
+    )
+)
 
 (defun -sort-by-key (compare keyfn seq)
-  (cl-stable-sort seq compare :key keyfn))
+  ;; (cl-stable-sort seq compare :key keyfn)
+  (-sort (lambda(x y) (funcall compare (funcall keyfn x) (funcall keyfn y))) seq)
+)
 
 
 (defmacro override-fun-nonrecursive (orignm overridenm &rest body)
