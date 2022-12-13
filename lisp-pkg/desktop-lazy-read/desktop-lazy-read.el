@@ -62,10 +62,11 @@
       )))
 
 (defun my-around/create-file-buffer(fn filename)
-  (if-let
+  (if-let*
       (
        (filename (f-canonical filename))
        (buf (nth 0 (ht-get desktop-lazy-restore-pending-buffers filename)))
+       (buf-valid (buffer-live-p buf)) ;; the user may kill the buffer before its restored
        )
       (progn
         (message "Desktop: found buffer '%s' for file '%s'" buf filename)
