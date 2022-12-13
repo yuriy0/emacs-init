@@ -4,7 +4,7 @@
   :commands (persp-mode)
 
   :hook
-  (persp-mode . #'persp-mode-setup-advice)
+  (persp-mode . persp-mode-setup-advice)
 
   :custom
   (persp-lighter

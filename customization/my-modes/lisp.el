@@ -46,8 +46,8 @@
   :diminish
   :disabled
   :hook
-  ((emacs-lisp-mode . #'enable-paredit-mode)
-   (lisp-interaction-mode-hook . #'enable-paredit-mode)
+  ((emacs-lisp-mode . enable-paredit-mode)
+   (lisp-interaction-mode-hook . enable-paredit-mode)
    )
 
   :bind
