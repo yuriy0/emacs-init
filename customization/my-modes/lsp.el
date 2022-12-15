@@ -242,3 +242,10 @@
               (lsp-ui-sideline-companions-mode (if lsp-ui-sideline-mode 1 -1)))
             )
 )
+
+(use-package lsp-preview-text-edits
+  :after (lsp-mode)
+  :load-path "lisp-pkg/lsp-preview-text-edits"
+  :config
+
+  (lsp-preview-text-edits-mode))
