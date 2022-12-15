@@ -299,6 +299,10 @@
 
 (use-package helm-flycheck
   :after (:all helm flycheck)
-  :disabled ;; not very pretty...
+  :bind
+  (:map flycheck-mode-map
+  ("C-c C-c @" . 'helm-flycheck)
+  )
+
   :config
 )
