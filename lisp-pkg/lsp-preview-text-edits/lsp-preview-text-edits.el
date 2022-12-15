@@ -260,7 +260,7 @@ within the body of these functions."
        it #'my-around/perhaps-lsp-will-edit-text))
 
     ;; add advice to all new values
-    (when lsp-preview-text-edits-mode
+    (when (and (boundp 'lsp-preview-text-edits-mode) lsp-preview-text-edits-mode)
       (--each val
         (advice-add
          it :around #'my-around/perhaps-lsp-will-edit-text))
