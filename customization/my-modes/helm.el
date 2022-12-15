@@ -287,8 +287,15 @@
 )
 (use-package helm-tramp :ensure
   :after (helm))
+
 (use-package helm-lsp :ensure
-  :after (helm lsp-mode))
+  :after (helm lsp-mode)
+
+  :bind
+  (:map lsp-mode-map
+        ("C-c C-c f" . helm-lsp-workspace-symbol)
+        )
+)
 
 (use-package helm-flycheck
   :after (:all helm flycheck)
