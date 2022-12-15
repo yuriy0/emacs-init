@@ -63,9 +63,6 @@
   ;; custom behaviour for display-buffer-in-tab
   (advice-add 'display-buffer-in-tab :around #'my/display-buffer-in-tab)
 
-  ;; enable repeat mode in tab-bar mode
-  (add-hook 'tab-bar-mode-hook #'repeat-mode)
-
   ;; custom behaviour for frameset-save (work in progress, currently broken?)
   (advice-add 'frameset-filter-tabs :around #'my/frameset-filter-tabs)
 

@@ -26,6 +26,8 @@
      company-pseudo-tooltip-unless-just-one-frontend
      company-preview-if-just-one-frontend))
 
+  :hook ((company-mode . yas-minor-mode))
+
   :bind
 
   ;; explicit completion
