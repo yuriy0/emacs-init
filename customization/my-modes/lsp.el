@@ -3,6 +3,10 @@
 (use-package lsp-mode
   :ensure
   :commands (lsp lsp-deferred)
+
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+
   :custom
 
   ;;"lens" = count references to symbols
