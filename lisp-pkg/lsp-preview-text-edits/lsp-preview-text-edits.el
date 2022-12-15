@@ -240,12 +240,32 @@ automated LSP server text edit requests)."
   '(lsp--execute-code-action
     lsp--before-save
     lsp-format-buffer
-    lsp-rename)
-  "When `lsp-preview-text-edits-mode' is enabled, these symbols are automatically
-advised to handle any LSP text edits generated within the body of these functions."
+    lsp-rename
+    lsp-format-region
+    )
+  "When `lsp-preview-text-edits-mode' is enabled, these symbols are
+automatically advised to handle any LSP text edits generated
+within the body of these functions."
 
   :type
   '(repeat symbol)
+
+  :set
+  (lambda(sym val)
+    (set-default sym val)
+
+    ;; remove advice from all previous values
+    (--each val
+      (advice-remove
+       it #'my-around/perhaps-lsp-will-edit-text))
+
+    ;; add advice to all new values
+    (when lsp-preview-text-edits-mode
+      (--each val
+        (advice-add
+         it :around #'my-around/perhaps-lsp-will-edit-text))
+      )
+    )
 )
 
 (defun my/advice-add-or-remove(add-or-remove symbol where function &optional props)
@@ -263,7 +283,7 @@ the changes. "
   :keymap lsp-preview-text-edits-mode-map
 
   (--each lsp-preview-text-edits-perhaps-will-edit
-     (advice-add-or-remove
+     (my/advice-add-or-remove
       lsp-preview-text-edits-mode
       it :around #'my-around/perhaps-lsp-will-edit-text))
 )
@@ -306,6 +326,7 @@ gives you the chance to reject them."
 
 (create-lsp-with-preview-text-edits-command lsp-execute-code-action)
 (create-lsp-with-preview-text-edits-command lsp-format-buffer)
+(create-lsp-with-preview-text-edits-command lsp-format-region)
 (create-lsp-with-preview-text-edits-command lsp-rename)
 
 ;;; helm compat
