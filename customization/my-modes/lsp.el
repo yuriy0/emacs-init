@@ -79,6 +79,7 @@
         ("M-j" . #'lsp-treemacs-symbols)
         ("C-c C-c a" . #'lsp-execute-code-action)
         ("C-c C-c y" . #'lsp-ui-flycheck-list)
+        ("C-c C-c g" . #'lsp-ui-doc-show)
 
         ;; standard xref jump using lsp-ui instead
         (([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
