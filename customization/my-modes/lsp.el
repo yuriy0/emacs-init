@@ -43,7 +43,7 @@
   ;; auto start lsp-ui
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
 
-  (lsp-enable-which-key-integration t)
+  (with-eval-after-load 'which-key (lsp-enable-which-key-integration t))
 
   ;; fixes a bug in windows, where paths are case-insensitive so the canonical form
   ;; should be case-normalized
