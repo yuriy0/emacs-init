@@ -294,6 +294,7 @@
   :bind
   (:map lsp-mode-map
         ("C-c C-c f" . helm-lsp-workspace-symbol)
+        ([remap lsp-execute-code-action] . helm-lsp-code-actions)
         )
 )
 

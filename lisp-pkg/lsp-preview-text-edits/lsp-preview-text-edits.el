@@ -126,6 +126,10 @@ automated LSP server text edit requests)."
 
 (defvar lsp-preview-text-edits-inhibit nil)
 
+(defmacro with-inhibiting-lsp-preview-text-edits (&rest body)
+  "Within the scope of BODY, never produce LSP text edit previews"
+  `(let ((lsp-preview-text-edits-inhibit t)) ,@body))
+
 (defun my-around/lsp--apply-text-edits (fn edits &optional operation)
   (if (and my/lsp-inside-previewing
            (or (eq lsp-preview-text-edits-captured-text-edit-type 'all)
@@ -155,9 +159,7 @@ automated LSP server text edit requests)."
       ;; initiated an LSP edit command during another LSP edit command. however
       ;; we need to handle this whenever we advise a function with this wrapper,
       ;; and then call that function explicitly with the wrapper elsewhere
-      (message "previewer: re-entered")
-      (apply fn args)
-      )
+      (apply fn args))
 
      ;; explicitly skip preview in some context
      (lsp-preview-text-edits-inhibit
@@ -220,59 +222,98 @@ automated LSP server text edit requests)."
 (defvar my/lsp-text-edit-active-preview nil)
 
 (defun lsp-text-edit-switch-active-preview (&optional new-preview)
+  "Remove the current active preview and set the new active preview to the given one"
   (interactive)
   (when my/lsp-text-edit-active-preview
     (with-demoted-errors "Failed to remove old LSP text edit preview %s"
       (funcall my/lsp-text-edit-active-preview)))
   (setq my/lsp-text-edit-active-preview new-preview))
 
+(defalias 'lsp-text-edit-hide-active-preview 'lsp-text-edit-switch-active-preview)
+
 (defvar lsp-preview-text-edits-mode-map
   (let ((map (make-sparse-keymap)))
     map)
   "")
 
+(defcustom lsp-preview-text-edits-perhaps-will-edit
+  '(lsp--execute-code-action
+    lsp--before-save
+    lsp-format-buffer
+    lsp-rename)
+  "When `lsp-preview-text-edits-mode' is enabled, these symbols are automatically
+advised to handle any LSP text edits generated within the body of these functions."
+
+  :type
+  '(repeat symbol)
+)
+
+(defun my/advice-add-or-remove(add-or-remove symbol where function &optional props)
+  (if add-or-remove
+      (advice-add symbol where function props)
+    (advice-remove symbol function)))
+
 (define-minor-mode lsp-preview-text-edits-mode
   "When this global minor mode is enabled, LSP commands which
-modify text within the "
+modify text within the current buffer offer a preview before
+those modifications are applied, with the opportunity to reject
+the changes. "
   :init-value nil
   :global t
   :keymap lsp-preview-text-edits-mode-map
-  (cond
-   (lsp-preview-text-edits-mode
-    ;; enable
-    (advice-add 'lsp--apply-text-edits :around #'my-around/lsp--apply-text-edits)
-    (advice-add 'lsp--execute-code-action :around #'my-around/perhaps-lsp-will-edit-text)
-    (advice-add 'lsp--before-save :around #'my-around/perhaps-lsp-will-edit-text)
-    (advice-add 'lsp-format-buffer :around #'my-around/perhaps-lsp-will-edit-text)
-    (advice-add 'lsp-rename :around #'my-around/perhaps-lsp-will-edit-text)
-    )
-   (t
-    ;; disable
-    (advice-remove 'lsp--apply-text-edits #'my-around/lsp--apply-text-edits)
-    (advice-remove 'lsp--execute-code-action #'my-around/perhaps-lsp-will-edit-text)
-    (advice-remove 'lsp--before-save #'my-around/perhaps-lsp-will-edit-text)
-    (advice-remove 'lsp-format-buffer #'my-around/perhaps-lsp-will-edit-text)
-    (advice-remove 'lsp-rename #'my-around/perhaps-lsp-will-edit-text)
-    )
-   )
+
+  (--each lsp-preview-text-edits-perhaps-will-edit
+     (advice-add-or-remove
+      lsp-preview-text-edits-mode
+      it :around #'my-around/perhaps-lsp-will-edit-text))
 )
 
 (defun lsp-preview-text-edits-mode-toggle()
   (interactive)
   (lsp-preview-text-edits-mode 'toggle))
 
-(defun lsp-execute-code-action-with-preview()
-  (interactive)
-  (my-around/preview-lsp-edit-text
-   (lambda()
-     (call-interactively 'lsp-execute-code-action))))
+(advice-add 'lsp--apply-text-edits :around #'my-around/lsp--apply-text-edits)
+
+(defmacro create-lsp-with-preview-text-edits-command(funsymbol)
+  (let*
+      ((funsymbol-str (symbol-name funsymbol))
+       (funsymbol-quoted (list 'quote funsymbol))
+       (fun-commandp (commandp funsymbol))
+       (with-preview-docstring
+        (format "Behaves like '%s' except that if that command would \
+produce text edits from LSP, shows a preview of those edits and \
+gives you the chance to reject them."
+                funsymbol-str)
+        )
+       )
+    `(progn
+       (defun ,(intern (concat funsymbol-str "-with-preview"))
+           ,(if fun-commandp () `(&rest args))
+         ,with-preview-docstring
+         ,@(if fun-commandp
+               `((interactive)
+                 (my-around/perhaps-lsp-will-edit-text
+                  (lambda()
+                    (call-interactively ,funsymbol-quoted))))
+             `((my-around/perhaps-lsp-will-edit-text
+                (lambda()
+                  (apply ,funsymbol-quoted args))))
+             )
+         )
+       )
+    )
+  )
+
+(create-lsp-with-preview-text-edits-command lsp-execute-code-action)
+(create-lsp-with-preview-text-edits-command lsp-format-buffer)
+(create-lsp-with-preview-text-edits-command lsp-rename)
 
 ;;; helm compat
 (with-eval-after-load 'helm-lsp
   (defvar my/helm-lsp-code-actions-preview-actions
     `(("Execute code action" .
        ,(lambda(candidate)
-          (let ((lsp-preview-text-edits-inhibit t))
+          (with-inhibiting-lsp-preview-text-edits
             (lsp-execute-code-action (plist-get candidate :data)))
          )
        )))
