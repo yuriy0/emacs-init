@@ -32,6 +32,14 @@
       (funcall act))
     ))
 
+(defun my/uniquify-do-rename-buffer (buff filename)
+  (if (and (boundp 'uniquify-buffer-name-style)
+           uniquify-buffer-name-style)
+      (let ((filename (expand-file-name (directory-file-name filename))))
+	(uniquify-rationalize-file-buffer-names
+	 (file-name-nondirectory filename)
+         (file-name-directory filename) buff))))
+
 (defun my-around/desktop-create-buffer
     (fn
      file-version
@@ -52,7 +60,9 @@
 
         ;; mark the dummy buffer as such
         (with-current-buffer buf
-          (desktop-deferred-load-mode))
+          (desktop-deferred-load-mode)
+          (setq-local list-buffers-directory buffer-filename))
+        (my/uniquify-do-rename-buffer buf buffer-filename)
 
         ;; save our dummy buffer for later...
         (message "Desktop: created dummy buffer '%s' for file '%s'" buf buffer-filename)
@@ -159,6 +169,15 @@ dialogues which would display the mode of the buffer")
   (add-hook 'desktop-lazy-restore-completed-hook
             (lambda() (advice-remove 'helm-buffer--details #'my/around-helm-buffer--details)))
 )
+
+(with-eval-after-load 'uniquify
+  ;; this causes uniquify to look at `list-buffers-directory' instead of
+  ;; `buffer-file-name' when determining if a buffer is visiting a file.  we
+  ;; need this because settings buffer-file-name would cause the empty dummy
+  ;; buffers to overwrite the actual file contents.
+  (add-to-list 'uniquify-list-buffers-directory-modes
+               'desktop-deferred-load-mode)
+  )
 
 ;; we need these settings to work properly.
 ;; - must be using eager restore, because we need to create buffers right away.
