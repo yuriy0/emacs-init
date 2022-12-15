@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
+(defvar helm-buffers-maybe-switch-to-tab)
+
 (use-package helm
   :ensure
   :autoload (find-file-create-if-nonexistant)
