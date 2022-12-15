@@ -4,6 +4,10 @@
   :ensure
   :commands (windresize)
   :defer t
+
+  :init
+  (global-set-key (kbd "C-c C-w") #'windresize)
+
   :config
 
   ;;replaces these two functions which are bugged upstream
@@ -24,15 +28,13 @@ N is the number of lines by which moving borders."
 	       windresize-increment)))
       (windresize-down i t)))
 
-  (global-set-key (kbd "C-c C-w") #'windresize)
-
-  (with-eval-after-load 'hercules
-    (hercules-def
-     :show-funs 'windresize
-     :hide-funs '(windresize-exit windresize-cancel-and-quit)
-     :keymap 'windresize-map
-     )
-    )
+  ;; (with-eval-after-load 'hercules
+  ;;   (hercules-def
+  ;;    :show-funs 'windresize
+  ;;    :hide-funs '(windresize-exit windresize-cancel-and-quit)
+  ;;    :keymap 'windresize-map
+  ;;    )
+  ;;   )
   )
 
 
