@@ -2,6 +2,7 @@
 
 (require 'lsp-mode)
 (require 'dash)
+(require 'cl-lib)
 
 (defface lsp-preview-text-edit-remove-text
   '((t (:strike-through "RoyalBlue4")))
@@ -50,7 +51,7 @@ automated LSP server text edit requests)."
 
 (defun my/symbol-name-safe(sym)
   (cond ((symbolp sym) (symbol-name sym))
-        (t nil)))
+        (t sym)))
 
 (defun my/make-closure-for-text-edit-operation(fn &rest args)
   (let*
@@ -123,10 +124,13 @@ automated LSP server text edit requests)."
        )
 )
 
+(defvar lsp-preview-text-edits-inhibit nil)
+
 (defun my-around/lsp--apply-text-edits (fn edits &optional operation)
   (if (and my/lsp-inside-previewing
            (or (eq lsp-preview-text-edits-captured-text-edit-type 'all)
                (memq operation lsp-preview-text-edits-captured-text-edit-type))
+           (not lsp-preview-text-edits-inhibit)
            )
       ;; create some overlays, save them for later deletion
       ;; and append the real action to be taken later
@@ -134,7 +138,6 @@ automated LSP server text edit requests)."
         (setq my/lsp-previewing-text-edit-overlays
               (append my/lsp-previewing-text-edit-overlays
                       (my/lsp-preview-text-edits (copy-sequence edits))))
-        (message "saving %s edits for later..." (length edits))
         (my/make-closure-for-text-edit-operation
          fn edits operation)
         )
@@ -143,51 +146,85 @@ automated LSP server text edit requests)."
     )
 )
 
-(defun my-around/perhaps-lsp-will-edit-text(fn &rest args)
-  (if my/lsp-inside-previewing
-      ;; this is non-rentrant, although we could make it so with little effort,
-      ;; this probably wouldn't make sense as then the user is applying/rejecting
-      ;; multiple different changes? instead we error out
-      (error "command '%s' was used while already previewing another LSP edit command '%s'"
-             (my/symbol-name-safe fn)
-             (my/symbol-name-safe my/lsp-inside-previewing))
-    (let*
-        ((my/lsp-previewing-text-edit-overlays nil)
-         (my/lsp-previewing-text-edit-actions nil)
-         (result)
-         )
-      (unwind-protect
-          (progn
-
-            ;; in the scope where the above variables are set, we except this function
-            ;; to create the preview and save the actions for later
-            (let ((my/lsp-inside-previewing fn))
-              (setq result
-                    (apply fn args)))
-
-            (cond
-             ;; if there is anything to preview, ask the user if they want to keep these changes
-             (my/lsp-previewing-text-edit-overlays
-              (let ((apply-edits (y-or-n-p "Apply edits?")))
-                (when apply-edits
-                  (-each my/lsp-previewing-text-edit-actions #'funcall))
-                )
-              )
-
-             ;; if there is nothing to preview just execute any pending actions
-             (my/lsp-previewing-text-edit-actions
-              (-each my/lsp-previewing-text-edit-actions #'funcall))
-             )
-            )
-
-        ;; always clear the overlays
-        (-each my/lsp-previewing-text-edit-overlays #'delete-overlay)
+(cl-defun my-around/create-lsp-edit-text-previewer (&key preview-only)
+  (lambda (fn &rest args)
+    (cond
+     (my/lsp-inside-previewing
+      ;; when re-entering don't do anything special, just call the wrapped
+      ;; function.  this would typically be a very unusual case - the user
+      ;; initiated an LSP edit command during another LSP edit command. however
+      ;; we need to handle this whenever we advise a function with this wrapper,
+      ;; and then call that function explicitly with the wrapper elsewhere
+      (message "previewer: re-entered")
+      (apply fn args)
       )
 
-      result ;; this almost certainly isn't reliable anyways
+     ;; explicitly skip preview in some context
+     (lsp-preview-text-edits-inhibit
+      (apply fn args))
+
+     (t (let*
+            ((my/lsp-previewing-text-edit-overlays nil)
+             (my/lsp-previewing-text-edit-actions nil)
+             (result)
+             )
+          (unwind-protect
+              (progn
+
+                ;; in the scope where the above variables are set, we except this function
+                ;; to create the preview and save the actions for later
+                (let ((my/lsp-inside-previewing fn))
+                  (setq result
+                        (apply fn args)))
+
+                (when (not preview-only)
+                  (cond
+                   ;; if there is anything to preview, ask the user if they want to keep these changes
+                   (my/lsp-previewing-text-edit-overlays
+                    (let ((apply-edits (y-or-n-p "Apply edits?")))
+                      (when apply-edits
+                        (-each my/lsp-previewing-text-edit-actions #'funcall))
+                      )
+                    )
+
+                   ;; if there is nothing to preview just execute any pending actions
+                   (my/lsp-previewing-text-edit-actions
+                    (-each my/lsp-previewing-text-edit-actions #'funcall))
+                   )
+                  )
+                )
+
+            ;; always clear the overlays when we used y-or-n-p
+            ;; to determine whether to apply
+            (when (not preview-only)
+              (-each my/lsp-previewing-text-edit-overlays #'delete-overlay))
+            )
+
+          ;; return a function which removes the overlay preview
+          (when preview-only
+            (-partial
+             #'-each my/lsp-previewing-text-edit-overlays #'delete-overlay)
+            )
+          )
+        )
       )
     )
 )
+
+(defalias 'my-around/perhaps-lsp-will-edit-text
+  (my-around/create-lsp-edit-text-previewer :preview-only nil))
+
+(defalias 'my-around/preview-lsp-edit-text
+  (my-around/create-lsp-edit-text-previewer :preview-only t))
+
+(defvar my/lsp-text-edit-active-preview nil)
+
+(defun lsp-text-edit-switch-active-preview (&optional new-preview)
+  (interactive)
+  (when my/lsp-text-edit-active-preview
+    (with-demoted-errors "Failed to remove old LSP text edit preview %s"
+      (funcall my/lsp-text-edit-active-preview)))
+  (setq my/lsp-text-edit-active-preview new-preview))
 
 (defvar lsp-preview-text-edits-mode-map
   (let ((map (make-sparse-keymap)))
@@ -223,5 +260,70 @@ modify text within the "
 (defun lsp-preview-text-edits-mode-toggle()
   (interactive)
   (lsp-preview-text-edits-mode 'toggle))
+
+(defun lsp-execute-code-action-with-preview()
+  (interactive)
+  (my-around/preview-lsp-edit-text
+   (lambda()
+     (call-interactively 'lsp-execute-code-action))))
+
+;;; helm compat
+(with-eval-after-load 'helm-lsp
+  (defvar my/helm-lsp-code-actions-preview-actions
+    `(("Execute code action" .
+       ,(lambda(candidate)
+          (let ((lsp-preview-text-edits-inhibit t))
+            (lsp-execute-code-action (plist-get candidate :data)))
+         )
+       )))
+
+  (defun my/helm-lsp-code-action-preview-candidate(candidate)
+    (interactive)
+    (setq candidate (plist-get candidate :data))
+    (->> candidate
+         (my-around/preview-lsp-edit-text #'lsp-execute-code-action)
+         lsp-text-edit-switch-active-preview))
+
+  (defvar my/helm-lsp-code-actions-preview-persistent-action
+    '(my/helm-lsp-code-action-preview-candidate . never-split))
+
+  (defun my/helm-lsp-code-actions-preview-make-source(actions)
+    (helm-build-sync-source
+        "Code Actions (With Preview)"
+      :candidates actions
+      :candidate-transformer
+      (lambda (candidates)
+        (-map
+         (-lambda ((candidate &as
+                              &CodeAction :title))
+           (list title :data candidate))
+         candidates))
+      :action my/helm-lsp-code-actions-preview-actions
+      :persistent-action 'my/helm-lsp-code-action-preview-candidate
+      :cleanup #'lsp-text-edit-switch-active-preview
+      ))
+
+  ;; this is copied from `helm-lsp-code-actions' except that we replace the
+  ;; `:sources' argument to `helm'
+  (defun helm-lsp-code-actions-with-preview()
+    "Show lsp code actions using helm."
+    (interactive)
+    (let ((actions (lsp-code-actions-at-point)))
+      (cond
+       ((seq-empty-p actions) (signal 'lsp-no-code-actions nil))
+       ((and (eq (seq-length actions) 1) lsp-auto-execute-action)
+        (lsp-execute-code-action (lsp-seq-first actions)))
+       (t (helm :sources
+                (my/helm-lsp-code-actions-preview-make-source actions))))))
+
+  ;; there really isn't a good place to hook into to provide a new action to the
+  ;; helm-lsp-code-actions source, so we just replace it entirely
+  (add-hook 'lsp-preview-text-edits-mode-hook
+            (lambda()
+              (if lsp-preview-text-edits-mode
+                  (advice-add 'helm-lsp-code-actions :override #'helm-lsp-code-actions-with-preview)
+                (advice-remove 'helm-lsp-code-actions #'helm-lsp-code-actions-with-preview))))
+
+)
 
 (provide 'lsp-preview-text-edits)
