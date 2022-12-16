@@ -4,7 +4,23 @@
 
 (use-package all-the-icons
   :ensure
-  :if (display-graphic-p))
+  :defer t ;; note: loading this only if making a GUI frame
+
+  :init
+  (add-hook-once
+   'after-make-frame-functions
+   (lambda (&optional _frame)
+     (when (display-graphic-p)
+       (require 'all-the-icons)
+       t)))
+
+  (setq all-the-icons-scale-factor 1.0)
+  (custom-set-variables
+   '(all-the-icons-scale-factor 1.0))
+
+  :config
+  (setq all-the-icons-scale-factor 1.0)
+)
 
 ;; fixes an issue with emacs hanging when viewing some unicode files
 ;; see https://github.com/purcell/emacs.d/issues/273

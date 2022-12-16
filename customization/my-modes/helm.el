@@ -1,6 +1,32 @@
 ;; -*- lexical-binding: t; -*-
 
 (defvar helm-buffers-maybe-switch-to-tab)
+(defvar all-the-icons-scale-factor)
+
+(use-package helm-all-the-icons
+  :defer t
+  :after (all-the-icons)
+  :quelpa
+  ((helm-all-the-icons
+    :fetcher github
+    :repo "merrickluo/helm-all-the-icons"))
+
+  :config
+  (setq helm-all-the-icons-separator " "
+        helm-all-the-icons-prefix " "
+        helm-all-the-icons-properties '(:height 0.93 :v-adjust -0.1))
+
+  (define-advice helm-all-the-icons--get-icon
+      (:override (for param) my-around)
+    (with-demoted-errors "failed to get icon %s"
+      (-if-let*
+          ((icon-func (intern (concat "all-the-icons-icon-for-" (symbol-name for))))
+           (res (apply icon-func param helm-all-the-icons-properties))
+           )
+          (when (sequencep res) res))))
+
+  (helm-all-the-icons-enable)
+)
 
 (use-package helm
   :ensure
@@ -27,6 +53,10 @@
    )
 
   :config
+  ;; helm-icons works by advising helm-create-source, and some types of sources
+  ;; are created only once and cached forever, so we have to load this very early
+  (require 'helm-all-the-icons)
+
   (helm-mode 1)
   (helm-autoresize-mode t)
   (helm-adaptive-mode t)

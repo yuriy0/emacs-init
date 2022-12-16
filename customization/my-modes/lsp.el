@@ -92,6 +92,7 @@
   (lsp-ui-doc-enable nil)
   (lsp-ui-sideline-show-hover nil)
   (lsp-ui-sideline-show-diagnostics t)
+  (lsp-ui-doc-show-with-mouse nil) ;; causes massive flicker on the taskbar, even when no keybinds/handlers registered?
 
   :config
 
