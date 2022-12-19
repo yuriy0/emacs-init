@@ -135,6 +135,9 @@ preview would require a user confirmation/prompt")
   "Within the scope of BODY, never produce LSP text edit previews"
   `(let ((lsp-preview-text-edits-inhibit t)) ,@body))
 
+(defun my-around/with-inhibiting-lsp-preview-text-edits (fn &rest args)
+  (with-inhibiting-lsp-preview-text-edits (apply fn args)))
+
 (defun my-around/lsp--apply-text-edits (fn edits &optional operation)
   (if (and my/lsp-inside-previewing
            (or (eq lsp-preview-text-edits-captured-text-edit-type 'all)
@@ -243,6 +246,24 @@ preview would require a user confirmation/prompt")
     map)
   "")
 
+(defmacro my/advised-symbols-list-custom-setter
+    (enable-when where function &optional props)
+  `(lambda(sym val)
+    ;; remove advice from all previous values
+    (--each (and (boundp sym) (default-value sym))
+      (advice-remove
+       it ,function))
+
+    (set-default sym val)
+
+    ;; add advice to all new values
+    (when ,enable-when
+      (--each val
+        (advice-add
+         it ,where ,function ,props))
+      ))
+  )
+
 (defcustom lsp-preview-text-edits-perhaps-will-edit
   '(lsp--execute-code-action
     lsp--before-save
@@ -259,12 +280,12 @@ within the body of these functions."
 
   :set
   (lambda(sym val)
-    (set-default sym val)
-
     ;; remove advice from all previous values
-    (--each val
+    (--each (and (boundp sym) (default-value sym))
       (advice-remove
        it #'my-around/perhaps-lsp-will-edit-text))
+    
+    (set-default sym val)
 
     ;; add advice to all new values
     (when (and (boundp 'lsp-preview-text-edits-mode) lsp-preview-text-edits-mode)
@@ -274,6 +295,30 @@ within the body of these functions."
       )
     )
 )
+
+
+(defcustom lsp-never-preview-text-edits
+  '(indent-region)
+  "Within the body of these functions, never try to preview text
+edits."
+
+  :type
+  '(repeat symbol)
+
+  :set
+  (lambda(sym val)
+    ;; remove advice from all previous values
+    (--each (and (boundp sym) (default-value sym))
+      (advice-remove
+       it #'my-around/with-inhibiting-lsp-preview-text-edits))
+
+    (set-default sym val)
+
+    ;; add advice to all new values
+    (--each val
+      (advice-add
+       it :around #'my-around/with-inhibiting-lsp-preview-text-edits)))
+  )
 
 (defun my/advice-add-or-remove(add-or-remove symbol where function &optional props)
   (if add-or-remove
