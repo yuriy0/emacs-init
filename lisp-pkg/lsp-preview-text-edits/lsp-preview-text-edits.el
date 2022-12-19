@@ -45,6 +45,11 @@ automated LSP server text edit requests)."
      ))
 )
 
+(defcustom lsp-preview-text-edits-previewing-allowed-predicates nil
+  "Irregular hook run to determine if previewing is allowed in some context.
+This is passed one parameter, which is non-nil exactly when the
+preview would require a user confirmation/prompt")
+
 (defvar my/lsp-previewing-text-edit-overlays nil)
 (defvar my/lsp-previewing-text-edit-actions nil)
 (defvar my/lsp-inside-previewing nil)
@@ -162,7 +167,9 @@ automated LSP server text edit requests)."
       (apply fn args))
 
      ;; explicitly skip preview in some context
-     (lsp-preview-text-edits-inhibit
+     ((or lsp-preview-text-edits-inhibit
+          (not (run-hook-with-args-until-failure
+                'lsp-preview-text-edits-previewing-allowed-predicates preview-only)))
       (apply fn args))
 
      (t (let*
@@ -386,6 +393,17 @@ gives you the chance to reject them."
                   (advice-add 'helm-lsp-code-actions :override #'helm-lsp-code-actions-with-preview)
                 (advice-remove 'helm-lsp-code-actions #'helm-lsp-code-actions-with-preview))))
 
+  (add-hook 'lsp-preview-text-edits-previewing-allowed-predicates
+            (lambda(preview-only)
+              (if preview-only
+                  ;; always allowed previewing without prompt
+                  t
+
+                ;; when there might be a prompt, disallow previewing if helm is
+                ;; active this is not technically wrong, since helm allows the
+                ;; minibuffer read during helm modes, but is potentially
+                ;; confusing as helm actions don't typically have confirmations.
+                (not helm-alive-p))))
 )
 
 (provide 'lsp-preview-text-edits)
