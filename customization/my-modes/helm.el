@@ -3,6 +3,7 @@
 (defvar helm-buffers-maybe-switch-to-tab)
 (defvar all-the-icons-scale-factor)
 
+
 (use-package helm-all-the-icons
   :defer t
   :after (all-the-icons)
@@ -12,9 +13,13 @@
     :repo "merrickluo/helm-all-the-icons"))
 
   :config
-  (setq helm-all-the-icons-separator " "
-        helm-all-the-icons-prefix " "
-        helm-all-the-icons-properties '(:height 0.93 :v-adjust -0.1))
+  (defun left-align-to-mm(i)
+    (propertize " " 'display `(space :align-to (+ left-fringe (,i . mm)))))
+
+  (setq
+   helm-all-the-icons-separator (left-align-to-mm 10)
+   helm-all-the-icons-prefix (left-align-to-mm 4)
+   helm-all-the-icons-properties '(:height 0.93 :v-adjust -0.1))
 
   (define-advice helm-all-the-icons--get-icon
       (:override (for param) my-around)
