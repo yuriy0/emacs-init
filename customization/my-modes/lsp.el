@@ -250,4 +250,8 @@
   :load-path "lisp-pkg/lsp-preview-text-edits"
   :config
 
-  (lsp-preview-text-edits-mode))
+  (lsp-preview-text-edits-mode)
+
+  (with-eval-after-load 'helm-lsp
+    (advice-add 'helm-lsp-code-actions :override #'helm-lsp-code-actions-with-preview))
+)
