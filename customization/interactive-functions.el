@@ -485,6 +485,7 @@ value produced by `ARGS'"
         (progn ,@body)
         ))))
 
+;;;###autoload
 (defun shell-command-with-stdin (cmd stdin)
   "Call a shell command and pipe the given string to the standard
 input of the process. This is exactly like
@@ -512,3 +513,31 @@ Returns a list `(ERRORCODE STDOUTANDERR)'"
          )
     )
   )
+
+(defmacro if-with-rate-limit (rate func then &rest else)
+  "Eval THEN forms if the symbol FUNC has **not** been passed to this
+  function for RATE seconds; otherwise eval ELSE form"
+  `(let ((last-called (get ,func 'last-called-time))
+        (tnow (float-time)))
+    (if (or (not last-called)
+            (< (+ last-called ,rate) tnow))
+        (progn
+          (put ,func 'last-called-time tnow)
+          ,then
+          )
+      ,@else))
+)
+
+;;;###autoload
+(defun add-lines-to-point(buffer point lines-to-add)
+  (save-current-buffer
+    (when buffer (set-buffer buffer))
+    (save-excursion
+      (goto-char point)
+      (line-move lines-to-add t)
+      (point))))
+
+;;;###autoload
+(defun expand-position-range-by-lines(buffer a b more)
+  (list (add-lines-to-point buffer a (- more))
+        (add-lines-to-point buffer b more)))
