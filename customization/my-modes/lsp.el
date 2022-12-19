@@ -231,7 +231,31 @@
                                   (if (require 'lsp-treemacs nil t) #'lsp-treemacs-errors-list #'lsp-ui-flycheck-list))
                       ))))
 
-  (advice-add 'lsp-modeline-diagnostics-statistics :override #'my--lsp-modeline-diagnostics-statistics))
+  (advice-add 'lsp-modeline-diagnostics-statistics :override #'my--lsp-modeline-diagnostics-statistics)
+
+  ;; fixes `lsp-diagnostic-stats' having totally broken values...
+  (defun sub-stats (a b) (cl-map 'vector #'- a b))
+  (lsp-defun my--lsp--on-diagnostics-update-stats (workspace
+                                               (&PublishDiagnosticsParams :uri :diagnostics))
+    (let*
+        ((path (lsp--fix-path-casing (lsp--uri-to-path uri)))
+         (prev-stats (or (lsp-diagnostics-stats-for path) (make-vector 5 0)))
+         (new-stats
+          (sub-stats
+           (let ((v (make-vector 5 0)))
+            (mapc (-lambda ((&Diagnostic :severity?))
+              (cl-incf (aref v (or severity? 1))))
+            diagnostics)
+            v)
+           prev-stats)
+          )
+         )
+      (lsp-diagnostics--update-path path new-stats)
+      (while (not (string= path (setf path (file-name-directory
+                                            (directory-file-name path)))))
+        (lsp-diagnostics--update-path path new-stats))))
+  (advice-add 'lsp--on-diagnostics-update-stats :override #'my--lsp--on-diagnostics-update-stats)
+)
 
 
 (use-package lsp-ui-sideline-companions
