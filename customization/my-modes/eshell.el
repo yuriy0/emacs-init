@@ -1,27 +1,30 @@
-;; eshell
+;; eshell  -*- lexical-binding: t; -*-
+
 (use-package eshell
   :ensure
   :commands (eshell eshell-mode eshell-command)
 
-  :bind
-  (:map eshell-mode-map
-   ("M-]" . 'helm-eshell-history)
-   ("M-/" . 'helm-esh-pcomplete)
-   ("C-w" . kill-region)
-   )
-
-  (:map eshell-rebind-mode-map
-   ("C-c l" . eshell-lock-local-map))
-
   :config
-  ;; just for *Help*
-  (mapc #'require '(em-alias em-banner em-basic em-cmpl em-dirs
-                             em-glob em-hist em-ls em-prompt em-rebind em-script
-                             em-smart em-term em-tramp em-unix em-xtra esh-arg esh-cmd
-                             esh-ext esh-groups esh-io esh-mode esh-module esh-opt
-                             esh-proc esh-util esh-var eshell))
+  ;; load eshell modules
+  (mapc #'require
+        '(helm-eshell
+          esh-mode
+          em-prompt
+          em-rebind ;; change localmap based on whether the cursor is in the command area
+          em-hist ;; provides command history
+          em-cmpl ;; provides completions
+          ))
 
-  (require 'helm-eshell)
+  ;; customize keybinds
+  ;; we don't use use-package for these because it ends up loading too much eagerly
+  (bind-keys
+   :map eshell-mode-map
+   ("M-]" . helm-eshell-history)
+   ("M-/" . helm-esh-pcomplete)
+   ("C-w" . kill-region)
+
+   :map eshell-rebind-mode-map
+   ("C-c l" . eshell-lock-local-map))
 
   ;; modules
   (add-to-list 'eshell-modules-list 'eshell-rebind)
