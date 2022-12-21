@@ -30,6 +30,9 @@
   ;; (lsp-rust-analyzer-diagnostics-disabled [])
 
   :config
+  ;; its possible that lsp-mode is required before this file is loaded
+  ;; in which case the prefix keymap is set with the wrong binding
+  (define-key lsp-mode-map (kbd lsp-keymap-prefix) lsp-command-map)
 
   ;; uncomment for less flashiness
   ;; (setq lsp-eldoc-hook nil)
