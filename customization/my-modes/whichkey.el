@@ -15,4 +15,30 @@
         )
 
   (define-key global-map (kbd "C-h /") 'which-key-show-major-mode)
+
+  ;; adds some extra formatting to keybinds which are displaed by whichkey
+  (define-advice which-key--format-and-replace
+      (:around (fn &rest args) extra-formatting)
+    (let ((r (apply fn args)))
+      (cl-map 'list (lambda(formatted unformatted)
+                      (cond
+                       ;; (cdr unformatted) is a string with special meaning
+                       ;; based on the type of command keybind. see
+                       ;; `which-key--get-keymap-bindings-1'
+                       ((equal (cdr unformatted) "nil")
+
+                        ;; this is a menu-item whose :filter property returned nil
+                        ;; (the nil gets stringified via symbol-name)
+                        (list
+                         (add-strikethrough (nth 0 formatted))
+                         (nth 1 formatted)
+                         (concat (add-strikethrough (nth 2 formatted)) " ")
+                         ))
+
+                       ;; default: return unchanged
+                       (t
+                        formatted))
+                      )
+              r
+              (car args))))
 )
