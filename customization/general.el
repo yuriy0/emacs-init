@@ -146,14 +146,6 @@ If the new path's directories does not exist, create them."
 ;; tabs are EVIL 
 (setq-default indent-tabs-mode nil)
 
-;; window {un/re}do
-(let ((map (make-sparse-keymap)))
-  (progn
-      (define-key map (kbd "C-c ,") 'winner-undo)
-      (define-key map (kbd "C-c .") 'winner-redo)
-      (setq winner-mode-map map)))
-(winner-mode t)
-
 ;; who needs this...
 (fset 'find-file-read-only 'find-file)
 

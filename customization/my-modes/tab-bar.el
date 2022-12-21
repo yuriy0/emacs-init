@@ -7,6 +7,14 @@
              tab-bar-switch-to-next-tab
              tab-bar-switch-to-prev-tab)
 
+  :init
+  ;; for some reason tab-bar doesn't actually define this???  it must be defined
+  ;; before requiring tab-bar so that the minor mode correctly registers this as
+  ;; its keymap.
+  (defvar tab-bar-history-mode-map
+    (make-sparse-keymap)
+    "Keymap for tab-bar-history-mode")
+
   :bind
 
   ;; bindings for tab switching left/right and tab re-ordering left/right
@@ -58,7 +66,16 @@
 
   ;; use tab bar mode
   (tab-bar-mode +1)
+
+  ;; tab bar history mode
   (tab-bar-history-mode +1)
+
+  ;; bindings for tab bar history mode
+  ;; TODO add display string????
+  ;; TODO more repeat mode functionality for tab bar?
+  (bind-keys-repeating tab-bar-history-mode-map nil "C-c"
+    ("," . tab-bar-history-back)
+    ("." . tab-bar-history-forward))
 
   ;; custom behaviour for display-buffer-in-tab
   (advice-add 'display-buffer-in-tab :around #'my/display-buffer-in-tab)

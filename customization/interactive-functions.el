@@ -541,3 +541,31 @@ Returns a list `(ERRORCODE STDOUTANDERR)'"
 (defun expand-position-range-by-lines(buffer a b more)
   (list (add-lines-to-point buffer a (- more))
         (add-lines-to-point buffer b more)))
+
+
+;;;###autoload
+(defun make-repeat-map-symbol-default(sym)
+  (let* ((nm (symbol-name sym))
+         (nm-parts (s-split "-map" nm))
+         )
+    (intern
+     (concat
+      (pcase nm-parts
+        (`(,pref "") pref)
+        (_ nm))
+      "-repeat-map"))))
+
+(defun make-prefixed-keybinds (prefix args)
+  (mapcar (-lambda ((key . fun)) (cons (concat prefix " " key) fun)) args))
+
+(defmacro bind-keys-repeating (map repeat-map_ prefix &rest args)
+  (declare (indent 3))
+  (let ((repeat-map_ (or repeat-map_ (make-repeat-map-symbol-default map)))
+        (binds (make-prefixed-keybinds prefix args))
+        )
+    `(bind-keys :map ,map
+                 ,@binds
+                 :repeat-map ,repeat-map_
+                 ,@args)
+     ))
+
