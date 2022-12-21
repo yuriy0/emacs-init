@@ -202,7 +202,13 @@
                (format
                 "%d:%s"
                 (line-number-at-pos) (marker-buffer marker))
-               (- helm-mark-ring-all-max-marker-location-length 1))
+                ;; note: minus 2 because we have an extra ":" character, and
+                ;; also the elipse is 2 characters wide, despite being a single
+                ;; logical character
+               (- helm-mark-ring-all-max-marker-location-length 2)
+               nil nil
+               "\u2026" ;; unicode elipse
+               )
               'face '(italic underline))
 
              ;; when NOT showing context, insert alignment so that buffer
