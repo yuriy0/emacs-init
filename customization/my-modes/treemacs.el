@@ -59,6 +59,7 @@
 )
 
 (use-package treemacs-tab-bar
+  :disabled ;; this somehow massively breaks LSP mode - switching tabs disconnects the LSP server?????
   :after (treemacs)
   :ensure t
 
