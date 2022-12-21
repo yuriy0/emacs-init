@@ -432,26 +432,36 @@ current buffer."
   (-sort (lambda(x y) (funcall compare (funcall keyfn x) (funcall keyfn y))) seq)
 )
 
-
 (defmacro override-fun-nonrecursive (orignm overridenm &rest body)
   "Within the scope of BODY, the function symbol `originm' will in fact refer to `overridenm',
 except that if the function `overridenm' actually calls the
 function symbol `originm', that second (recursive) call will
 invoke the original function."
   (declare (indent defun))
-  `(let ((inside-inner nil)
-         (original (symbol-function (quote ,orignm)))
-         )
+  `(let* ((inside-inner 0)
+          (original (symbol-function (quote ,orignm)))
+          (overridesfn
+           (lambda (&rest innerargs)
+             (cl-letf
+                 (
+                  ((symbol-function (quote ,orignm)) original)
+                  )
+               (apply ,(cond
+                        ((symbolp overridenm)
+                         `(function ,overridenm))
+                        ((functionp overridenm)
+                         overridenm)
+                        (t
+                         (error "expecting functionp, got %S" overridenm))
+                        )
+                      innerargs)
+               )
+             )
+           )
+          )
      (cl-letf
          (
-          ((symbol-function (quote ,orignm))
-           (lambda (&rest innerargs)
-             (if inside-inner
-                 (apply original innerargs)
-               (let ((inside-inner t))
-                 (apply (function ,overridenm) innerargs)
-                 ))
-             ))
+          ((symbol-function (quote ,orignm)) overridesfn)
           )
        (progn ,@body)
        )
