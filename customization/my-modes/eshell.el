@@ -6,7 +6,9 @@
   :bind
   (:map eshell-mode-map
    ("M-]" . 'helm-eshell-history)
-   ("M-/" . 'helm-esh-pcomplete))
+   ("M-/" . 'helm-esh-pcomplete)
+   ("C-w" . kill-region)
+   )
 
   (:map eshell-rebind-mode-map
    ("C-c l" . eshell-lock-local-map))
@@ -55,6 +57,7 @@
             (defun my/eshell-mode-hook()
               (eshell-cmpl-initialize)
               (push-mark) ;; adds point in ehsell to mark ring
+              (setenv "TERM" "xterm-256color") ;; used for xterm-color
               ))
 
   ;; customize prompt
@@ -64,8 +67,15 @@
         sp (abbreviate-file-name (eshell/pwd)) "\n"
         sp (if (= (user-uid) 0) "#" "$") " ")) ))
 
-
   (advice-add 'eshell :override #'my--eshell)
+
+  ;; ansi colors in eshell via xterm-color
+  (require 'xterm-color)
+  (add-hook 'eshell-before-prompt-hook
+            (lambda ()
+              (setq xterm-color-preserve-properties t)))
+  (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+  (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
 )
 
 ;; copied almost verbatim from eshell.el (***). The behaviour which is

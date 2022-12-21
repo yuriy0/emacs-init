@@ -607,3 +607,9 @@ the left fringe. See 'Pixel Specification for Spaces' for details."
                                                    amount
                                                    )
                                                 ))))
+
+
+(defun remove-region-read-only (begin end)
+  (interactive "r")
+  (let ((inhibit-read-only t))
+    (remove-text-properties begin end '(read-only t))))
