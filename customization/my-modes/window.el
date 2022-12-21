@@ -165,3 +165,5 @@ as a string."
       (if did-quit nil res)))
   )
 
+;; when creating popup frame, set a frame parameter to lable them as such
+(add-to-list 'pop-up-frame-alist '(popup . t))

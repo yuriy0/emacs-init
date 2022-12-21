@@ -83,6 +83,13 @@
   ;; custom behaviour for frameset-save (work in progress, currently broken?)
   (advice-add 'frameset-filter-tabs :around #'my/frameset-filter-tabs)
 
+  ;; when creating a popup frame, disable tab bar there
+  (add-hook 'after-make-frame-functions
+            (defun my/tab-bar-after-make-frame-functions(fr)
+              (when (frame-parameter fr 'popup)
+                (toggle-frame-tab-bar fr))
+              ))
+
   :custom-face
   (tab-bar-tab ((t (:box (:line-width (1 . 1) :color "#cce8ff" :style released-button) :background "#e5f3ff" :inherit tab-bar))))
   (tab-bar-tab-inactive ((t (:box (:line-width (1 . 1) :style released-button) :background "grey75" :inherit tab-bar-tab))))
