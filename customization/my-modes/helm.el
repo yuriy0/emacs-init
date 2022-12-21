@@ -6,7 +6,6 @@
 
 (use-package helm-all-the-icons
   :defer t
-  :after (all-the-icons)
   :quelpa
   ((helm-all-the-icons
     :fetcher github
@@ -452,8 +451,11 @@
   )
 
 ;; misc.
-(use-package ac-helm :ensure
+(use-package ac-helm
+  :ensure
+  :disabled ;; made obsolete by company?
   :after (helm))
+
 (use-package helm-descbinds :ensure
   :after (helm)
   :config
