@@ -5,6 +5,7 @@
 (require 'f)
 (require 'desktop)
 (require 'window)
+(require 'cl)
 
 (defvar desktop-lazy-restore-pending-buffers (ht))
 (defvar desktop-lazy-restore-read-desktopfile-completed nil)
@@ -40,6 +41,15 @@
 	 (file-name-nondirectory filename)
          (file-name-directory filename) buff))))
 
+(cl-defstruct desktop-lazy-buffer
+  dummy-buffer
+  restore-function)
+
+(defun my/find-desktop-lazy-restore-pending-buffer (the-buf)
+  (ht-find
+   (-lambda(_ info) (eq (desktop-lazy-buffer-dummy-buffer info) the-buf))
+   desktop-lazy-restore-pending-buffers))
+
 (defun my-around/desktop-create-buffer
     (fn
      file-version
@@ -67,7 +77,8 @@
         ;; save our dummy buffer for later...
         (message "Desktop: created dummy buffer '%s' for file '%s'" buf buffer-filename)
         (ht-set! desktop-lazy-restore-pending-buffers (f-canonical buffer-filename)
-                 (list buf do-it))
+                 (make-desktop-lazy-buffer :dummy-buffer buf
+                                           :restore-function do-it))
         )
       )))
 
@@ -75,7 +86,7 @@
   (if-let*
       (
        (filename (f-canonical filename))
-       (buf (nth 0 (ht-get desktop-lazy-restore-pending-buffers filename)))
+       (buf (desktop-lazy-buffer-dummy-buffer (ht-get desktop-lazy-restore-pending-buffers filename)))
        (buf-valid (buffer-live-p buf)) ;; the user may kill the buffer before its restored
        )
       (progn
@@ -91,7 +102,8 @@
   (dolist (wind (my/get-visible-windows))
     (-let*
         ((wind-buf (window-buffer wind))
-         ((buf-fname (_ mk-buf-act)) (ht-find (-lambda(_ (b _)) (eq b wind-buf)) desktop-lazy-restore-pending-buffers))
+         ((buf-fname buf-info) (my/find-desktop-lazy-restore-pending-buffer wind-buf))
+         (mk-buf-act (desktop-lazy-buffer-restore-function buf-info))
          )
       ;; if we have found a corresponding lazy restore buffer for the given window...
       (when buf-fname
@@ -148,7 +160,7 @@ dialogues which would display the mode of the buffer")
 
   (defun my/around-helm-buffer--details (fn bufnm &optional details)
     (if-let ((buf (get-buffer bufnm))
-             (lazy-restore-buf (ht-find (-lambda(_ (b _)) (equal b buf)) desktop-lazy-restore-pending-buffers))
+             (lazy-restore-buf (my/find-desktop-lazy-restore-pending-buffer buf))
              )
         (helm-buffer--show-details
          bufnm ; name
