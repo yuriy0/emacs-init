@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (use-package which-key
   :ensure
   :defer 10 ;; which-key mainly functions by an idle timer so we have no good way to determine when this is needed
@@ -45,4 +47,54 @@
                       )
               r
               (car args))))
+
+  ;; makes it easier to advise this function via letf...
+  (advice-add 'which-key--create-pages :filter-return
+              (defun my/which-key--create-pages(pages-obj)
+                pages-obj
+                ))
+
+  (with-eval-after-load 'repeat
+    ;; taken from https://karthinks.com/software/it-bears-repeating/
+    ;;
+    ;; Disable the built-in repeat-mode hinting, instead spawn a which-key popup
+    ;; when repeat mode activates.
+    (defvar which-key-side-window-location)
+    (defvar which-key-side-window-max-height)
+
+    (setq repeat-echo-function #'ignore)
+    (defun repeat-help--which-key-popup ()
+      (if-let ((should-activate repeat-in-progress)
+               (cmd (or this-command real-this-command))
+               (keymap (or repeat-map (repeat--command-property 'repeat-map))))
+          (run-at-time
+           0 nil
+           (lambda ()
+             (cl-letf
+                 (
+                  ;; override configuration of which-key temporarily: show at
+                  ;; bottom with a smaller window than normal; and add some text
+                  ;; indicating that we're in repeat mode to the title area of
+                  ;; the repeat mode buffer
+                  (which-key-side-window-location 'bottom)
+                  (which-key-side-window-max-height 0.1)
+                  ((symbol-function 'my/which-key--create-pages)
+                   (lambda (pages-obj)
+                     (if pages-obj
+                         (modf-v (which-key--pages-prefix-title pages-obj) title
+                                 (concat "Repeating... " title)
+                                 ))
+                     pages-obj
+                     ))
+                  )
+               (which-key--create-buffer-and-show
+                nil (symbol-value keymap))
+               )
+             )
+           )
+        (which-key--hide-popup)))
+    (advice-add 'repeat-post-hook :after #'repeat-help--which-key-popup)
+  )
 )
+
+
