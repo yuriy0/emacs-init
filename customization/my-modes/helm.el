@@ -132,6 +132,32 @@
 
   ;; helm mark ring & global mark ring actions which raise the buffer in its current tab
   ;; TODO
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; helm M-x toggle option to show only keybound commands
+  (defvar helm-M-x-show-only-with-keybinds nil)
+
+  (defun helm-M-x-toggle-show-only-with-keybinds ()
+    "Toggle showing only commands with active keybinds in helm-M-x."
+    (interactive)
+    (modf helm-M-x-show-only-with-keybinds not)
+
+    ;; taken from helm-M-x-toggle-short-doc, unclear what these parameters actually mean...
+    (helm-force-update (concat "^" (helm-get-selection)) (helm-get-current-source)))
+  (put 'helm-M-x-toggle-show-only-with-keybinds 'no-helm-mx t)
+
+  (defun my/command-has-keybind(cand)
+    ;; kind of hacky but uses the same method as helm for consistency
+    (not (string-match "^M-x" (substitute-command-keys (format "\\[%s]" cand)))))
+
+  (define-advice helm-M-x-transformer-1
+      (:around (fn candidates &rest args) my)
+    (when helm-M-x-show-only-with-keybinds
+      (setq candidates (-filter #'my/command-has-keybind candidates)))
+    (apply fn candidates args))
+
+  (bind-keys :map helm-M-x-map
+             ("C-b" . helm-M-x-toggle-show-only-with-keybinds))
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 )
 
 (defvar helm-source-tab-buffers-list nil)
