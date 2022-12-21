@@ -3,10 +3,15 @@
   :ensure
   :commands (eshell eshell-mode eshell-command)
 
+  :bind
+  (:map eshell-mode-map
+   ("M-]" . 'helm-eshell-history)
+   ("M-/" . 'helm-esh-pcomplete))
+
+  (:map eshell-rebind-mode-map
+   ("C-c l" . eshell-lock-local-map))
+
   :config
-
-  (message "use-package eshell")
-
   ;; just for *Help*
   (mapc #'require '(em-alias em-banner em-basic em-cmpl em-dirs
                              em-glob em-hist em-ls em-prompt em-rebind em-script
@@ -23,34 +28,38 @@
 
   ;; don't rebind <up> and <down> as history scroll keys
   (setq eshell-hist-rebind-keys-alist
-        (--remove (member (car it) '([up] [down])) 
+        (--remove (member (car it) '([up] [down]))
                   eshell-hist-rebind-keys-alist))
 
+  ;; don't rebind some keys...
+  (setq eshell-rebind-keys-alist
+        (--remove (member (car it)
+                          '([home] [backspace] [delete]))
+                  eshell-rebind-keys-alist))
+
+  ;; additional keybinds which move point but should not move into the prompt string
+  (many 1 (lambda (c) (add-to-list 'eshell-cannot-leave-input-list c))
+        'left-char
+        'right-char
+        'move-beginning-of-line
+        )
+
+  ;; prompt colour
+  (set-face-attribute 'eshell-prompt nil :foreground "chartreuse4")
+
+  ;; ignore case in completions
+  (setq eshell-cmpl-ignore-case t)
+
   ;; customization of eshell
-  (add-hook 'eshell-mode-hook 
-            (lambda () 
-              ;; ignore case in completions
-              (setq eshell-cmpl-ignore-case t)
+  (add-hook 'eshell-mode-hook
+            (defun my/eshell-mode-hook()
               (eshell-cmpl-initialize)
-              ;; prompt colour
-              (set-face-attribute 'eshell-prompt nil :foreground "chartreuse4")
-              (push-mark) ;; ??
-              ;; custom keybindings
-              (define-keys eshell-mode-map 
-                (kbd "M-]") 'helm-eshell-history
-                [remap eshell-pcomplete] 'helm-esh-pcomplete
-                (kbd "<home>") 'eshell-bol
-                )
-              ;; left and right cannot move into the prompt string
-              (many 1 (lambda (c) (add-to-list 'eshell-cannot-leave-input-list c))
-                    'left-char 
-                    'right-char
-                    )
+              (push-mark) ;; adds point in ehsell to mark ring
               ))
 
   ;; customize prompt
   (setq eshell-prompt-function #'(lambda ()
-     (let ((sp (propertize " " 'face '(:background "#fff"))))
+     (let ((sp (propertize " " 'face 'solaire-default-face)))
        (concat
         sp (abbreviate-file-name (eshell/pwd)) "\n"
         sp (if (= (user-uid) 0) "#" "$") " ")) ))
