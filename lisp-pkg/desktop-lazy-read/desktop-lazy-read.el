@@ -43,7 +43,8 @@
 
 (cl-defstruct desktop-lazy-buffer
   dummy-buffer
-  restore-function)
+  restore-function
+  create-params)
 
 (defun my/find-desktop-lazy-restore-pending-buffer (the-buf)
   (ht-find
@@ -56,7 +57,8 @@
      buffer-filename
      buffer-name &rest args)
   (let ((do-it
-         (lambda() (apply fn file-version buffer-filename buffer-name args))))
+         (lambda() (apply fn file-version buffer-filename buffer-name args)))
+        )
 
     (if (or (not buffer-filename) (equal buffer-filename ""))
         ;; if not visiting a file, do everything normally, as we don't have a
@@ -77,8 +79,21 @@
         ;; save our dummy buffer for later...
         (message "Desktop: created dummy buffer '%s' for file '%s'" buf buffer-filename)
         (ht-set! desktop-lazy-restore-pending-buffers (f-canonical buffer-filename)
-                 (make-desktop-lazy-buffer :dummy-buffer buf
-                                           :restore-function do-it))
+                 (make-desktop-lazy-buffer
+                  :dummy-buffer buf
+                  :restore-function do-it
+                  :create-params
+
+                  ;; see `desktop-buffer-info' for description of the meaning of
+                  ;; this list: these are exactly the parameters to
+                  ;; `desktop-create-buffer' except that the first argument is
+                  ;; additionally the `uniquify-buffer-base-name'
+                  (append
+                   (list
+                    (with-current-buffer buf (uniquify-buffer-base-name))
+                    buffer-filename buffer-name)
+                   args))
+                 )
         )
       )))
 
@@ -86,7 +101,8 @@
   (if-let*
       (
        (filename (f-canonical filename))
-       (buf (desktop-lazy-buffer-dummy-buffer (ht-get desktop-lazy-restore-pending-buffers filename)))
+       (info (ht-get desktop-lazy-restore-pending-buffers filename))
+       (buf (desktop-lazy-buffer-dummy-buffer info))
        (buf-valid (buffer-live-p buf)) ;; the user may kill the buffer before its restored
        )
       (progn
@@ -100,7 +116,7 @@
 (defun my/check-restore-any-visible-windows(&rest _args)
   ;; find all visible windows, and if any is displaying one of our dummy buffers, fill that buffer now
   (dolist (wind (my/get-visible-windows))
-    (-let*
+    (-if-let*
         ((wind-buf (window-buffer wind))
          ((buf-fname buf-info) (my/find-desktop-lazy-restore-pending-buffer wind-buf))
          (mk-buf-act (desktop-lazy-buffer-restore-function buf-info))
@@ -124,8 +140,15 @@
   (setq desktop-lazy-restore-read-desktopfile-completed t)
   (my/check-restore-any-visible-windows))
 
+(defun my-around/desktop-buffer-info (fn buffer)
+  "Advice around 'desktop-buffer-info' which permits saving buffers to the desktop which were lazily loaded but never restored"
+  (-if-let ((buf-fp buf-info) (my/find-desktop-lazy-restore-pending-buffer buffer))
+      (desktop-lazy-buffer-create-params buf-info)
+    (funcall fn buffer)))
+
 (advice-add 'create-file-buffer :around #'my-around/create-file-buffer '((depth . -100)))
 (advice-add 'desktop-create-buffer :around #'my-around/desktop-create-buffer)
+(advice-add 'desktop-buffer-info :around #'my-around/desktop-buffer-info)
 (add-hook 'desktop-after-read-hook #'my/desktop-after-read-hook)
 (add-hook 'window-selection-change-functions #'my/check-restore-any-visible-windows)
 
