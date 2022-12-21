@@ -12,9 +12,13 @@
         which-key-idle-delay 2.5
         which-key-idle-secondary-delay 0.05
         which-key-show-early-on-C-h t
+        which-key-unicode-correction 2
         )
 
   (define-key global-map (kbd "C-h /") 'which-key-show-major-mode)
+
+  (defun add-strikethrough(s)
+    (add-to-faces s '(:strikethrough "black")))
 
   ;; adds some extra formatting to keybinds which are displaed by whichkey
   (define-advice which-key--format-and-replace
