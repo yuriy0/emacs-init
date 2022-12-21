@@ -118,3 +118,7 @@
   (solaire-default-face ((t (:background "grey93"))))
   ;; (solaire-default-face ((t (:background "orange"))))
   )
+
+;; better distinction for active window
+(set-face-attribute 'mode-line nil
+                    :background "#cce8ff")

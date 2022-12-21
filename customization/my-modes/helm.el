@@ -13,12 +13,10 @@
     :repo "merrickluo/helm-all-the-icons"))
 
   :config
-  (defun left-align-to-mm(i)
-    (propertize " " 'display `(space :align-to (+ left-fringe (,i . mm)))))
 
   (setq
-   helm-all-the-icons-separator (left-align-to-mm 10)
-   helm-all-the-icons-prefix (left-align-to-mm 4)
+   helm-all-the-icons-separator (left-align-to 10 'mm)
+   helm-all-the-icons-prefix (left-align-to 4 'mm)
    helm-all-the-icons-properties '(:height 0.93 :v-adjust -0.1))
 
   (define-advice helm-all-the-icons--get-icon
