@@ -132,6 +132,112 @@
 
   ;; helm mark ring & global mark ring actions which raise the buffer in its current tab
   ;; TODO
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; helm mark ring & global mark ring surrounding context
+  (defvar helm-mark-ring-context-lines 0)
+
+  (defvar helm-mark-ring-all-max-marker-location-length 20)
+
+  (defvar helm-mark-ring-map
+    (let ((map (make-sparse-keymap)))
+      (set-keymap-parent map helm-map)
+      (define-key map (kbd "C-=") 'helm-mark-ring-increment-context-lines)
+      (define-key map (kbd "C--") 'helm-mark-ring-decrement-context-lines)
+      map)
+    "Keymap for `helm-show-mark-ring'.")
+
+  (setf (alist-get 'keymap helm-source-global-mark-ring) helm-mark-ring-map)
+  (setf (alist-get 'keymap helm-source-mark-ring) helm-mark-ring-map)
+
+  (defun helm-mark-ring-increment-context-lines ()
+    (interactive)
+    (modf helm-mark-ring-context-lines (+ 1))
+    (helm-force-update nil (helm-get-current-source)))
+  (put 'helm-mark-ring-increment-context-lines 'no-helm-mx t)
+
+  (defun helm-mark-ring-decrement-context-lines ()
+    (interactive)
+    (when (> helm-mark-ring-context-lines 0)
+      (modf-v helm-mark-ring-context-lines it (- it 1))
+      (helm-force-update nil (helm-get-current-source))))
+  (put 'helm-mark-ring-decrement-context-lines 'no-helm-mx t)
+
+  (defun buffer-substring-with-context-at-point(a &optional b)
+    (let* ((b (or b a))
+           (context-start (line-beginning-position (+ (- a) 1)))
+           (line-start (line-beginning-position))
+           (line-end (line-end-position))
+           (context-end (line-end-position (+ 1 b))))
+      (list 
+       (buffer-substring context-start line-start)
+       (buffer-substring line-start line-end)
+       (buffer-substring line-end context-end)
+       )))
+
+
+  (defun my/helm-mark-ring-format-contents-at-point(marker is-global)
+    (with-current-buffer (marker-buffer marker)
+      (goto-char marker)
+      (-let*
+          (
+           (use-ctx (> helm-mark-ring-context-lines 0))
+           (ctx-brk (if use-ctx "\n" ""))
+           ((before line after) (buffer-substring-with-context-at-point helm-mark-ring-context-lines))
+           (line
+            (concat before
+                    (progn
+                      ;; when displaying the context, highlight the actual marked line
+                      (when use-ctx (add-face-text-property 0 (length line) '(:background "orange") nil line))
+                      line)
+                    after))
+           )
+        (remove-text-properties 0 (length line) '(read-only) line) 
+        (if is-global
+            (concat
+             ;; display the buffer and marker (line number) with its own
+             ;; face; and truncated to some prespecified width;
+             (propertize
+              (truncate-string-to-width
+               (format
+                "%d:%s"
+                (line-number-at-pos) (marker-buffer marker))
+               (- helm-mark-ring-all-max-marker-location-length 1))
+              'face '(italic underline))
+
+             ;; when NOT showing context, insert alignment so that buffer
+             ;; contents starts at the same column. when showing context,
+             ;; just start a newline
+             (if use-ctx "\n"
+               (concat
+                (align-to `(+ left-margin ,helm-mark-ring-all-max-marker-location-length))
+                ":"
+                ))
+
+             ;; the actual buffer contents
+             line)
+
+          ;; for buffer mark ring, display only the buffer contents
+          ;; note that the display of the marker itself is handled elsewhere in this case
+          (format "%s%s" ctx-brk line))
+        )))
+
+  (define-advice helm-global-mark-ring-format-buffer
+      (:override (m) my)
+    (my/helm-mark-ring-format-contents-at-point m t))
+
+  (define-advice helm-mark-ring-line-string-at-pos
+      (:override (m) my)
+    (my/helm-mark-ring-format-contents-at-point m nil))
+
+  ;; (advice-remove 'helm-mark-ring-line-string-at-pos 'helm-mark-ring-line-string-at-pos@my)
+
+  (setf (alist-get 'multiline helm-source-global-mark-ring) t)
+  (setf (alist-get 'multiline helm-source-mark-ring) t)
+
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; helm M-x toggle option to show only keybound commands
   (defvar helm-M-x-show-only-with-keybinds nil)

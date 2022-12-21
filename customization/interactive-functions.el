@@ -579,3 +579,31 @@ Returns a list `(ERRORCODE STDOUTANDERR)'"
                  ,@args)
      ))
 
+
+;;;###autoload
+(defun add-to-faces(s &rest fs)
+  "Adds the given list of face attributes FS, as applicable to
+  the 'face property as given in \"Properties with Special
+  Meanings\", to the object S"
+  (add-text-properties 0 (length s)
+                       `(face ,(append fs
+                                     (get-text-property 0 'face s))
+                                     )
+                       s)
+  s)
+
+(defun align-to (spec)
+  "Returns an :align-to space with the given spec"
+  (propertize " " 'display `(space :align-to ,spec)))
+
+
+(defun left-align-to(amount &optional unit)
+  "Returns a space which will be aligned the given distance from
+the left fringe. See 'Pixel Specification for Spaces' for details."
+  (propertize " " 'display `(space :align-to (+ left-fringe
+                                                ;; (,amount . ,(or unit 'width))
+                                                ,(if unit
+                                                     `(,amount . ,unit)
+                                                   amount
+                                                   )
+                                                ))))
