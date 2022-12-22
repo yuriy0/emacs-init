@@ -1,6 +1,6 @@
 ;; lsp for javascript & typescript
 (use-package lsp-javascript
-  :ensure
+  :ensure lsp-mode
   :defer t ;; this is actually loaded by the appropriate major mode
 
   :config
