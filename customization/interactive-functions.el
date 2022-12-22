@@ -613,3 +613,32 @@ the left fringe. See 'Pixel Specification for Spaces' for details."
   (interactive "r")
   (let ((inhibit-read-only t))
     (remove-text-properties begin end '(read-only t))))
+
+
+;;;###autoload
+(defun demo-show-fonts()
+  "Show all fonts available to emacs"
+  (interactive)
+  (with-current-buffer-window "*demo-show-fonts*" nil nil
+    (local-set-key [?q] 'kill-buffer-and-window)
+    (switch-to-buffer-other-window (current-buffer))
+    (let (
+          (alphabet
+            (apply #'string (cl-loop for i from 0 to 25 collect (+ 65 i))))
+          )
+      (--each
+          (-distinct (-sort #'string< (font-family-list)))
+        (insert
+         (propertize it 'face `(:family ,it))
+         (left-align-to 50)
+         (propertize alphabet 'face `(:family ,it))
+         )
+        (insert
+         (left-align-to 100)
+         (format "%s" (with-current-buffer "*demo-show-fonts*" (describe-char-display (- (point-max) 2) nil)))
+         "\n"
+         )
+        )
+      )
+    )
+  )
