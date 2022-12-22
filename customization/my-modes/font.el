@@ -2,6 +2,10 @@
 (add-to-list 'default-frame-alist '(width . 85))
 (add-to-list 'default-frame-alist '(font . "Iosevka Extended 11"))
 
+;; default font used here (Courier) is a raster font (ugly)
+(custom-set-faces
+ '(fixed-pitch ((t (:family "Liberation Mono" :height 110)))))
+
 (use-package all-the-icons
   :ensure
   :defer t ;; note: loading this only if making a GUI frame
@@ -89,6 +93,8 @@
   ;; configures this variable in advice to load-theme.
   (setq solaire-mode--supported-p t)
 
+  (setq solaire-ignored-major-modes '(eshell-mode))
+
   ;; customization for what is considered a "real" buffer here
   (defun my/solaire-mode-real-buffer-p()
     (let*
@@ -100,6 +106,9 @@
       (or
        ;; don't modify minibuffer
        (minibufferp buf)
+
+       ;; don't modify some major modes
+       (memq (mode-of-buffer buf) solaire-ignored-major-modes)
 
        ;; don't modify faces for transient buffers, like helm buffers. they
        ;; arent file-visiting buffers, but they typically have their own color
