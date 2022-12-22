@@ -39,7 +39,9 @@
   ;; don't rebind some keys...
   (setq eshell-rebind-keys-alist
         (--remove (member (car it)
-                          '([home] [backspace] [delete]))
+                          '([home] [backspace] [delete]
+                            [(control 97)]
+                            [(control 119)]))
                   eshell-rebind-keys-alist))
 
   ;; additional keybinds which move point but should not move into the prompt string
