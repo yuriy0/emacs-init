@@ -201,17 +201,17 @@ the same window)."
 ;; For rationale, see:
 ;;   https://www.gnu.org/software/emacs/manual/html_node/tramp/Windows-setup-hints.html#Windows-setup-hints 
 ;;   https://www.emacswiki.org/emacs/SshWithNTEmacs
-;; (cond
-;;   ( (not (executable-find "fakecygpty"))
-;;     (message "Skipping 'fakecygpty' since 'fakecygpty.exe' not found on path")
-;;   )
-;;   (t (progn
-;;        (add-to-list 'load-path "~/.emacs.d/fakecygpty")
-;;        (require 'fakecygpty)
-;;        (fakecygpty-activate)
-;;      )
-;;   )
-;; )
+(cond
+  ( (not (executable-find "fakecygpty"))
+    (message "Skipping 'fakecygpty' since 'fakecygpty.exe' not found on path")
+  )
+  (t (progn
+       (add-to-list 'load-path "~/.emacs.d/fakecygpty")
+       (require 'fakecygpty)
+       (fakecygpty-activate)
+     )
+  )
+)
 
 ;; (eval-after-load "tramp"
 ;;   '(progn
