@@ -29,32 +29,70 @@ Does not compare equality predicates."
   nil
 )
 
-
-
-(defun my/lsp-diagnostic-get-origin-range (diag)
+(defun lsp-diagnostic-get-related-info (diag)
+  "Get the first 'related info' field of an LSP diagnostic"
   (if-let (
            (diag-related-infos (lsp:diagnostic-related-information? diag))
            (at-least-1 (> (length diag-related-infos) 0))
-           (diag-related-info0 (aref diag-related-infos 0))
-           (rel-info-msg (or (lsp:diagnostic-related-information-message diag-related-info0) t))
-           (diag-msg-is-orign (equal rel-info-msg "original diagnostic"))
+           )
+      (aref diag-related-infos 0)))
+
+(defun lsp-diagnostic-get-origin-range (diag)
+  "Get the 'location range' field of the first 'related info' field of an LSP diagnostic."
+  (if-let (
+           (diag-related-info0 (lsp-diagnostic-get-related-info diag))
            )
       (lsp:location-range
-       (lsp:diagnostic-related-information-location diag-related-info0)
-       )
-  ))
+       (lsp:diagnostic-related-information-location diag-related-info0))))
 
+(defun lsp-sideline-companions-rust-diagnostic-is-companion (_ diag)
+  (if-let ((diag-related-info (lsp-diagnostic-get-related-info diag)))
+      (and (equal (lsp:diagnostic-related-information-message diag-related-info) "original diagnostic")
+           (lsp:location-range (lsp:diagnostic-related-information-location diag-related-info)))))
+
+(defcustom lsp-sideline-companions-show-diagnostic-as-companion-by-major-mode
+  '(
+    (rustic-mode . lsp-sideline-companions-rust-diagnostic-is-companion)
+    (rust-mode . lsp-sideline-companions-rust-diagnostic-is-companion)
+    )
+  "Alist which maps buffer major modes to a predicate which
+determines if an LSP diagnostic in that buffer should be treated
+as a \"companion\".
+
+Companions are not displayed in the sideline by
+`lsp-ui-sideline-mode'. Instead, they are displayed under their
+corresponding source locations whenever the point is on the
+related error.
+
+Each predicate should return either `nil' to indicate that this
+diagnostic should not be treated specially; or `t' to treat it as
+a companion (in which case it this diagnostic should have a
+\"related info\" property, and the location range of that related
+info is used as the related error); or a LSP diagnostic range to
+treat it as a companion (in which case the returned value
+identifies the related error).
+"
+  :local t)
 
 ;;;###autoload
-(defun my/lsp-diagnostics-rust-partition-associated-message (all-diags diag)
-  (require 'yaml)
-  (if-let (
-           (diag-origin-range (my/lsp-diagnostic-get-origin-range diag))
-           )
-      (progn
-        (push (list diag-origin-range diag) my/lsp-associated-overlays)
-        nil)
-    t))
+(defun my/lsp-diagnostics-partition-associated-message (filter-fn all-diags diag)
+  (pcase (funcall filter-fn all-diags diag)
+    (`t
+     (if-let ((range (my/lsp-diagnostic-get-origin-range diag)))
+         (progn
+           (push (list range diag) my/lsp-associated-overlays)
+           nil)
+       (message "Internal error: lsp-sideline-companions-show-diagnostic-as-companion-by-major-mode returned `t' for a diagnostic without an origin range")
+       t
+       )
+     )
+
+    ((and res (pred lsp-range?))
+     (push (list res diag) my/lsp-associated-overlays)
+     nil)
+
+    (`nil
+     t)))
 
 
 ;;;###autoload
@@ -66,10 +104,15 @@ CALLBACK is the status callback passed by Flycheck."
   (remove-hook 'lsp-on-idle-hook #'lsp-diagnostics--flycheck-buffer t)
   (my/lsp-diagnostics-pre-send-to-flycheck)
 
-  (let ((diags (lsp--get-buffer-diagnostics)))
+  (let* (
+         (diags (lsp--get-buffer-diagnostics))
+         (mode major-mode)
+         (filter-fn (alist-get mode lsp-sideline-companions-show-diagnostic-as-companion-by-major-mode))
+        )
     (setq my/lsp-all-buffer-diags diags)
-    (->> diags
-         (-filter (-partial #'my/lsp-diagnostics-rust-partition-associated-message diags))
+    (->> (if filter-fn
+             (-filter (-partial #'my/lsp-diagnostics-partition-associated-message filter-fn diags) diags)
+           diags)
          (-map (-lambda ((&Diagnostic :message :severity? :tags? :code? :source?
                                       :range (&Range :start (&Position :line      start-line
                                                                        :character start-character)
