@@ -5,7 +5,13 @@
 [submodule "fakecygpty"]
 	path = fakecygpty
 	url = https://github.com/d5884/fakecygpty
+
 [submodule "lisp-pkg/lsp-treemacs"]
 	path = lisp-pkg/lsp-treemacs
 	url = https://github.com/yuriy0/lsp-treemacs
+	branch = master
+
+[submodule "lisp-pkg/treesitter-grammar-ensure"]
+	path = lisp-pkg/treesitter-grammar-ensure
+	url = https://github.com/yuriy0/treesitter-grammar-ensure
 	branch = master
