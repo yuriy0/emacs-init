@@ -1,5 +1,10 @@
 ;; -*- lexical-binding: t; -*-
 
+(defface lsp-inlay-face
+  '((t :inherit font-lock-comment-face))
+  "The face to use for LSP inlays."
+  :group 'lsp-faces)
+
 (use-package lsp-mode
   :ensure
   :commands (lsp lsp-deferred)
@@ -60,6 +65,14 @@
 
   ;;   (advice-add 'lsp-f-canonical :override #'my/lsp-f-canonical))
 
+  :custom-face
+  (lsp-inlay-face ((t (:height 0.8 :slant italic :foreground "pale violet red" :inherit font-lock-comment-face))))
+
+  (lsp-javascript-inlay-face
+   ((t :inherit lsp-inlay-face)))
+
+  (lsp-rust-analyzer-inlay-face
+   ((t :inherit lsp-inlay-face)))
   )
 
 (use-package eldoc
