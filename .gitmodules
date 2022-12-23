@@ -15,3 +15,15 @@
 	path = lisp-pkg/treesitter-grammar-ensure
 	url = https://github.com/yuriy0/treesitter-grammar-ensure
 	branch = master
+[submodule "lisp-pkg/desktop-lazy-read"]
+	path = lisp-pkg/desktop-lazy-read
+	url = https://github.com/yuriy0/desktop-lazy-read
+	branch = master
+[submodule "lisp-pkg/lsp-preview-text-edits"]
+	path = lisp-pkg/lsp-preview-text-edits
+	url = https://github.com/yuriy0/lsp-preview-text-edits
+	branch = master
+[submodule "lisp-pkg/lsp-ui-sideline-companions"]
+	path = lisp-pkg/lsp-ui-sideline-companions
+	url = https://github.com/yuriy0/lsp-ui-sideline-companions
+	branch = master
