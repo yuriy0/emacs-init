@@ -40,9 +40,9 @@
     ;; '("*scratch*" "*Messages*")
     "List of buffer names kept by `my-tab-bar-create'.")
 
-  (defun my/tab-bar-new-tab-after ()
+  (defun my/tab-bar-new-tab-after (&rest _args)
     (when tab-bar-new-tab-choice ;; this variable is set to nil when explicitly cloning an existing tab
-      (let ((visible-buffers (helm-buffers-get-visible-buffers)))
+      (let ((visible-buffers (get-visible-buffers)))
         (filter-buffer-list-frame-parameters
          nil
          (lambda (buffer)
@@ -111,6 +111,14 @@ information for the current tab as well"
      )
    (tab-bar-tabs frame)))
 
+(defun get-visible-buffers ()
+  "Returns buffers visibles on current frame."
+  (let (result)
+    (walk-windows
+     (lambda (x)
+       (push (window-buffer x) result))
+     nil 'visible)
+    result))
 
 ;;;###autoload
 (defun tab-bar-tab-visible-buffers (tab)
