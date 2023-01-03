@@ -642,3 +642,29 @@ the left fringe. See 'Pixel Specification for Spaces' for details."
       )
     )
   )
+
+
+(defvar last-backtrace nil)
+
+;;;###autoload
+(defun not-is-my-debugger-frame-info(x)
+  (not (s-starts-with-p "my-debugger" (s-trim-left x))))
+
+;;;###autoload
+(defun my-debugger (&rest args)
+  (setq last-backtrace
+        (-drop-while #'not-is-my-debugger-frame-info
+                     (s-lines (backtrace-to-string))))
+  (message "BACKTRACE from %S:\n%s" args (s-join "\n" last-backtrace)))
+
+(let ((prev-debugger nil))
+  (defun toggle-my-debugger()
+    (interactive)
+    (if prev-debugger
+        (setq debugger prev-debugger
+              debug-on-error nil
+              prev-debugger nil)
+      (setq prev-debugger debugger
+            debugger #'my-debugger
+            debug-on-error t))))
+
