@@ -126,6 +126,13 @@
   (advice-add 'lsp-ui-sideline--align :override #'my/lsp-ui-sideline--align)
   (advice-add 'lsp-ui-sideline--compute-height :override #'my/lsp-ui-sideline--compute-height)
 
+  ;; bug: this face is referenced but not defined???
+  (when (not (facep 'lsp-flycheck-warning-unnecessary))
+    (defface lsp-flycheck-warning-unnecessary
+      '((t :inherit warning))
+      "???"
+      :group 'lsp-faces))
+
   :custom-face
   (lsp-modeline-code-actions-preferred-face ((t (:foreground "dark goldenrod"))))
 
