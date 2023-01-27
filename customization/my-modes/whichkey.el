@@ -55,6 +55,9 @@
                 ))
 
   (with-eval-after-load 'repeat
+    ;; need this for setf expansion on `cl-defstruct which-key--pages'
+    (eval-and-compile (require 'which-key))
+
     ;; taken from https://karthinks.com/software/it-bears-repeating/
     ;;
     ;; Disable the built-in repeat-mode hinting, instead spawn a which-key popup
@@ -96,5 +99,3 @@
     (advice-add 'repeat-post-hook :after #'repeat-help--which-key-popup)
   )
 )
-
-

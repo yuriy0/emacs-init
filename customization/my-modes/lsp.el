@@ -110,6 +110,7 @@
   (lsp-ui-sideline-show-hover nil)
   (lsp-ui-sideline-show-diagnostics t)
   (lsp-ui-doc-show-with-mouse nil) ;; causes massive flicker on the taskbar, even when no keybinds/handlers registered?
+  (lsp-signature-render-documentation nil) ;; way too intrusive, we can use -ui-doc-show to great effect
 
   :config
 
@@ -128,11 +129,11 @@
   (advice-add 'lsp-ui-sideline--compute-height :override #'my/lsp-ui-sideline--compute-height)
 
   ;; bug: this face is referenced but not defined???
-  (when (not (facep 'lsp-flycheck-warning-unnecessary))
-    (defface lsp-flycheck-warning-unnecessary
-      '((t :inherit warning))
-      "???"
-      :group 'lsp-faces))
+  ;; (when (not (facep 'lsp-flycheck-warning-unnecessary))
+  ;;   (defface lsp-flycheck-warning-unnecessary
+  ;;     '((t :inherit warning))
+  ;;     "???"
+  ;;     :group 'lsp-faces))
 
   :custom-face
   (lsp-modeline-code-actions-preferred-face ((t (:foreground "dark goldenrod"))))
