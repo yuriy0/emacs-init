@@ -25,7 +25,8 @@
   (lsp-idle-delay 0.6)
 
   ;; after changes clear diagnostics since they will usually refer to invalid line/column numbers
-  (lsp-diagnostic-clean-after-change t)
+  ;; NOTE: invalid line/columns on errors fixed in `lsp-ui-sideline-companions'
+  ;; (lsp-diagnostic-clean-after-change t)
 
   ;; don't execute an action automatically when its the only one
   (lsp-auto-execute-action nil)
