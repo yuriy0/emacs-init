@@ -483,3 +483,53 @@
 
   :config
 )
+
+(use-package helm-company
+  ;; :disabled
+  :after (:all helm company)
+  :bind
+  (:map company-active-map
+        ("C-/" . helm-company))
+
+  :config
+  (defvar company-candidates)
+  (defvar company-backend)
+  (defvar company-common)
+  (defvar company-prefix)
+  (defvar company-point)
+
+  (define-advice helm-company-action-insert
+      (:around (fn &rest args) my)
+    (let ((company-point (or company-point (point))))
+      (apply fn args)))
+
+  (define-advice company-post-command
+      (:around (fn &rest args) my)
+    (if (and
+         company-point
+         (not (memq this-command
+                    '(helm-maybe-exit-minibuffer))))
+      (apply fn args)))
+
+  ;; (defun helm-company-show-doc-buffer (candidate)
+  ;;   "Temporarily show the documentation buffer for the CANDIDATE."
+  ;;   (interactive)
+  ;;   (let* ((selection (cl-find-if (lambda (s) (string-match-p candidate s)) helm-company-candidates))
+  ;;          (buffer (let ((company-auto-update-doc t))
+  ;;                    (helm-company-call-backend 'doc-buffer selection))))
+  ;;     (when buffer
+  ;;       (if (and helm-company-help-window
+  ;;                (window-live-p helm-company-help-window))
+  ;;           (with-selected-window helm-company-help-window
+  ;;             (helm-company-display-document-buffer buffer))
+  ;;         (setq helm-company-help-window
+  ;;               (helm-company-display-document-buffer buffer))))))
+
+  (defun helm-company-display-document-buffer (buffer)
+    "Temporarily show the documentation BUFFER."
+    (with-current-buffer buffer
+      (goto-char (point-min)))
+    (display-buffer buffer
+                    '((display-buffer-same-window)
+                      (display-buffer-reuse-window))))
+)
