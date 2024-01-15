@@ -81,6 +81,7 @@
         history-delete-duplicates t            ; dont put duplicate commands in the command history
 
         helm-buffers-maybe-switch-to-tab t
+        helm-move-to-line-cycle-in-source nil   ; allows arrow down key to navigate between sources
    )
 
   (when (system-type-windowslike-p)
