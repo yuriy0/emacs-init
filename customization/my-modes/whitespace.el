@@ -34,7 +34,7 @@
     (set-face-attribute 'whitespace-trailing nil
        :background "bisque")
     (set-face-attribute 'whitespace-line nil
-       :foreground nil
+       :foreground 'unspecified
        :background "RosyBrown1")))
 
   ;; cleanup whitespace before saving

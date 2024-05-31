@@ -307,3 +307,12 @@
   (with-eval-after-load 'helm-lsp
     (advice-add 'helm-lsp-code-actions :override #'helm-lsp-code-actions-with-preview))
 )
+
+
+
+(defface lsp-flycheck-warning-unnecessary
+  '((t
+     :foreground "black"
+     ))
+  "Random face which is referenced by LSP but not defined??"
+  :group 'lsp-ui)
