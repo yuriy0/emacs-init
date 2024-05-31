@@ -175,11 +175,14 @@
 
 (defvar lsp-ui-sideline-height-mult 0.8 "Relative line hieght of lsp-ui-sideline text")
 
+(defun my/get-text-scale()
+  (or (plist-get (cdar text-scale-mode-remapping) :height) 1))
+
 (defun my/lsp-ui-sideline--align (len margin)
   "Align sideline string by LENGTHS from the right of the window."
   (+ margin
      (if (display-graphic-p) 1 2)
-     (* lsp-ui-sideline-height-mult len)
+     (* lsp-ui-sideline-height-mult len (my/get-text-scale))
      ))
 
 (defun my/lsp-ui-sideline--compute-height ()
