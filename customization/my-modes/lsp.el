@@ -309,10 +309,17 @@
 )
 
 
+;;;; See https://github.com/emacs-lsp/lsp-mode/issues/4056
+;;;; These fixes don't actually work though and cause additional errors
 
-(defface lsp-flycheck-warning-unnecessary
-  '((t
-     :foreground "black"
-     ))
-  "Random face which is referenced by LSP but not defined??"
-  :group 'lsp-ui)
+;; (defface lsp-flycheck-warning-unnecessary
+;;   '((t
+;;      :foreground "black"
+;;      ))
+;;   "Random face which is referenced by LSP but not defined??"
+;;   :group 'lsp-ui-sideline)
+
+;; (defface lsp-flycheck-info-unnecessary
+;;   '((t))
+;;   "Random face which is referenced by LSP but not defined??"
+;;   :group 'lsp-ui-sideline)
