@@ -70,6 +70,8 @@
 )
 
 (use-package highlight-indent-guides
+  :disabled ;; DISABLED because its buggy as hell, causes misalignemnt ?
+
   :ensure
   :hook ((prog-mode . highlight-indent-guides-mode))
   :diminish highlight-indent-guides-mode
@@ -80,6 +82,17 @@
         'bitmap ;; slower but less buggy
         )
   (setq highlight-indent-guides-responsive 'stack)
+)
+
+;; Better version of highlight-indent-guides
+(use-package indent-guide
+
+  :ensure
+  :hook ((prog-mode . indent-guide-mode))
+
+  :config
+  (setq indent-guide-char "·") ;; cdot (unicode middle dot)
+  (set-face-foreground 'indent-guide-face "#b3af50")
 )
 
 (use-package solaire-mode
