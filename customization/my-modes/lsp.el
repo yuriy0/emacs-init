@@ -286,16 +286,17 @@
 )
 
 
-(use-package lsp-ui-sideline-companions
-  :after (lsp-ui)
-  :load-path "lisp-pkg/lsp-ui-sideline-companions"
-  :config
+;; (use-package lsp-ui-sideline-companions
+;;   :after (lsp-ui)
+;;   :load-path "lisp-pkg/lsp-ui-sideline-companions"
+;;   :config
+;;   :disabled
 
-  (add-hook 'lsp-ui-sideline-mode-hook
-            (lambda()
-              (lsp-ui-sideline-companions-mode (if lsp-ui-sideline-mode 1 -1)))
-            )
-)
+;;   (add-hook 'lsp-ui-sideline-mode-hook
+;;             (lambda()
+;;               (lsp-ui-sideline-companions-mode (if lsp-ui-sideline-mode 1 -1)))
+;;             )
+;; )
 
 (use-package lsp-preview-text-edits
   :after (lsp-mode)
